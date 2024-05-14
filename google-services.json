@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "827564940238",
+    "project_id": "app-stng",
+    "storage_bucket": "app-stng.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:827564940238:android:2437bbcbcee5ceaed7e99f",
+        "android_client_info": {
+          "package_name": "io.ionic.stng"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "827564940238-hk1ln1o1dl6rn7igr6c2n1i141qb7ud1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKrOSB7_tujGItXpODi8-OoZo2i_b3FQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "827564940238-hk1ln1o1dl6rn7igr6c2n1i141qb7ud1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "827564940238-t2tajaf6mgeauo16iiq6ks4hd06tfhrq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.stng"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

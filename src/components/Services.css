@@ -1,0 +1,90 @@
+.s-photo {
+    cursor: pointer;
+    background-color: #3880f0;
+    width:  4em;
+    height: 4em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.s-card {
+    color:  #3f64a9;
+}
+
+.s-photo-1 {
+    cursor: pointer;
+    background-color: #3880f0;
+    width:  4em;
+    height: 4em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.s-content {
+    position: absolute;
+    top: 10em;
+    width: 100%;
+    height: calc(100% - 120px);
+}
+
+.react-dadata__input{
+    font-size:12px !important;
+    border:1px solid #3f64a9;
+    border-radius:10px;
+    color: #3f64a9;
+    background-color: white;
+}
+
+.react-dadata__suggestions {
+    color: #3f64a9 !important;
+}
+
+.a-chip {
+    color: white;
+    background-color:  #3f64a9;
+}
+
+
+ion-popover {
+    --offset-x: -2em !important;
+    --width:  80vw !important;
+}
+
+.select-text {
+    white-space: normal !important;
+}
+
+.sbl-item {
+    margin-bottom: 1em; 
+    margin-left: 2em;
+    color:  #3880f0;
+    margin-top: 0.5em;
+    
+}
+.sbl-disabled {
+    margin-bottom: 1em; 
+    margin-left: 2em;
+    color:  gray;
+    margin-top: 1em;
+    
+}
+
+.sbl-selected {
+    border-bottom: 1px solid silver;
+}
+
+.f-content {
+    height: calc(100% - 6em);
+}
+
+.m-stack {
+    position: absolute;
+    left: 2em;
+    top: 3em;
+    background-color: white;
+    z-index: 999;
+}

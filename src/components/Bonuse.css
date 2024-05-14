@@ -1,0 +1,14 @@
+
+.b-card{
+    margin-top: 1em;
+    background-image: url("../../public/assets/img/bonuscard.png");  
+    background-size: contain;
+    height: 10.6em; 
+    border-radius: 5px;
+}
+
+.b-number {
+    position: absolute;
+    bottom: 2em;
+    right: 3em;
+}

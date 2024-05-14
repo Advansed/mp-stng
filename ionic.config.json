@@ -1,0 +1,7 @@
+{
+  "name": "mp-stng-lk",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

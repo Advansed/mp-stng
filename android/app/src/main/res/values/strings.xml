@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">СТНГ</string>
+    <string name="title_activity_main">СТНГ</string>
+    <string name="package_name">io.ionic.stng</string>
+    <string name="custom_url_scheme">io.ionic.stng</string>
+</resources>

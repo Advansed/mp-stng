@@ -1,0 +1,63 @@
+
+.n-btn-wrapper {
+
+    display: flex;
+    width: inherit;
+    flex-grow: 1;
+    justify-content: space-between;
+    background: #268FCC;
+    border-radius: 25px;
+    flex-wrap: wrap;
+    padding-right: 2px;
+    position: sticky;
+    z-index: 1000;
+    top: 5px;
+
+}
+
+.n-button {
+
+    --border-radius: 25px;
+    height: 45px;
+    --background: linear-gradient(91.35deg, #1C7AB1 1.84%, #10407D 101.1%);  
+    --background-activated: linear-gradient(270.1deg,
+        #94e4e2 -21.62%,
+        #0994da 49.87%,
+        #9eebe9 119.88%);
+
+  }
+
+
+  .n-outline {
+
+    --background: #ffffff00;
+    --border-width: 1px;
+    --border-color: #0378b4;
+    --border-style: solid;
+
+  }
+  
+  .n-outline ion-text {
+
+    color: #0378b4;
+
+  }
+  
+  .n-backgroundGrey {
+
+    --background: #268FCC;
+  
+  }
+  
+  .n-backgroundGrey ion-text {
+
+    color: #8BD4FF;
+
+  }
+  
+  .lightBlue {
+
+    --background: linear-gradient(89.74deg, #75E2E4 -0.72%, #2AA0DC 49.53%, #75E2E4 99.77%);
+  
+  }
+  
