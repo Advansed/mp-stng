@@ -1,5 +1,5 @@
 import React, { useEffect, useState }        from 'react';
-import { IonAlert, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg, IonMenuButton, IonPage, IonTabBar, IonTabButton } from '@ionic/react';
+import { IonAlert, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg, IonMenuButton, IonPage, IonTabBar, IonTabButton, isPlatform } from '@ionic/react';
 import { useHistory, useParams, useLocation } from 'react-router';
 import './Page.css';
 import { Lics }     from '../components/Lics';
@@ -157,7 +157,8 @@ const hist  = useHistory();
             role: 'confirm',
             handler: () => {
               console.log('Обновить');
-              window.open("https://play.google.com/store/apps/details?id=io.ionic.stng")
+              if(isPlatform("android"))
+                window.open("https://play.google.com/store/apps/details?id=io.ionic.stng")
             },
           },
         ]}

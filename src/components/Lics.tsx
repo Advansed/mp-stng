@@ -44,7 +44,10 @@ export function Lics() {
     } })
 
     Store.subscribe({num : 22, type: "lics", func: ()=>{
+        console.log( "lics" )
         setInfo( Store.getState().lics )
+        console.log( Store.getState().lics )
+        setUpd( upd + 1)
     } })
 
     function Items(){
@@ -993,17 +996,13 @@ export function Lics() {
             async function load(){
                 setLoad( true)
                 const res = await getData("SBOL", page )
-                console.log("sber deep link")
-                console.log( res.data.externalParams.sbolInactive )
                 if(res.error){ 
                     setMessage( res.message)
                     setPage(0)
                 } else {
                     if( page.type === "SberPay"){
                         window.open( res.data.externalParams.sbolDeepLink,  "_system" )
-                        console.log("after open")
-                        console.log( res.data.externalParams.sbolInactive )
-                            }
+                    }
                     else setInfo( res.data )
                 }
                 setLoad( false )
@@ -1036,6 +1035,152 @@ export function Lics() {
         return elem
     }
 
+    function Counter(props:{ info }){
+        const [ mode, setMode ]         = useState( false )
+        const [ avail, setAvail ]       = useState( 0 )
+        const [ bord ]    = useState( Store.getState().login.borders )
+        const [ upd1, setUpd1 ] = useState( 0 )
+
+        function monthDiff(dateFrom, dateTo) {
+            let months = dateTo.getMonth() - dateFrom.getMonth() + 
+              (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
+            
+            if( dateFrom.getDate() > dateTo.getDate() ) months = months - 1
+
+            return months
+        }
+           
+        useEffect(()=>{
+
+            console.log( "use")
+            const date = new Date()
+            let d     = date.getDate().toString(); if(d.length === 1) d =  "0" + d;
+            let m     = (date.getMonth() + 1).toString(); if(m.length === 1) m =  "0" + m;
+            const y   = date.getFullYear().toString()
+
+            console.log(info.predPeriod)
+            const pred = new Date( info.predPeriod.substring(6, 10)  + "-" + info.predPeriod.substring(3, 5) + "-" + info.predPeriod.substring(0, 2) )
+            console.log(pred)
+            console.log(date)
+
+            if( pred.getFullYear() === date.getFullYear() && pred.getMonth() === date.getMonth() ) setAvail( 1 )     
+            else if( monthDiff(pred, date) > 3 ) setAvail( 2 )
+            else {
+                if( bord.from < bord.to ){
+                    if(date.getDate() < bord.from || date.getDate() > bord.to) setAvail(  3 )
+                } else {
+                    if(date.getDate() > bord.to || date.getDate() < bord.from ) setAvail(  3 )
+                }
+            }
+        
+            page.current = d + "." + m + "." + y
+            
+        },[])
+
+        const info = props.info
+
+        async function lload(){
+            await getLics({ token: Store.getState().login.token })     
+            info.predIndice = info.indice
+            info.predPeriod = info.period
+            info.indice = 0; info.period = ""
+            console.log("lload")
+            setAvail( 4 )
+        }
+
+        const elem = <>
+            <div className='flex fl-space cl-prim'>
+                <div> <b> { info.name  } </b></div>
+            </div>
+            <div className='flex fl-space mt-1 ml-1 cl-prim'>
+                <div> { "Дата показания"  }</div>
+                <div> <b>{ info.predPeriod }</b> </div>
+            </div>
+            <div className='flex fl-space mt-1 ml-1 cl-prim'>
+                <div> { "Показание"  }</div>
+                <div className='fs-11'> <b>{ info.predIndice }</b> </div>
+            </div>
+            {
+                avail === 1
+                    ? <>
+                        <div className='ml-1 mt-2 fs-09 pb-1'>
+                            <b>Показания уже приняты</b>                            
+                        </div>
+                    </>
+                : avail === 2
+                    ? <>
+                        <div className='ml-1 mt-2 fs-09 pb-1'
+                            onClick={()=>{
+                                Store.dispatch({type: "route", route: "services"})
+                            }}
+                        >
+                            <b>Нарушен срок подачи показаний, в разделе услуги вам необходимо оформить</b>                            
+                            <b className='cl-prim fs-11'>{ " Вызов инспектора" }</b>                            
+                        </div>
+                    </>
+                : avail === 3 
+                    ? <>
+                        <div className='ml-1 mt-2 fs-09 pb-1'>
+                            <b>Показания передаются в период 20 по 25 числа</b>                            
+                        </div>
+                    </>
+                : avail === 4
+                    ? <>
+                        <div className='ml-1 mt-2 fs-09 pb-1'>
+                            <b>Показания приняты</b>                            
+                        </div>
+                    </>
+                : <>
+                    <div className='flex fl-space mt-1 ml-1 cl-prim'>
+                        <div> { "Передать"  }</div>
+                        <div className='s-input a-right'> 
+                            <IonInput
+                                className='s-input-1'
+                                placeholder='Показание'
+                                onIonInput={(e)=>{
+                                    info.indice = parseInt(e.detail.value as string)
+                                    info.period = page.current
+                                    if(info.indice > info.predIndice && (info.indice - info.predIndice) < 999 ) setMode(true);
+                                    else setMode(false);
+
+                                }}
+                            />
+                        </div>
+                    </div>
+                </>
+            }
+            {
+                mode 
+                    ? <>
+                        <div className='mt-1'>
+                            <IonButton
+                                color = "tertiary"
+                                expand='block'
+                                mode = "ios"
+                                onClick={()=>{
+                                    async function load(){
+                                        const res = await getData("setIndications", page )
+                                        console.log(res)
+                                        if(!res.error){
+                                            lload()
+                                        }
+                                    }
+                                    load()                                       
+                                }}
+                            >   
+                                { "Отправить показания" }
+                            </IonButton>        
+
+                        </div>
+                    </>
+                    : <></>
+                }
+
+        </>
+
+        return elem
+    }
+
     function Indication(){
         const [ upd, setUpd ] =useState( 0 )
         let items = <></>
@@ -1043,66 +1188,7 @@ export function Lics() {
 
             items = <>
                 { items }
-                <div className='flex fl-space cl-prim'>
-                    <div> <b> { page.counters[i].name  } </b></div>
-                </div>
-                <div className='flex fl-space mt-1 ml-1 cl-prim'>
-                    <div> { "Срок поверки"  }</div>
-                    <div> <b>{ page.counters[i].period }</b> </div>
-                </div>
-                <div className='flex fl-space mt-1 ml-1 cl-prim'>
-                    <div> { "Показание"  }</div>
-                    <div className='fs-12'> <b>{ page.counters[i].indication }</b> </div>
-                </div>
-                <div className='flex fl-space mt-1 ml-1 cl-prim'>
-                    <div> { "Передать"  }</div>
-                    <div className='s-input a-right'> 
-                        <IonInput
-                            className='s-input-1'
-                            placeholder='Показание'
-                            onIonInput={(e)=>{
-                                page.counters[i].indice = parseInt(e.detail.value as string)
-                                
-                                page.mode = false;
-                                page.counters.forEach(elem => {
-                                    if(elem.indice === undefined) elem.indice = 0
-                                    if(elem.indice > elem.indication && (elem.indice - elem.indication) < 10000) page.mode = true;
-                                });
-
-                                setUpd(upd + 1)
-                            }}
-                        />
-                    </div>
-                </div>
-                {
-                    page.mode 
-                        ? <>
-                            <div className='mt-1'>
-                                <IonButton
-                                    color = "tertiary"
-                                    expand='block'
-                                    mode = "ios"
-                                    onClick={()=>{
-                                        async function load(){
-                                            const res = await getData("setIndications", page )
-                                            console.log(res)
-                                            setPage( 0 )
-                                        }
-                                        load()
-                                        
-                                    }}
-                                >   {
-                                        "Отправить показания"
-                                    }
-                                </IonButton>        
-
-                            </div>
-                        </>
-                        : <>
-
-                        </>
-
-                }
+                <Counter info  = { page.counters[i]} />
             </>
         }
         const elem = <>
