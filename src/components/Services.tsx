@@ -355,7 +355,7 @@ function Date( props: { info }) {
                 <div className=' ml-1 s-input a-right pr-1 w-60'>
                     <MaskedInput
                         className='m-input a-right'
-                        mask={[ /[1-9]/, /\d/, '.', /\d/, /\d/,'.', /\d/, /\d/, /\d/, /\d/]}
+                        mask={[ /[0-9]/, /\d/, '.', /\d/, /\d/,'.', /\d/, /\d/, /\d/, /\d/]}
                         value={ info[ props.info.name ][0] }
                         placeholder="__.__.____"
                         onInput={(e: any) => {
@@ -563,7 +563,7 @@ function MCHRG( props: { info}){
             </div>
         </div>
             {
-                info?.План >= 7
+                info?.ВеличинаМЧРГ >= 7
                     ? <Files info = { info?.Файлы } name = "ПланМЧРГ" check = { true } title = "Расчет максимального часового расхода газа"/>
                     : <></>
             }
@@ -617,7 +617,7 @@ function MCHRG( props: { info}){
                             expand='block'
                             mode = "ios"
                             onClick={()=>{
-                                info.План = modal.МЧРГ
+                                info.ВеличинаМЧРГ = modal.МЧРГ
                                 setModal(undefined)
                             }}
                         >   {

@@ -12,6 +12,7 @@ import "./Bonuse.css"
         const res = await getData("spClient", {
             token: Store.getState().login.token
         })
+        console.log(res)
 
         if(res.error) setInfo( new Object())
         else {
@@ -23,7 +24,6 @@ import "./Bonuse.css"
         const res = await getData("spCreateClient", {
             token: Store.getState().login.token
         })
-        console.log(res)
         if(res.error) setInfo( new Object())
         else setInfo( res.data )
     }

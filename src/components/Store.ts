@@ -7,7 +7,7 @@ const reducers: Array<Reducer<any, any>> = [] // eslint-disable-line @typescript
 
 const listeners: Array<any>  = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
-export const version = '2.0.14'
+export const version = '2.1.2'
 
 export const i_state = {
 
@@ -207,7 +207,7 @@ export async function   getProfile( params){
 
 export async function   getLics( params){
     const res = await getData("getAccount", params)
-    
+    console.log(res)
     if(res.error) console.log(res.message)
     else res.data.forEach(elem => {
         elem.sum = elem.debts.reduce(function(a, b){

@@ -116,13 +116,13 @@ export function Lics() {
                     </div>    
                     <div className='ml-1 mr-1 pb-1 mt-1 flex fl-space'>
                         <div>{ 
-                                ( info[i].sum + info[i].sumto ) < 0 ? "Аванс за газ" : "Задолженность за газ" 
+                                ( info[i].sum ) < 0 ? "Аванс за газ" : "Задолженность за газ" 
                             }
                         </div>
                         <div className='cl-prim fs-11'>
                             <b>
                             { 
-                                 ( info[i].sum + info[i].sumto ) < 0 
+                                 ( info[i].sum ) < 0 
                                      ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( -( info[i].sum ) )
                                      : new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( info[i].sum ) )
                             }</b>
@@ -130,13 +130,13 @@ export function Lics() {
                     </div>    
                     <div className='ml-1 mr-1 pb-1 mt-1 flex fl-space'>
                         <div>{ 
-                                ( info[i].sum + info[i].sumto ) < 0 ? "Аванс за ТО" : "Задолженность за ТО" 
+                                ( info[i].sumto ) < 0 ? "Аванс за ТО" : "Задолженность за ТО" 
                             }
                         </div>
                         <div className='cl-prim fs-11'>
                             <b>
                             { 
-                                 ( info[i].sum + info[i].sumto ) < 0 
+                                 ( info[i].sumto ) < 0 
                                      ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( -( info[i].sumto ) )
                                      : new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( info[i].sumto ) )
                             }</b>
@@ -996,6 +996,8 @@ export function Lics() {
             async function load(){
                 setLoad( true)
                 const res = await getData("SBOL", page )
+                console.log(page)
+                console.log(res)
                 if(res.error){ 
                     setMessage( res.message)
                     setPage(0)
@@ -1058,7 +1060,7 @@ export function Lics() {
             let m     = (date.getMonth() + 1).toString(); if(m.length === 1) m =  "0" + m;
             const y   = date.getFullYear().toString()
 
-            console.log(info.predPeriod)
+            console.log(info)
             const pred = new Date( info.predPeriod.substring(6, 10)  + "-" + info.predPeriod.substring(3, 5) + "-" + info.predPeriod.substring(0, 2) )
             console.log(pred)
             console.log(date)
@@ -1121,7 +1123,7 @@ export function Lics() {
                 : avail === 3 
                     ? <>
                         <div className='ml-1 mt-2 fs-09 pb-1'>
-                            <b>Показания передаются в период 20 по 25 числа</b>                            
+                            <b>В настоящее время прием показаний недоступен. Показания принимаются с 20 по 25 число каждого месяца.</b>                            
                         </div>
                     </>
                 : avail === 4
@@ -1140,7 +1142,7 @@ export function Lics() {
                                 onIonInput={(e)=>{
                                     info.indice = parseInt(e.detail.value as string)
                                     info.period = page.current
-                                    if(info.indice > info.predIndice && (info.indice - info.predIndice) < 999 ) setMode(true);
+                                    if(info.indice >= info.predIndice && (info.indice - info.predIndice) < 999 ) setMode(true);
                                     else setMode(false);
 
                                 }}
@@ -1159,6 +1161,7 @@ export function Lics() {
                                 mode = "ios"
                                 onClick={()=>{
                                     async function load(){
+                                        console.log( page )
                                         const res = await getData("setIndications", page )
                                         console.log(res)
                                         if(!res.error){

@@ -168,7 +168,7 @@ export function Contacts(){
 
         <IonCard className="pb-1">
             <div className="mt-1 ml-1 fs-14 cl-black">
-                <b>Как связаться нам</b>
+                <b>Как связаться с нами</b>
             </div>
             <div className="ml-2 fs-12 cl-prim">
                 <p dangerouslySetInnerHTML={ { __html: info?.Текст }}/>

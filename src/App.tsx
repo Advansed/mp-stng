@@ -58,9 +58,9 @@ const App: React.FC = () => {
 
   Store.subscribe({ num: 1, type: "auth", func: ()=>{
     setAuth( Store.getState().auth ) 
-    // if( Store.getState().auth)
-    //  if( isPlatform("mobile") )
-    //    OneSignalInit();
+    if( Store.getState().auth)
+     if( isPlatform("mobile") )
+       OneSignalInit();
     
   }})
 

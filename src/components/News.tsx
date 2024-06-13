@@ -29,6 +29,11 @@ export function News(){
         const res = select === 0 ? await getNews( page + 1 ) : await getNotice( page + 1 )
       
       if(res.status) {
+        res.data.forEach(elem => {
+          if(typeof elem.image === "string")
+            if(elem.image.substring(0, 1) === "/")
+              elem.image = "https://aostng.ru" + elem.image          
+        });
           const jarr = [...info, ...res.data]
           setInfo( jarr )
       }
@@ -79,6 +84,11 @@ export function News(){
                           onClick={()=>{
                             async function load() {
                                const res = select === 0 ? await getNewsDetail( e.id ) : await getNoticeDetail( e.id )
+
+                               if(typeof res.data.image === "string" )
+                                  if(res.data.image.substring(0, 1) === "/")
+                                    res.data.image = "https://aostng.ru" + res.data.image
+                                console.log(res.data)
                                setModal(res.data)
                             }
                             load()
