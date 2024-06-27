@@ -66,10 +66,12 @@ export function Services(){
         setLoad(true)
         order.token = Store.getState().login.token
         const res = await getData("Services", order )
-        console.log(res)
+        order.result = res
+        console.log( res )
+        if(res.error) setPage(98)
+        else setPage(99)
         setLoad(false)
 
-        Store.dispatch({ type: "route", route: "apps"})
     }
 
     function Check(){
@@ -132,7 +134,7 @@ export function Services(){
     elem = <>
         <IonLoading message={ "Подождите..." } isOpen = { load }/>
         {
-              page === 0 ? elem 
+            page === 0 ? elem 
             : <>
                 <div className="cl-white ml-1"><h1><b>{ order?.Описание }</b></h1></div>
                 
@@ -159,6 +161,8 @@ export function Services(){
                                 setMessages([])
                                 if( order.Страниц > page)
                                     setPage( page + 1 )
+                                else 
+                                if( page > 97 ) Store.dispatch({ type: "route", route: "apps" })
                                 else Save()
                             }
                             else setMessages( jarr )
@@ -171,7 +175,9 @@ export function Services(){
                         {
                             order.Страниц > page 
                                 ? "Далее" 
-                                : order.Документ === "Договор" ? "Подписать и отправить" : "Отправить заявку"
+                            : page > 97 
+                                ? 'Перейти в "Договора, заявки"'
+                            : order.Просмотр !== undefined ? "Заключить договор" : "Отправить заявку"
                         }
                     </IonButton>
                 </IonCard>
@@ -242,6 +248,12 @@ function Service(props: { info, page }){
         setLoad(false)
     }
 
+    if( props.page === 98 ) 
+        elem = <Fail info = { info.result.message }/>
+    else
+    if( props.page === 99)
+        elem  = <Success info = { info } />
+    else
     for(const [ key ] of Object.entries(info)){
         if(key === "Заявка") continue
         if(key === "Описание") continue
@@ -1026,6 +1038,60 @@ function Sign(props: { info }) {
             />
         </div>               
 
+    </>
+
+    return elem
+}
+
+function Success( props: { info }){
+    const elem = <>
+        {
+            props.info.Просмотр !== undefined 
+                ? <>
+                    <div>
+                        <div className="ml-1 mt-1 flex fl-space">
+                            <div className="fs-14">Договор заключен!</div>
+                        </div>
+                        <div className="ml-2 mr-2">
+                            <p>
+                                Спасибо, теперь у Вас есть Договор о техническом обслуживании ВКГО. Он в течение нескольких минут появится в разделе  <span onClick={()=>{ Store.dispatch({type: "route", route: "apps"})}}><b> #Договора, Заявки#</b></span>.
+                            </p>
+                        </div>
+                    </div>               
+                </> 
+                : <>
+                    <div>
+                        <div className="ml-1 mt-1 flex fl-space">
+                            <div className="fs-14">Ваша заявка принята!</div>
+                        </div>
+                        <div className="ml-2 mr-2">
+                            <p>
+                                Спасибо, Ваша заявка принята в обработку. В течение нескольких минут ваша заявка появится в разделе  <span onClick={()=>{ Store.dispatch({type: "route", route: "apps"})}}><b> #Договора, Заявки#</b></span>.
+                            </p>
+                        </div>
+                    </div>               
+                </>
+        }
+    </>
+
+    return elem
+}
+
+function Fail(props: { info }){
+    const elem = <>
+        <div>
+            <div className="ml-1 mt-1 flex fl-space">
+                <div className="fs-14">Ошибка при подачи заявки!</div>
+            </div>
+            <div className="ml-2 mr-2">
+                <p>
+                    Что то пошло не так...
+                </p>
+                <p>
+                    Попробуйте подать заявку еще раз
+                </p>
+            </div>
+        </div>               
     </>
 
     return elem

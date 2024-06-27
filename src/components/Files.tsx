@@ -192,6 +192,124 @@ export function Files(props: { info, name, check, title }) {
     return elem
 }
 
+export function Files1(props: { info, name, check, title, onMode }) {
+    const [ upd,    setUpd] = useState( 0 )
+    const [ modal,  setModal] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ load ] = useState( false)
+
+    async function getFoto(){
+        try {
+            const imageUrl = await takePicture();
+
+            if(imageUrl.format === "pdf") props.info.length = 0
+            else if( props.info.length > 0 && props.info[0].format === "pdf" ) props.info.length = 0
+
+            props.info.push( imageUrl )
+            
+            props.onMode( true )
+
+        } catch (error) {
+            console.log( error )
+        }
+        setUpd(upd + 1)   
+    }
+
+    async function openPDF(){
+        try {
+            const res = await FilePicker.pickFiles({types: ['application/pdf'], multiple: false, readData: true})
+            const reader = new FileReader()
+
+            console.log(props.info)
+            if(res.files[0]?.data){
+                props.info.length = 0
+                props.info.push( { dataUrl: "data:application/pdf;base64," + res.files[0]?.data, format: 'pdf'})
+                setUpd(upd + 1)
+                props.onMode( true )
+            }
+
+        } catch (error) {
+            console.log( error )
+        }
+
+    }
+    
+    async function PDF(){
+
+        const pdf = await toPDF( props.info,  props.name + ".pdf")
+
+        props.info.length = 0;
+        props.info.push( { dataUrl: pdf, format: "pdf" } )
+        setUpd( upd + 1 )
+        props.onMode( true )
+    }
+
+    const elem = <>
+        <div>
+            <div className="flex fl-space t-underline ml-1 mr-1">
+                <div className= { props.check ? "mr-1" : "mr-1" }>
+                    { props.check ? " * " + props.title : props.title }
+                </div>
+                <IonButton
+                    fill="clear"
+                    onClick = {()=>{ 
+                        props.info.pop();    
+                        setUpd(upd + 1)
+                        props.onMode( true )
+                    }}
+                >
+                    <IonIcon icon = { playSkipBackCircleOutline } color={ "tertiary" } className="w-2 h-2"/>
+                </IonButton>
+            </div>
+                
+            <div className={ "flex fl-wrap" }>
+
+                { props.info.map((e, ind) =>{
+                    return e.format === "pdf"
+                        ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
+                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                        />
+                        : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
+                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                        />
+                        
+                    })}
+                    
+                <div
+                    onClick={()=>{ getFoto() }}
+                    className="ml-1 mt-1 s-photo"
+                >
+                    <IonIcon icon = { cameraOutline } color="warning" slot="icon-only" className="w-3 h-3 "/>
+                </div>                        
+
+                <img key = { 100 } src = "assets/pdf.png" alt="pdf"  className="ml-1 s-photo-1 mt-1"
+                    onClick={()=>{
+                        if(props.info.length > 1)
+                            PDF()
+                        else openPDF()
+                    }}              
+                />
+
+            </div>
+        </div> 
+        <IonLoading isOpen = { load } message = "Подождите..."/>
+        <IonModal
+            className="w-100 h-100"
+            isOpen = { modal !== undefined }
+            onDidDismiss={ () => setModal( undefined )}
+        >
+            <div className="w-100 h-100">
+                {  
+                    modal?.format === "pdf" 
+                        ? <PDFDoc url = { modal?.dataUrl } name  = { props.name } title = { props.title }/>
+                        : <img src={ modal?.dataUrl } alt = "" />
+                }
+            </div>
+        </IonModal>
+ 
+    </>
+    return elem
+}
+
 export function Agree(props: { info, name, check, title }) {
     const [ upd,    setUpd] = useState( 0 )
     const [ modal,  setModal] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -329,6 +447,37 @@ export function Filess(props: { info }){
             { 
 
                 <Files info = { info[ index ].Файлы } name = { info[ index ].Имя }   check = {false} title = { info[ index ].Описание }/>
+
+            }
+        </div>
+    </>
+
+    return elem
+}
+
+export function Filesss(props: { info, onMode }){
+    const [ info ] = useState( props.info )
+    const [ index, setIndex ] = useState( 0 )
+
+    console.log( info )
+
+    let elem = <></>;let item = <></>
+    
+    for(let i = 0; i < info.length;i++){
+        item = <>
+
+            { item }
+
+            <IonChip color="light" className={ index === i ? "a-chip" : "" }  onClick={()=> setIndex( i )}> { i + 1 } </IonChip>
+
+        </>
+    }
+    elem = <>
+        <div className="mt-1 ml-1">
+            { item }
+            { 
+
+                <Files1 info = { info[ index ].Файлы } name = { info[ index ].Имя }   check = {false} title = { info[ index ].Описание } onMode = { props.onMode }/>
 
             }
         </div>

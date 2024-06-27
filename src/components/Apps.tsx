@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { IonButton, IonCard, IonIcon, IonImg, IonLabel, IonLoading, IonText } from "@ionic/react"
 import { Store, getApps, getData } from "./Store"
-import { Agrees, Filess } from "./Files";
+import { Agrees, Filess, Filesss } from "./Files";
 import { chevronDownCircleOutline, chevronUpCircleOutline } from "ionicons/icons";
 
 
@@ -135,6 +135,7 @@ export function Apps_(){
 
 export function Apps():JSX.Element {
     const [ info, setInfo ] = useState<any>([])
+    const [ upd, setUpd ] = useState( 0 )
     let elem = <></>
 
     useEffect(()=>{
@@ -156,11 +157,16 @@ export function Apps():JSX.Element {
 
 
     function App(props: { info }):JSX.Element{
-        const [ load, setLoad ] = useState( false )
-        const [ message, setMessage ] = useState("")
+        const [ load, setLoad ]         = useState( false )
+        const [ message, setMessage ]   = useState("")
+        const [ mode, setMode ]         = useState(false)
 
         const info = props.info
-                
+        
+        function onSetMode( mod ){
+            setMode( mod )
+            console.log("onSetMode")
+        }        
     
         const elem = <>
             <IonCard className="pb-1 pr-1 s-card">
@@ -195,32 +201,45 @@ export function Apps():JSX.Element {
                 {
                     info.files?.Файлы?.length > 0
                         ? <>
-                            <Filess    info = { info.files.Файлы }/> 
+                            <Filesss    info = { info.files.Файлы } onMode = { onSetMode }/> 
                             <p className="ml-2">{ message }</p>
                             <div className="flex fl-space">
                                 <div></div>
-                                <div>
-                                    <IonButton
-                                        onClick={()=>{
-                                            async function upload(){
-                                                const res = await getData("s_files", {
-                                                    token:  Store.getState().login.token,
-                                                    id:     info.id,
-                                                    files:  info.files
-                                                })
-                                                console.log(res)
-                                                if(!res.error) {
-                                                    setMessage(res.message);
-                                                    info.files = new Object()
-                                                }
-                                                
-                                            }
-                                            upload()
-                                        }}
-                                    >
-                                        Отправить файлы
-                                    </IonButton>
-                                </div>
+                                { 
+                                    mode ? <>
+                                        <div className="flex">
+                                            <IonButton
+                                                onClick={()=>{
+                                                    getApps({ token: Store.getState().login.token })
+                                                    setUpd( upd + 1)
+                                                }}
+                                            >
+                                                Отмена
+                                            </IonButton>
+                                            <IonButton
+                                                onClick={()=>{
+                                                    async function upload(){
+                                                        const res = await getData("s_files", {
+                                                            token:  Store.getState().login.token,
+                                                            id:     info.id,
+                                                            files:  info.files
+                                                        })
+                                                        console.log(res)
+                                                        if(!res.error) {
+                                                            setMessage(res.message);
+                                                            info.files = new Object()
+                                                        }
+                                                        
+                                                    }
+                                                    upload()
+                                                }}
+                                            >
+                                                Сохранить
+                                            </IonButton>
+                                        </div>
+                                    </>
+                                    : <></>
+                                }
                             </div>
                         </>
                         : <></>

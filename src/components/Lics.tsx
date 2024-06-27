@@ -1142,7 +1142,7 @@ export function Lics() {
                                 onIonInput={(e)=>{
                                     info.indice = parseInt(e.detail.value as string)
                                     info.period = page.current
-                                    if(info.indice >= info.predIndice && (info.indice - info.predIndice) < 999 ) setMode(true);
+                                    if(info.indice >= info.predIndice && (info.indice - info.predIndice) < 3001 ) setMode(true);
                                     else setMode(false);
 
                                 }}

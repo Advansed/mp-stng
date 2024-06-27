@@ -7,12 +7,12 @@ const reducers: Array<Reducer<any, any>> = [] // eslint-disable-line @typescript
 
 const listeners: Array<any>  = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
-export const version = '2.1.2'
+export const version = '2.1.3'
 
 export const i_state = {
 
     auth:                               false,
-    reg:                                false,
+    reg:                                false, 
     route:                              "",
     login:                              "",
     back:                               0,
