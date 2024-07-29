@@ -231,6 +231,12 @@
     position: relative;
 }
 
+.borders1 {
+    border-radius: 0.5em;
+    border: 1px solid silver;
+    padding: 1em;
+    position: relative;
+}
 .borders-wp {
     border-radius: 0.5em;
     border: 1px solid silver;

@@ -1,0 +1,62 @@
+
+  
+  .apl-input {
+    background-color: white;
+    padding-left: 1em;
+    padding-right: 1em;
+    width: auto;
+    border-radius: 5px;
+    color: rgb(32, 31, 31)!important;;
+  }
+
+  .apl-string {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .apl-cnt {
+    display: grid;
+    width: 2em;
+    height: 2em;
+    color: white;
+    text-align: center;
+    align-items: center;
+    background-color: green;
+    border-radius: 50%;
+  }
+
+  .apl-bg {
+    position: relative;
+    margin-top: 0.5em;
+    padding: 1em;
+    border-radius: 15px;
+    background-color: rgb(1, 170, 1);
+    color: white;
+  }
+
+  .apl-bg1 {
+    position: relative;
+    margin-top: 0.5em;
+    padding: 1em;
+    border-radius: 15px;
+    background-color: #3f64a9;
+    color: white;
+  }
+
+  .apl-date {
+    position: absolute;
+    right: 1em;
+    bottom: 0.5em;
+  }
+
+  .apl-borders {
+    border: 1px solid silver;
+    border-radius: 5px;
+  }
+
+  .apl-card {
+    height: calc(100% - 5em);
+    width: auto;
+    overflow-y: scroll;
+  }

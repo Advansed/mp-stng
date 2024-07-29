@@ -5,7 +5,7 @@ import { Reducer } from 'react';
 
 const reducers: Array<Reducer<any, any>> = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
-const listeners: Array<any>  = [] // eslint-disable-line @typescript-eslint/no-explicit-any
+export const listeners: Array<any>  = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export const version = '2.1.3'
 
@@ -21,6 +21,7 @@ export const i_state = {
     apps:                               [],   
     pred:                               [],
     notices:                            [],
+    appeals:                            [],    
 
 }
 
@@ -135,16 +136,17 @@ function                create_Store(reducer, initialState) {
 
 const                   rootReducer = combineReducers({
 
-    auth:                      reducers[0],
-    reg:                       reducers[1],
-    route:                     reducers[2],
-    login:                     reducers[3],
-    back:                      reducers[4],
-    profile:                   reducers[5],
-    lics:                      reducers[6],
-    apps:                      reducers[7],
-    pred:                      reducers[8],
-    notices:                   reducers[9],
+    auth:                      reducers[ 0],
+    reg:                       reducers[ 1],
+    route:                     reducers[ 2],
+    login:                     reducers[ 3],
+    back:                      reducers[ 4],
+    profile:                   reducers[ 5],
+    lics:                      reducers[ 6],
+    apps:                      reducers[ 7],
+    pred:                      reducers[ 8],
+    notices:                   reducers[ 9],
+    appeals:                   reducers[10],
 
 })
 
@@ -213,9 +215,11 @@ export async function   getLics( params){
         elem.sum = elem.debts.reduce(function(a, b){
             return a + b.sum;
         }, 0);
+        elem.sum = parseFloat( elem.sum.toFixed(2)) 
         elem.sumto = elem.debtsto.reduce(function(a, b){
             return a + b.sum;
         }, 0);
+        elem.sumto = parseFloat( elem.sumto.toFixed(2)) 
     }); 
     if(res.error) console.log(res.message)
     else Store.dispatch({ type: "lics", lics: res.data})
@@ -280,13 +284,22 @@ export async function   getNoticeDetail( id ){
     return res
 }
 
-export async function getNotifications( page ){
+export async function   getNotifications( page ){
     const res = await getData("GetNotices", {
         token: Store.getState().login.token,
         page : page
     })
     console.log(res)
     if(!res.error) Store.dispatch({ type: "notices", notices: res.data})
+}
+
+
+export async function   getAppeals(){
+    const res = await getData("getMessages", {
+        token: Store.getState().login.token
+    })
+    console.log(res)
+    if(!res.error) Store.dispatch({ type: "appeals", appeals: res.data})
 }
 
 Store.subscribe({ num: 1001, type: "login", func: ()=>{

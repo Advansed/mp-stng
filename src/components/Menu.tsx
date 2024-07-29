@@ -60,6 +60,12 @@ const appPages: AppPage[] = [
     mdIcon: notificationsSharp
   },
   {
+    title: 'Обращения',
+    url: '/page/appeals',
+    iosIcon: notificationsOutline,
+    mdIcon: notificationsSharp
+  },
+  {
     title: 'Лицевые счета',
     url: '/page/lics',
     iosIcon: documentTextOutline,

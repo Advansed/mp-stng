@@ -288,7 +288,7 @@ function Service(props: { info, page }){
                                 case "text"     : elem = <> { elem } <Text      info = {{ info: info[key], title: info[key][req][2], name: req }}  /> </>; break;
                                 case "date"     : elem = <> { elem } <Date      info = {{ info: info[key], title: info[key][req][2], name: req }}  /> </>; break;
                                 case "box"      : elem = <> { elem } <Box       info = {{ info: info[key], title: info[key][req][2], name: req, choice: Array.isArray(info[key][req][3]) ? info[key][req][3] : [] }}  /> </>; break;
-                                case "lics"     : elem = <> { elem } <Box       info = {{ info: info[key], title: info[key][req][2], name: req, choice: Store.getState().profile.lics === undefined ? [] : Store.getState().profile.lics }}  /> </>; break;
+                                case "lics"     : elem = <> { elem } <Box       info = {{ info: info[key], title: info[key][req][2], name: req, choice: Store.getState().lics === undefined ? [] : Store.getState().lics }}  /> </>; break;
                                 case "address"  : elem = <> { elem } <Address   info = {{ info: info[key], title: info[key][req][2], name: req }} setUpd = { Upd } /> </>; break;
                                 default         : elem = <> { elem } </>
                             }

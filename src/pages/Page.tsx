@@ -15,6 +15,7 @@ import { Queye }    from '../components/Queye';
 import { Bonuses }  from '../components/Bonuse';
 import { Contacts } from '../components/Contacts';
 import { Notifications } from '../components/Notifications';
+import { Appeals } from '../components/Appeals';
 
 const Page: React.FC = () => {
   const [ alert, setAlert ] = useState( false )
@@ -75,6 +76,7 @@ const hist  = useHistory();
         case "queye":             elem = <Queye />; break;
         case "bonuse":            elem = <Bonuses />; break;
         case "services":          elem = <Services />; break;
+        case "appeals":           elem = <Appeals />; break;
         case "contacts":          elem = <Contacts />; break;
         case "push":              elem = <Notifications />; break;
         default: elem = <></>
