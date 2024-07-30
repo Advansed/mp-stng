@@ -93,7 +93,7 @@ const Page: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <div className='p-header flex fl-space'>
+        <div className={ isPlatform("ios") ? 'p-header flex fl-space mt-3' : "p-header flex fl-space" }>
           <IonButton
             fill = "clear"
             onClick = {()=>{ 

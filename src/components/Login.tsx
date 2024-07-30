@@ -1,4 +1,4 @@
-import { IonButton, IonCheckbox, IonHeader, IonIcon, IonImg, IonInput, IonLoading, IonText } from "@ionic/react"
+import { IonButton, IonCheckbox, IonHeader, IonIcon, IonImg, IonInput, IonLoading, IonText, isPlatform } from "@ionic/react"
 import React, { useState, useEffect } from "react"
 import { Store, getData, version } from "./Store"
 import "./Login.css"
@@ -208,7 +208,7 @@ export function Login() {
 
     const elem = <>
         <IonLoading isOpen= { load } message={"Подождите..."}/>
-        <div className="l-background w-100 h-100">
+        <div className={ isPlatform("ios") ? "l-background w-100 h-100 mt-3" : 'l-background w-100 h-100'}>
             <div className="l-container">
                 {
                     page === 0
@@ -469,7 +469,7 @@ export function Registration():JSX.Element {
 
     const elem = <>
         <IonLoading isOpen = { load } message={"Подождите..."}/>
-        <div className="l-background w-100 h-100">
+        <div className={ isPlatform("ios") ? "l-background w-100 h-100 mt-3" : 'l-background w-100 h-100'}>
             <div className="l-container">
                 {
                     page === 0

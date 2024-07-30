@@ -5,6 +5,7 @@ import {
   IonImg,
   IonMenu,
   IonMenuToggle,
+  isPlatform,
 } from '@ionic/react';
 
 import { useHistory } from 'react-router-dom';
@@ -92,10 +93,10 @@ const Menu: React.FC = () => {
   return (
     <IonMenu contentId="main" type="overlay">
       <IonContent>
-        <div className='layer-1'>
+        <div className={ isPlatform("ios") ? 'layer-1 mt-3' : "layer-1"}>
           <IonImg  src="assets/img/pattern2.png" />
         </div>
-        <div className='layer-2'>
+        <div className={ isPlatform("ios") ? 'layer-2 mt-3' : 'layer-2'}>
           <div className='m-header flex fl-space'>
               <div className='flex fl-center w-100 h-3'><IonImg class="p-menu" src="assets/img/logoSTNG.png" /></div>
           </div>
