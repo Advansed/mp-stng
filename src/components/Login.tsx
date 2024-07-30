@@ -9,7 +9,7 @@ import { arrowBackOutline } from "ionicons/icons"
 
 export function Login() {
     
-    const [ info,   setInfo]    = useState<any>({ phone: "", password: ""}) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ info,   setInfo]    = useState<any>({ phone: "", password: "", version: version, mode: "android"}) // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ error,  setError]   = useState("")
     const [ upd,    setUpd]     = useState( 0 )
     const [ load,   setLoad ]   = useState( false)
@@ -23,7 +23,7 @@ export function Login() {
         if( login !== null && pass !== null){
             info.phone = login; info.password = pass
             setInfo( info )
-            Auth()
+            setUpd( upd + 1)
         }   
     },[])
 
@@ -35,9 +35,8 @@ export function Login() {
 
         } else {
 
-            console.log("Authorization")
             const res = await getData("authorization", info)
-            console.log( res )
+
             if(!res.error){
 
                 localStorage.setItem( "stngul.phone", info.phone )
@@ -78,7 +77,7 @@ export function Login() {
             <div>
                 <div className="l-input pl-1">
                     <MaskedInput
-                        mask={['+', /[1-9]/, '(', /\d/, /\d/, /\d/, ')', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
+                        mask={['+', /[7]/, '(', /\d/, /\d/, /\d/, ')', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
                         className="m-input"
                         id='1'
                         value={ info?.phone }
@@ -247,7 +246,7 @@ export function Registration():JSX.Element {
             }    
         } else {
             const res = await getData("registration", info )
-            console.log(res)
+
             if(res.error) { info.SMS = "";setError(res.message) }
             else {
                 if(res.message === "СМС верен") setUpd(upd + 1)

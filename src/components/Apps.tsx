@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { IonButton, IonCard, IonIcon, IonImg, IonLabel, IonLoading, IonText } from "@ionic/react"
+import { IonButton, IonCard, IonIcon, IonLabel, IonLoading, IonText } from "@ionic/react"
 import { Store, getApps, getData } from "./Store"
 import { Agrees, Filess, Filesss } from "./Files";
 import { chevronDownCircleOutline, chevronUpCircleOutline } from "ionicons/icons";
@@ -42,7 +42,6 @@ export function Apps_(){
                 } )
 
                 info.Файлы = res.data
-                console.log(res)
 
             } 
             
@@ -157,7 +156,7 @@ export function Apps():JSX.Element {
 
 
     function App(props: { info }):JSX.Element{
-        const [ load, setLoad ]         = useState( false )
+        const [ load ]         = useState( false )
         const [ message, setMessage ]   = useState("")
         const [ mode, setMode ]         = useState(false)
 
@@ -165,7 +164,6 @@ export function Apps():JSX.Element {
         
         function onSetMode( mod ){
             setMode( mod )
-            console.log("onSetMode")
         }        
     
         const elem = <>
@@ -224,7 +222,6 @@ export function Apps():JSX.Element {
                                                             id:     info.id,
                                                             files:  info.files
                                                         })
-                                                        console.log(res)
                                                         if(!res.error) {
                                                             setMessage(res.message);
                                                             info.files = new Object()

@@ -1,18 +1,13 @@
 import React, { useState } from "react";
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { cameraOutline, playSkipBackCircleOutline, saveOutline, sendOutline } from "ionicons/icons";
+import { cameraOutline, playSkipBackCircleOutline, sendOutline } from "ionicons/icons";
 import { jsPDF } from "jspdf";
 import { FilePicker } from '@capawesome/capacitor-file-picker';
-import { IonButton, IonChip, IonIcon, IonLoading, IonModal, isPlatform } from "@ionic/react";
+import { IonButton, IonChip, IonIcon, IonLoading, IonModal } from "@ionic/react";
 import { Document, Page } from 'react-pdf';
 import { pdfjs } from 'react-pdf';
 import { Store, getData } from "./Store";
-
-// pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-//     'pdfjs-dist/build/pdf.worker.min.js',
-//     import.meta.url,
-//   ).toString();
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -102,9 +97,7 @@ export function Files(props: { info, name, check, title }) {
     async function openPDF(){
         try {
             const res = await FilePicker.pickFiles({types: ['application/pdf'], multiple: false, readData: true})
-            const reader = new FileReader()
 
-            console.log(props.info)
             if(res.files[0]?.data){
                 props.info.length = 0
                 props.info.push( { dataUrl: "data:application/pdf;base64," + res.files[0]?.data, format: 'pdf'})
@@ -148,10 +141,10 @@ export function Files(props: { info, name, check, title }) {
                 { props.info.map((e, ind) =>{
                     return e.format === "pdf"
                         ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                            onClick = {()=>{ setModal( e );  }}
                         />
                         : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                            onClick = {()=>{ setModal( e );  }}
                         />
                         
                     })}
@@ -217,9 +210,7 @@ export function Files1(props: { info, name, check, title, onMode }) {
     async function openPDF(){
         try {
             const res = await FilePicker.pickFiles({types: ['application/pdf'], multiple: false, readData: true})
-            const reader = new FileReader()
 
-            console.log(props.info)
             if(res.files[0]?.data){
                 props.info.length = 0
                 props.info.push( { dataUrl: "data:application/pdf;base64," + res.files[0]?.data, format: 'pdf'})
@@ -311,7 +302,6 @@ export function Files1(props: { info, name, check, title, onMode }) {
 }
 
 export function Agree(props: { info, name, check, title }) {
-    const [ upd,    setUpd] = useState( 0 )
     const [ modal,  setModal] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ load ] = useState( false)
 
@@ -361,7 +351,7 @@ export function PDFDoc( props ){
     const [ pages, setPages ] = useState<any>(1)
     const [ page, setPage ] = useState(1)
     const [ width, setWidth ] = useState( 380 )
-    const [ height, setHeight ] = useState( 190 )
+    const [ height ] = useState( 190 )
     const [ message, setMessage ] = useState("")
     return <>
         <div className="h-3 pl-2 w-100 bg-2 flex">
@@ -381,7 +371,6 @@ export function PDFDoc( props ){
                     /* eslint-disable */
                     onClick={()=>{ 
                         async function send() {
-                            console.log("sendMail")
                             const res = await getData('SendMail', {
                                 token: Store.getState().login.token,
                                 type: props.title,
@@ -401,7 +390,7 @@ export function PDFDoc( props ){
             <Document 
                 file={ props.url } 
                 
-                onLoadSuccess={( pdfInfo )=>{ setPages( pdfInfo._pdfInfo.numPages );  console.log(pdfInfo._pdfInfo)}}
+                onLoadSuccess={( pdfInfo )=>{ setPages( pdfInfo._pdfInfo.numPages ); }}
             >
                 <Page renderTextLayer = { false } renderAnnotationLayer = { false } pageNumber={ page } width={ width } height={ height }/>
             </Document>
@@ -427,8 +416,6 @@ export function PDFDoc( props ){
 export function Filess(props: { info }){
     const [ info ] = useState( props.info )
     const [ index, setIndex ] = useState( 0 )
-
-    console.log( info )
 
     let elem = <></>;let item = <></>
     
@@ -459,8 +446,6 @@ export function Filesss(props: { info, onMode }){
     const [ info ] = useState( props.info )
     const [ index, setIndex ] = useState( 0 )
 
-    console.log( info )
-
     let elem = <></>;let item = <></>
     
     for(let i = 0; i < info.length;i++){
@@ -489,8 +474,6 @@ export function Filesss(props: { info, onMode }){
 export function Agrees(props: { info }){
     const [ info ] = useState( props.info )
     const [ index, setIndex ] = useState( 0 )
-
-    console.log( info )
 
     let elem = <></>;let item = <></>
     

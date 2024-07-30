@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Store, getData, getLics, listeners } from './Store'
+import { Store, getData, getLics, getProfile } from './Store'
 import './Lics.css'
 import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLoading, IonModal, IonPopover, IonRow, IonText } from '@ionic/react'
 import { chevronForwardOutline, documentTextOutline, ellipsisVerticalOutline, newspaperOutline, pencilOutline, trashBinOutline } from 'ionicons/icons'
@@ -8,9 +8,9 @@ import { PDFDoc } from './Files'
 
 export function Lics() {
     const [ info,   setInfo ]   = useState<any>([])
-    const [ upd,    setUpd ] = useState( 0 )
-    const [ page, setPage ] = useState( 0 )
-    const [ item, setItem ] = useState<any>()
+    const [ upd,    setUpd ]    = useState( 0 )
+    const [ page,   setPage ]   = useState( 0 )
+    const [ item,   setItem ]   = useState<any>()
 
     Store.subscribe({num : 22, type: "lics", func: ()=>{
         setInfo( Store.getState().lics )
@@ -73,6 +73,7 @@ async function Add( params, setMessage, setPage ){
         setMessage(res.message);
     } else {
         getLics({ token: Store.getState().login.token })
+        getProfile({ token: Store.getState().login.token })
         setPage( 0 )
     }
 }   
@@ -225,7 +226,6 @@ function AddLic2(props:{ setPage }){
             token   : Store.getState().login.token,
             s_id    : e.s_id
         })
-        console.log(res)
         if(res.error) setMessage( res.message )
         else {
             e.streets = res.data;
@@ -638,7 +638,6 @@ function AddLic2(props:{ setPage }){
 
 function Lic(props: { info, ind, setItem, setPage } ){
     const [ load,   setLoad ]   = useState(false)
-    const [ upd,    setUpd ]    = useState( 0 )
     const [ modal,  setModal ]  = useState<any>()
 
     const info = props.info 
@@ -1131,7 +1130,6 @@ function SberPay(props: { item, setPage }){
         async function load(){
             setLoad( true)
             const res = await getData("SBOL", item.order )
-            console.log( res )
             if(res.error){ 
                 props.setPage( 4 )
             } else {
@@ -1198,7 +1196,6 @@ function Equaring(props: { item, setPage }){
 }
 
 function Indices(props: { item, setPage}){
-    const [ upd, setUpd ] =useState( 0 )
 
     const item = props.item
 
@@ -1206,7 +1203,6 @@ function Indices(props: { item, setPage}){
         const [ mode, setMode ]         = useState( false )
         const [ avail, setAvail ]       = useState( 0 )
         const [ bord ]    = useState( Store.getState().login.borders )
-        const [ upd1, setUpd1 ] = useState( 0 )
     
         function monthDiff(dateFrom, dateTo) {
             let months = dateTo.getMonth() - dateFrom.getMonth() + 
@@ -1247,7 +1243,6 @@ function Indices(props: { item, setPage}){
             info.predIndice = info.indice
             info.predPeriod = info.period
             info.indice = 0; info.period = ""
-            console.log("lload")
             setAvail( 4 )
         }
     
@@ -1328,7 +1323,6 @@ function Indices(props: { item, setPage}){
                                             counters:   [ info ]
                                         }
                                         const res = await getData("setIndications", order )
-                                        console.log(res)
                                         if(!res.error){
                                             lload()
                                         }
@@ -1404,7 +1398,6 @@ function HistoryIndices(props: { item }){
             token: Store.getState().login.token,
             counterId: item.selected.counterId 
         })  
-        console.log(res.data)
         if(!res.error){
             if(res.data.length > 0 ){
                 setInfo( res.data[0].indications )

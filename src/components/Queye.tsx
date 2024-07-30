@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Store, getData } from "./Store";
 import MaskedInput from "../mask/reactTextMask";
 import Select from "react-tailwindcss-select";
-import { setMaxListeners } from "process";
 
 export function Queye1(){
     const [ page, setPage ] = useState( 0 )
@@ -24,13 +23,6 @@ export function Queye1(){
         const [ datas,  setDatas ]  = useState<any>([])             // eslint-disable-line @typescript-eslint/no-explicit-any
         const [ times,  setTimes ]  = useState<any>([])             // eslint-disable-line @typescript-eslint/no-explicit-any
         const [ upd,    setUpd ]    = useState( 0 )
-
-        const options: any = [
-            { value: "10", label: "Прием документов"},
-            { value: "12", label: "Прием документов"},
-            { value: "14", label: "Прием документов"},
-            { value: "14", label: "Прием документов"},
-        ]
     
         useEffect(()=>{
             info.token  = Store.getState().login.token
@@ -100,7 +92,6 @@ export function Queye1(){
                                         const res = await getData("elGetDatas", {
                                             operation: info.operation
                                         })
-                                        console.log( res )    
                                         setDatas( res.data )
 
                                     }
@@ -132,7 +123,6 @@ export function Queye1(){
                                             operation:  info.operation,
                                             date:       info.date,
                                         })
-                                        console.log( res )
                                         let jarr: any = []  // eslint-disable-line @typescript-eslint/no-explicit-any
                                         res.data.forEach(elem => {
                                             if(elem.is_available) jarr = [...jarr, elem.time ]
@@ -352,8 +342,6 @@ export function Queye1(){
 }
 
 export function Queye(){
-    const [ page,       setPage ]   = useState( 0 )
-    const [ note,       setNote ]   = useState<any>(  ) // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ modal,      setModal ]  = useState( 0 )
 
     useEffect(()=>{
@@ -464,7 +452,6 @@ function Note() {
     async function load1(){
         
         const res = await getData('elGetOperations', {})
-        console.log(res)
         if(!res.error)
             setInfo(res.data)
     }
@@ -514,7 +501,7 @@ function Note() {
 
                 } } 
                     classNames={{
-                        listItem: ( isSelected ) => (
+                        listItem: ( ) => (
                             `sbl-item`
                         )
                     }}
@@ -532,7 +519,7 @@ function Note() {
                                 load3( e )
                             } } 
                                 classNames={{
-                                    listItem: ( isSelected ) => (
+                                    listItem: ( ) => (
                                         `sbl-item`
                                     )
                                 }}
@@ -552,7 +539,7 @@ function Note() {
                             } } 
                                 classNames={{
                                     menu: 'sbl-disabled',
-                                    listItem: ( value : any ) => (
+                                    listItem: ( ) => (
                                         `sbl-item a-right mr-2`
                                     )
                                 }}
@@ -592,7 +579,6 @@ function Note() {
                                             phone:      Store.getState().login.phone.substring(1),
                                             email:      Store.getState().profile.email,
                                         } )
-                                        console.log(res)
                                         if(!res.error) {
                                             setNote({ 
                                                 date:   value1.value, 
@@ -642,7 +628,6 @@ function Notes(props:{ setModal }) {
         const res = await getData('elQueye', {
             token: Store.getState().login.token
         })
-        console.log(res)
         if(!res.error)
             setInfo(res.data)
     }

@@ -75,7 +75,6 @@ export function News(){
               onIonScrollEnd={()=>{
                 if(( lastTop - scrollTop) < 1000) load()
               }}
-            // onIonScroll={(e) => { console.log(e)}}
             >
             {
                 info.map((e, i) =>{
@@ -88,7 +87,6 @@ export function News(){
                                if(typeof res.data.image === "string" )
                                   if(res.data.image.substring(0, 1) === "/")
                                     res.data.image = "https://aostng.ru" + res.data.image
-                                console.log(res.data)
                                setModal(res.data)
                             }
                             load()

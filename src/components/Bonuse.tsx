@@ -12,7 +12,6 @@ import "./Bonuse.css"
         const res = await getData("spClient", {
             token: Store.getState().login.token
         })
-        console.log(res)
 
         if(res.error) setInfo( new Object())
         else {
@@ -63,7 +62,6 @@ import "./Bonuse.css"
     function Cipher(){
         let st = info.card_id + ";" + (new Date()).toISOString()
 
-        console.log(st)
         const jarr = st.split("")
         const key = "AOSTNG"
         st = ""
@@ -73,7 +71,6 @@ import "./Bonuse.css"
             st = st + String.fromCharCode( elem.charCodeAt(0) + (key.charCodeAt(i) - key.charCodeAt(0)) )
             i = i + 1;
         });
-        console.log(st)
         return st
     }
     

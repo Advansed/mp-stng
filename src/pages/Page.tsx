@@ -26,12 +26,23 @@ const Page: React.FC = () => {
 
   async function check() {
     const res = await getData("getVersion", {})
-    console.log(res.message + " = " + version )
     if( res.message !== version ){
       setAlert( true )
     }
-}
+  }
 
+  Store.subscribe({ num: 3, type: "route", func: ()=>{
+
+    const route = Store.getState().route;
+
+    if( route === "back") {
+      hist.goBack()
+    }
+    else {
+        hist.push( route )
+    }
+  
+  }})
 
   useEffect(()=>{
 
@@ -46,22 +57,11 @@ const Page: React.FC = () => {
     
     check()
 
+    return ()=>{ Store.unSubscribe( 3 )}
+
   },[])
 
-const hist  = useHistory();
-
-  Store.subscribe({ num: 3, type: "route", func: ()=>{
-
-    const route = Store.getState().route;
-
-    if( route === "back") {
-      hist.goBack()
-    }
-    else {
-        hist.push( route )
-    }
-  
-  }})
+  const hist  = useHistory();
   
   function Main():JSX.Element {
     let elem = <></>
@@ -113,10 +113,6 @@ const hist  = useHistory();
         <Main />
         <div className='p-footer'>
           <IonTabBar slot="bottom">
-            {/* <IonTabButton tab="home" href="/home">
-              <IonIcon icon={ homeOutline } mode = "ios" />
-              <IonLabel>Меню</IonLabel>
-            </IonTabButton> */}
 
             <IonTabButton tab="services" href="/page/services">
               <IonIcon icon={ contractOutline } className='w-1 h-1'/>

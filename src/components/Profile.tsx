@@ -230,20 +230,6 @@ export function Profile(){
             <div className='flex fl-space ml-2 mt-1 mr-1'>
                 <div> Когда выдан </div>
                 <div className='s-input a-right pr-1'>
-                    {/* <IonInput
-                        class='s-input-1'
-                        value={ info?.passport?.issuedDate }
-                        placeholder="Когда выдан"
-                        type="date"
-                        onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-                            if(mode.passport === undefined) mode.passport = new Object
-                            info.passport.issuedDate = e.target.value    
-                            let str = e.target.value
-                            str = str.substring(8, 10) + "." + str.substring(5, 7) + "." + str.substring(0, 4)
-                            console.log(str)
-                            mode.passport.issuedDate = str    
-                        }}
-                    /> */}
                     <MaskedInput
                         mask={[ /[1-9]/, /\d/, '.', /\d/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
                         className="m-input-1 a-right"

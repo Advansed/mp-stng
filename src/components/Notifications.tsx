@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Store } from "./Store"
-import { IonCard, IonCardSubtitle, IonCardTitle, IonText } from "@ionic/react"
+import { IonCard, IonText } from "@ionic/react"
 
 
 export function Notifications(){
@@ -47,7 +47,7 @@ export function Notifications(){
 
 
 export function Chats(){
-    const [ info, setInfo ] = useState<any>([])
+    const [ info ] = useState<any>([])
 
     let elem = <></>
 

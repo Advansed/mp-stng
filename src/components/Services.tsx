@@ -1,5 +1,5 @@
 import React, { IonButton, IonCard, IonIcon, IonInput, IonLoading, IonModal, IonText } from "@ionic/react"
-import { addCircleOutline, arrowBackCircleOutline, buildOutline, calculatorOutline, callOutline, closeCircleOutline, closeOutline, documentTextOutline, gitBranchOutline, gitMergeOutline, listOutline, removeCircleOutline } from "ionicons/icons"
+import { addCircleOutline, arrowBackCircleOutline, buildOutline, calculatorOutline, callOutline, closeOutline, documentTextOutline, gitBranchOutline, gitMergeOutline, removeCircleOutline } from "ionicons/icons"
 import { useEffect, useState } from "react"
 import { AddressSuggestions, FioSuggestions } from "react-dadata"
 import { Store, getData } from "./Store"
@@ -22,26 +22,15 @@ const icons = {
 }
 
 export function Services(){
-    const [ info, setInfo ]     = useState<any>()
-    const [ order, setOrder ]   = useState<any>()
-    const [ page, setPage ]     = useState(0)
-    const [ load, setLoad ]     = useState( false )
-    const [ messages, setMessages ]   = useState<any>([])
+    const [ info, setInfo ]             = useState<any>( Store.getState().services )
+    const [ order, setOrder ]           = useState<any>()
+    const [ page, setPage ]             = useState(0)
+    const [ load, setLoad ]             = useState( false )
+    const [ messages, setMessages ]     = useState<any>([])
+    const [ upd, setUpd]                = useState( 0 )
 
     
     let elem = <></>
-
-    async function Load(){
-
-        setLoad( true)
-
-        const res = await getData("S_Details", {
-            token: Store.getState().login.token
-        })
-        if(!res.error) setInfo( res.data)
-
-        setLoad( false )
-    }
 
     Store.subscribe({num: 21, type: "back", func: ()=>{
         if( page > 0 ) {
@@ -52,12 +41,20 @@ export function Services(){
         else Store.dispatch({ type: "route", route: "back"})
     }})
 
+    Store.subscribe({num: 22, type: "services", func: ()=>{
+        console.log("subscibe 22")
+        setInfo( Store.getState().services )
+        setUpd( upd + 1)
+    }})
+
     useEffect(()=>{
 
-        Load()
+        setInfo( Store.getState().services )
+        setUpd( upd + 1)
         
         return ()=>{
             Store.unSubscribe( 21 )
+            Store.unSubscribe( 22 )
         }
 
     },[])
@@ -67,7 +64,6 @@ export function Services(){
         order.token = Store.getState().login.token
         const res = await getData("Services", order )
         order.result = res
-        console.log( res )
         if(res.error) setPage(98)
         else setPage(99)
         setLoad(false)
@@ -97,8 +93,6 @@ export function Services(){
                                 if(order[key][req][4])
                                     if(order[key][req][0] === "" || order[key][req][0] === 0 || order[key][req][0] === undefined){
                                         jarr.push( "Заполните " + order[key][req][2] )
-                                        console.log( [req] )
-                                        console.log( order[key][req] )
                                     }
                                 
                         }                        
@@ -133,7 +127,7 @@ export function Services(){
 
     elem = <>
         <IonLoading message={ "Подождите..." } isOpen = { load }/>
-        {
+        {   
             page === 0 ? elem 
             : <>
                 <div className="cl-white ml-1"><h1><b>{ order?.Описание }</b></h1></div>
@@ -192,12 +186,13 @@ export function Services(){
 
 function Service(props: { info, page }){
     const [ info ] = useState( props.info  )
-    const [ page ] = useState( props.page)
     const [ upd, setUpd] = useState( 0 )
     const [ load, setLoad] = useState( false)
 
 
     useEffect(()=>{
+        console.log("useeffects +")
+        console.log( info )
         for(const [ key ] of Object.entries(info)){
             if(key === "Заявка") continue
             if(key === "Описание") continue
@@ -218,17 +213,30 @@ function Service(props: { info, page }){
                 }        
             }
         }
-        console.log( props.page)
-        console.log( info)
         setUpd( upd + 1)
+        console.log("useeffects -")
+        
+        return ()=>{
+            info.Просмотр.Файл = ""
+        }
+
     },[])
 
     useEffect(()=>{
-        console.log( "use page")
+        console.log("preview")
         if( info.Просмотр !== undefined){
             if(info.Просмотр.Страница === props.page) 
                 Preview();
         }        
+
+        return ()=>{
+            if( info.Просмотр !== undefined){
+                if(info.Просмотр.Страница === props.page) {
+                    info.Просмотр.Файл = ""
+                }
+            }
+
+        }
     },[ props.page ])
 
     function Upd(){
@@ -239,17 +247,19 @@ function Service(props: { info, page }){
 
     async function Preview()   {
         setLoad(true)
-        info.token = Store.getState().login.token
-        const res = await getData("Preview", info )
-        console.log(res)
-        if(res.data.Файлы.length > 0 ){
-            info.agree = res.data.Файлы[0].Файлы[0].dataUrl;    
-}
+        if( info.Просмотр.Файл === ""){
+            info.token = Store.getState().login.token
+            const res = await getData("Preview", info )
+            console.log(res)
+            if(res.data.Файлы.length > 0 ){
+                info.Просмотр.Файл = res.data.Файлы[0].Файлы[0].dataUrl;    
+            }       
+        }
         setLoad(false)
     }
 
     if( props.page === 98 ) 
-        elem = <Fail info = { info.result.message }/>
+        elem = <Fail />
     else
     if( props.page === 99)
         elem  = <Success info = { info } />
@@ -261,7 +271,12 @@ function Service(props: { info, page }){
         if(info[key].Страница === props.page ) {
             if(key === "Просмотр") {
                 elem = <>
-                    <PDFDoc url = { info.agree } name  = { "ДоговорНаТО" } title = { "Договор на тех/обслуживание" }/>        
+                    {
+                        info.Просмотр.Файл !== ""
+                            ? <PDFDoc url = { info.Просмотр.Файл } name  = { "ДоговорНаТО" } title = { "Договор на тех/обслуживание" }/>                
+                            : <></>
+                    }
+                    
                 </>
             } else   
             switch( key ){
@@ -288,7 +303,7 @@ function Service(props: { info, page }){
                                 case "text"     : elem = <> { elem } <Text      info = {{ info: info[key], title: info[key][req][2], name: req }}  /> </>; break;
                                 case "date"     : elem = <> { elem } <Date      info = {{ info: info[key], title: info[key][req][2], name: req }}  /> </>; break;
                                 case "box"      : elem = <> { elem } <Box       info = {{ info: info[key], title: info[key][req][2], name: req, choice: Array.isArray(info[key][req][3]) ? info[key][req][3] : [] }}  /> </>; break;
-                                case "lics"     : elem = <> { elem } <Box       info = {{ info: info[key], title: info[key][req][2], name: req, choice: Store.getState().lics === undefined ? [] : Store.getState().lics }}  /> </>; break;
+                                case "lics"     : elem = <> { elem } <Box       info = {{ info: info[key], title: info[key][req][2], name: req, choice: Store.getState().profile.lics === undefined ? [] : Store.getState().profile.lics }}  /> </>; break;
                                 case "address"  : elem = <> { elem } <Address   info = {{ info: info[key], title: info[key][req][2], name: req }} setUpd = { Upd } /> </>; break;
                                 default         : elem = <> { elem } </>
                             }
@@ -299,7 +314,6 @@ function Service(props: { info, page }){
                     
         }
     }
-
 
     return <>
         <IonLoading isOpen = { load } message={"Подождите..."}/>
@@ -411,7 +425,7 @@ function Box(props: { info }) {
                 <div className=' ml-1 s-input pl-1 pr-1 w-60'>
                     <Select options={ options } value={ value } primaryColor="red" onChange={ handleChange } 
                          classNames={{
-                            listItem: ( isSelected ) => (
+                            listItem: () => (
                                 `sbl-item`
                             )
                         }}
@@ -432,7 +446,7 @@ function Address( props: { info, setUpd }){
     const [ modal, setModal ] = useState( false )
 
     function ModalForm(){
-        const [ address, setAddress ] = useState(
+        const [ address ] = useState(
             {
                 area:   [],
                 city:   "",
@@ -462,7 +476,6 @@ function Address( props: { info, setUpd }){
             token:  Store.getState().login.token,
             address: arg[0],
         })
-        console.log(res)
         info[ arg[5] ] = res.data
         props.setUpd()
     }
@@ -502,7 +515,6 @@ function Address( props: { info, setUpd }){
                                 if( info[ props.info.name ][5] !== undefined ) {
                                     load( info[ props.info.name ] )
                                 }    
-                                console.log(info[ props.info.name ][0] )
                             }
 
                         }} 
@@ -611,7 +623,6 @@ function MCHRG( props: { info}){
                                 onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
                                     modal.Высота = (e.target.value as number)
                                     Counted()
-                                    console.log(modal)
                                 }}
                             />
                         </div>
@@ -728,7 +739,6 @@ function Rooms(props: { info }){
     }
 
     for( let i = 0;i < info.length;i++){
-        console.log( info[i] )
         elem = <>
             { elem }
             <div className="flex sl-space ml-2 mt-1 mr-1">
@@ -740,7 +750,6 @@ function Rooms(props: { info }){
                         onClick={()=>{
                         info.splice(i, 1)
                         setUpd( upd + 1)
-                        console.log( info )
                         }}
                     />
                 </div>
@@ -755,7 +764,7 @@ function Rooms(props: { info }){
                 <div className=' ml-1 s-input pl-1 pr-1 w-60'>
                     <Select options={ options } value={ value } primaryColor="red" onChange={ handleChange2 } 
                         classNames={{
-                            listItem: ( isSelected ) => (
+                            listItem: () => (
                                 `sbl-item`
                             )
                         }}
@@ -789,7 +798,6 @@ function Rooms(props: { info }){
                 onClick={()=>{
                   info.push({ ТипПомещения: value.value, Объем: vol,Площадь: squ} )
                   setValue( { value: "Тип", label: "Тип помещения"} );setSqu( undefined ); setVol( undefined );
-                  console.log( info )
                 }}
             />
         </div>
@@ -812,7 +820,6 @@ function Equips(props: { info }){
                 token:  Store.getState().login.token,
                 tip:    props.info.ОбъектГазификации.Строение[ 0 ] 
             })
-            console.log(res)
             if(!res.error) setOptions(res.data)
         }
 
@@ -837,7 +844,6 @@ function Equips(props: { info }){
     }
 
     for( let i = 0;i < info.length;i++){
-        console.log( info[i] )
         elem = <>
             { elem }
             <div className="flex fl-space ml-2 mt-1 mr-1">
@@ -852,9 +858,8 @@ function Equips(props: { info }){
                 <div>
                     <IonIcon icon = { removeCircleOutline } className="ml-1  w-2 h-2"
                         onClick={()=>{
-                        info.splice(i, 1)
-                        setUpd( upd + 1)
-                        console.log( info )
+                            info.splice(i, 1)
+                            setUpd( upd + 1)
                         }}
                     />
                 </div>
@@ -869,7 +874,7 @@ function Equips(props: { info }){
                 <div className=' ml-1 s-input-2 pl-1 pr-1'>
                     <Select options={ options } value={ value } primaryColor="red" onChange={ handleChange } 
                         classNames={{
-                            listItem: ( isSelected ) => (
+                            listItem: ( ) => (
                                 `sbl-item`
                             )
                         }}
@@ -902,7 +907,6 @@ function Equips(props: { info }){
                 onClick={()=>{
                   info.push( { Оборудование: value.value, Тип: tip, Количество: amount} )  
                   setValue( { value: "Тип", label: "Оборудование"} );setTip( undefined ); setAmount( undefined );
-                  console.log( info )
                 }}
             />
         </div>
@@ -922,7 +926,6 @@ function Meters(props: { info }){
     </>
 
     for( let i = 0;i < info.length;i++){
-        console.log( info[i] )
         elem = <>
             { elem }
             <div className="flex sl-space ml-2 mt-1 mr-1">
@@ -1004,7 +1007,6 @@ function Meters(props: { info }){
                   info.push( value )  
                   setValue( new Object );
                   setUpd( upd + 1 )
-                  console.log( info )
                 }}
             />
         </div>
@@ -1077,7 +1079,7 @@ function Success( props: { info }){
     return elem
 }
 
-function Fail(props: { info }){
+function Fail(){
     const elem = <>
         <div>
             <div className="ml-1 mt-1 flex fl-space">

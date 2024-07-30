@@ -2,17 +2,14 @@ import { IonCard, IonIcon, IonInput, IonLoading, IonText } from "@ionic/react"
 import React, { useEffect, useState } from "react"
 import { getAppeals, getData, Store } from "./Store"
 import "./Appeals.css"
-import { downloadOutline, syncCircleOutline, syncOutline } from "ionicons/icons"
+import { syncCircleOutline } from "ionicons/icons"
 
 export function Appeals() {
-    const [ info, setInfo ] = useState<any>([])
-    const [ load, setLoad ] = useState( false )
-    const [ value, setValue ] = useState<any>( { value: "Получатель", label: "Получатель" } )
-    const [ item, setItem ] = useState<any>()
-    const [ upd, setUpd]    = useState( 0 )
+    const [ info, setInfo ]     = useState<any>([])
+    const [ load ]              = useState( false )
+    const [ item, setItem ]     = useState<any>()
+    const [ upd, setUpd]        = useState( 0 )
   
-    const options: any = []
-
     Store.subscribe({num : 101, type: "back", func: ()=>{
 
         if(item !== undefined) {
@@ -42,11 +39,10 @@ export function Appeals() {
                 : props.info.Сообщения[0]
         )
         async function read() {
-            const res = await getData("readMessages", {
+            await getData("readMessages", {
                 token:      Store.getState().login.token,
                 channel:    props.info.Код,
             })
-            console.log(res)
         }
 
         const elem = <>

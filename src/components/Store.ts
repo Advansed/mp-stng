@@ -21,7 +21,8 @@ export const i_state = {
     apps:                               [],   
     pred:                               [],
     notices:                            [],
-    appeals:                            [],    
+    appeals:                            [],  
+    services:                           [],  
 
 }
 
@@ -134,21 +135,14 @@ function                create_Store(reducer, initialState) {
     };
 }
 
-const                   rootReducer = combineReducers({
+const reduct: any = {}
 
-    auth:                      reducers[ 0],
-    reg:                       reducers[ 1],
-    route:                     reducers[ 2],
-    login:                     reducers[ 3],
-    back:                      reducers[ 4],
-    profile:                   reducers[ 5],
-    lics:                      reducers[ 6],
-    apps:                      reducers[ 7],
-    pred:                      reducers[ 8],
-    notices:                   reducers[ 9],
-    appeals:                   reducers[10],
 
-})
+Object.keys(i_state).map((e, i)=>{ reduct[e] = reducers[i]})
+
+
+const                   rootReducer = combineReducers( reduct )
+
 
 export const Store   =  create_Store(rootReducer, i_state)
 
@@ -209,7 +203,6 @@ export async function   getProfile( params){
 
 export async function   getLics( params){
     const res = await getData("getAccount", params)
-    console.log(res)
     if(res.error) console.log(res.message)
     else res.data.forEach(elem => {
         elem.sum = elem.debts.reduce(function(a, b){
@@ -227,7 +220,6 @@ export async function   getLics( params){
 
 export async function   getApps( params){
     const res = await getData("ListServices", params)
-    console.log(res)
     if(res.error) console.log(res.message)
     else Store.dispatch({ type: "apps", apps: res.data})
 }
@@ -289,24 +281,34 @@ export async function   getNotifications( page ){
         token: Store.getState().login.token,
         page : page
     })
-    console.log(res)
+    console.log( res )
     if(!res.error) Store.dispatch({ type: "notices", notices: res.data})
-}
 
+}
 
 export async function   getAppeals(){
     const res = await getData("getMessages", {
         token: Store.getState().login.token
     })
-    console.log(res)
     if(!res.error) Store.dispatch({ type: "appeals", appeals: res.data})
+}
+
+export async function   getServices() {
+
+    const res = await getData("S_Details", {
+        token: Store.getState().login.token
+    })
+    
+    if(!res.error) Store.dispatch({ type: "services", services: res.data })
+
 }
 
 Store.subscribe({ num: 1001, type: "login", func: ()=>{
 
-    getLics({ token: Store.getState().login.token })
-    getProfile({ token: Store.getState().login.token })
-    getApps({ token: Store.getState().login.token })
+    getLics( { token: Store.getState().login.token } )
+    getProfile( { token: Store.getState().login.token } )
+    getApps( { token: Store.getState().login.token } )
+    getServices(  );
     getNotifications( 0 )
 
 }})
