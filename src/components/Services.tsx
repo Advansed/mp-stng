@@ -130,7 +130,7 @@ export function Services(){
         {   
             page === 0 ? elem 
             : <>
-                <div className="cl-white ml-1"><h1><b>{ order?.Описание }</b></h1></div>
+                {/* <div className="cl-white ml-1"><h1><b>{ order?.Описание }</b></h1></div> */}
                 
                 <IonCard className="pb-1 s-card">
                     <Service  info = { order } page = { page }/>    
@@ -191,8 +191,6 @@ function Service(props: { info, page }){
 
 
     useEffect(()=>{
-        console.log("useeffects +")
-        console.log( info )
         for(const [ key ] of Object.entries(info)){
             if(key === "Заявка") continue
             if(key === "Описание") continue
@@ -207,23 +205,24 @@ function Service(props: { info, page }){
                     case "ПаспортДатаВыдачи":       info[key][req][0]   = Store.getState().profile?.passport?.issuedDate; break;    
                     case "Доп6":                    info[key][req][0]   = Store.getState().profile?.passport?.codePodr; break;    
                     case "ПаспортКемВыдан":         info[key][req][0]   = Store.getState().profile?.passport?.issuedBy; break;    
-                    case "СНИЛС":                   info[key][req][0]   = Store.getState().profile?.snils; break;    
+                    // case "СНИЛС":                   info[key][req][0]   = Store.getState().profile?.snils; break;    
                     case "Доп1":                    info[key][req][0]   = Store.getState().profile?.email; break;    
                     case "КонтактныйТелефон":       info[key][req][0]   = Store.getState().login?.phone; break;    
                 }        
             }
         }
         setUpd( upd + 1)
-        console.log("useeffects -")
         
+        console.log( info )
+
         return ()=>{
-            info.Просмотр.Файл = ""
+            if( info.Просмотр !== undefined)
+                info.Просмотр.Файл = ""
         }
 
     },[])
 
     useEffect(()=>{
-        console.log("preview")
         if( info.Просмотр !== undefined){
             if(info.Просмотр.Страница === props.page) 
                 Preview();

@@ -42,6 +42,12 @@ export function Notifications(){
         </>    
     }
 
+    elem = <>
+        <div className="">
+            { elem }
+        </div>
+    </>
+
     return elem
 }
 

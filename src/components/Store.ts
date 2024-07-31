@@ -277,7 +277,7 @@ export async function   getNoticeDetail( id ){
 }
 
 export async function   getNotifications( page ){
-    const res = await getData("GetNotices", {
+    const res = await getData("GetNotifications", {
         token: Store.getState().login.token,
         page : page
     })
