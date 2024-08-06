@@ -83,7 +83,7 @@ const Page: React.FC = () => {
       }
 
     return <>
-      <div className='p-content'>
+      <div className={ isPlatform("ios") ? 'p-content-ios': "p-content"}>
         { elem }
       </div>
     </>
@@ -107,7 +107,7 @@ const Page: React.FC = () => {
           </IonButtons>
         </div>
 
-      <IonContent className='p-content'>
+      <IonContent>
         <Main />
         <div className='p-footer'>
           <IonTabBar slot="bottom">

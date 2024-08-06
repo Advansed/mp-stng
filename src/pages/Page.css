@@ -18,3 +18,13 @@
   background-position: bottom;
 
 }
+
+.p-content-ios {
+  height: calc( 100vh - 10em);
+  overflow-y:scroll;
+  background: url('pattern.png'), linear-gradient(156.39deg, #1B80B9 7.75%, #0E3977 100.99%); 
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom;
+
+}
