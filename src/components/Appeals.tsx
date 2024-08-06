@@ -19,6 +19,7 @@ export function Appeals() {
          Store.dispatch({type: "route", route: "back"}) 
 
     } })
+
     Store.subscribe({num : 102, type: "appeals", func: ()=>{
         setInfo( Store.getState().appeals )
     } })
@@ -60,7 +61,7 @@ export function Appeals() {
                 
                 <div className="flex fl-space mr-1 ml-1 mt-1 apl-string">
                     <div className="w-90 apl-string"> { last.Текст } </div>    
-                    <div className="apl-cnt"> { info.Кнт } </div>    
+                    <div className={ info.Кнт === 0 ? "apl-cnt-1" : "apl-cnt" }> { info.Кнт } </div>    
                 </div>
             </IonCard>
         </>
@@ -131,21 +132,26 @@ export function Appeals() {
         }
 
         const elem = <>
-            <IonCard className="bg-3 pb-1 h-80 mr-1">
-                <div className="ml-1 mt-1 fs-12"><b>{ propsInfo.Наименование + " - " + propsInfo.Кнт }</b></div>
+            <IonCard className="bg-3 pb-1 h-90 mr-1">
+                <div className="apl-body">
+                    <div className="ml-1 mt-1 fs-12"><b>{ propsInfo.Наименование + " - " + propsInfo.Кнт }</b></div>
 
-                <div className="apl-borders ml-1 mr-1 pl-1 pr-1">
-                    <IonInput 
-                        placeholder="Введите текст"
-                        onIonChange={(e)=>{
-                            Add( e.detail.value )
-                        }}
-                    />
+                    <div className="apl-borders ml-1 mr-1 pl-1 pr-1">
+                        <IonInput 
+                            placeholder="Введите текст"
+                            onIonChange={(e)=>{
+                                Add( e.detail.value )
+                            }}
+                        />
+                    </div>
+                    <div className="apl-card">
+                        {
+                            items
+                        }
+                    </div>
                 </div>
-                <div className="apl-card">
-                    {
-                        items
-                    }
+                <div className="h-10 ml-1 mr-1 mt-1 fs-09">
+                    { propsInfo.Описание }
                 </div>
             </IonCard>
         </>

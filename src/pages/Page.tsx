@@ -92,7 +92,6 @@ const Page: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
         <div className={ isPlatform("ios") ? 'p-header flex fl-space mt-3' : "p-header flex fl-space" }>
           <IonButton
             fill = "clear"
@@ -107,7 +106,6 @@ const Page: React.FC = () => {
             <IonMenuButton color= 'light' />
           </IonButtons>
         </div>
-      </IonHeader>
 
       <IonContent className='p-content'>
         <Main />

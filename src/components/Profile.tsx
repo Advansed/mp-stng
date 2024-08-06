@@ -6,8 +6,8 @@ import { KemVydan, Store, getData } from "./Store"
 import MaskedInput from "../mask/reactTextMask"
 
 export function Profile(){
-    const [ info, setInfo ] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
-    const [ mode, setMode ] = useState<any>({ // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ info, setInfo ] = useState<any>() 
+    const [ mode, setMode ] = useState<any>({ 
         token : Store.getState().login.token
     })
     const [ upd, setUpd] = useState( 0 )
@@ -231,7 +231,7 @@ export function Profile(){
                 <div> Когда выдан </div>
                 <div className='s-input a-right pr-1'>
                     <MaskedInput
-                        mask={[ /[1-9]/, /\d/, '.', /\d/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
+                        mask={[ /[0-9]/, /\d/, '.', /\d/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
                         className="m-input-1 a-right"
                         id='10'
                         value={ info?.passport.issuedDate }
@@ -239,6 +239,7 @@ export function Profile(){
                         type='text'
                         onChange={(e) => {
                             info.passport.issuedDate = e.target.value    
+                            if(mode.passport === undefined) mode.passport = new Object
                             mode.passport.issuedDate = e.target.value        
                         }}
                     />
@@ -255,6 +256,7 @@ export function Profile(){
                         onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
                             if(mode.passport === undefined) mode.passport = new Object
                             info.passport.codePodr = e.target.value    
+                            if(mode.passport === undefined) mode.passport = new Object
                             mode.passport.codePodr = e.target.value    
                         }}
                         onIonChange={(e)=>{
@@ -264,6 +266,7 @@ export function Profile(){
                                 if(res?.suggestions !== undefined ){
                                     if(mode.passport === undefined) mode.passport = new Object
                                     info.passport.issuedBy = res?.suggestions[0]?.value
+                                    if(mode.passport === undefined) mode.passport = new Object
                                     mode.passport.issuedBy = res?.suggestions[0]?.value
                                     setUpd( upd + 1)
                                 }
@@ -295,12 +298,13 @@ export function Profile(){
                 className='l-content'
             >
                 <IonCard className="pb-1">
-                    <FIO />
+                    <FIO  />
                     <Passport />
                     <Contacts/>
                 </IonCard>
             </div>
         </div>
     </>
+    
     return elem
 }

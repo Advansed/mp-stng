@@ -25,6 +25,16 @@
     background-color: green;
     border-radius: 50%;
   }
+  .apl-cnt-1 {
+    display: grid;
+    width: 2em;
+    height: 2em;
+    color: white;
+    text-align: center;
+    align-items: center;
+    background-color: gray;
+    border-radius: 50%;
+  }
 
   .apl-bg {
     position: relative;
@@ -59,4 +69,8 @@
     height: calc(100% - 5em);
     width: auto;
     overflow-y: scroll;
+  }
+
+  .apl-body {
+    height: 85%;
   }

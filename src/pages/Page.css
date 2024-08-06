@@ -10,7 +10,7 @@
   }
 
 .p-content {
-  height: 81vh;
+  height: calc( 100vh - 7em);
   overflow-y:scroll;
   background: url('pattern.png'), linear-gradient(156.39deg, #1B80B9 7.75%, #0E3977 100.99%); 
   background-size: contain;

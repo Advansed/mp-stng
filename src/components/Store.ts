@@ -7,7 +7,7 @@ const reducers: Array<Reducer<any, any>> = [] // eslint-disable-line @typescript
 
 export const listeners: Array<any>  = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
-export const version = '2.1.3'
+export const version = '2.1.4'
 
 export const i_state = {
 

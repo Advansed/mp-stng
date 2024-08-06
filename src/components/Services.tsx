@@ -205,7 +205,6 @@ function Service(props: { info, page }){
                     case "ПаспортДатаВыдачи":       info[key][req][0]   = Store.getState().profile?.passport?.issuedDate; break;    
                     case "Доп6":                    info[key][req][0]   = Store.getState().profile?.passport?.codePodr; break;    
                     case "ПаспортКемВыдан":         info[key][req][0]   = Store.getState().profile?.passport?.issuedBy; break;    
-                    // case "СНИЛС":                   info[key][req][0]   = Store.getState().profile?.snils; break;    
                     case "Доп1":                    info[key][req][0]   = Store.getState().profile?.email; break;    
                     case "КонтактныйТелефон":       info[key][req][0]   = Store.getState().login?.phone; break;    
                 }        

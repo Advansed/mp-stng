@@ -639,9 +639,11 @@ function AddLic2(props:{ setPage }){
 function Lic(props: { info, ind, setItem, setPage } ){
     const [ load,   setLoad ]   = useState(false)
     const [ modal,  setModal ]  = useState<any>()
+    const [ pop,    setPop ]    = useState( false )
 
     const info = props.info 
-
+    
+    console.log( info )
     async function delAccont() {
         setLoad( true)
         const res = await  getData("DelAccount", {
@@ -675,13 +677,13 @@ function Lic(props: { info, ind, setItem, setPage } ){
                 <div className='cl-black'> <h4><b>{ "Лицевой счет №" + info.code }</b></h4></div>
                 <IonButton
                     fill    = "clear"
-                    id      = { "trigger-" + props.ind.toString() }
+                    onClick={()=>{ setPop( true )}}
                 >
                     <IonIcon icon = { ellipsisVerticalOutline }  color="primary" slot='icon-only'/> 
                 </IonButton>
                 <IonPopover
-                    trigger         = { "trigger-" + props.ind.toString() }
-                    triggerAction   = 'click'
+                    isOpen = { pop }
+                    onDidDismiss={ ()=> setPop( false) }
                 >
                     <IonContent>
                         <div className='flex fl-space ml-2 t-underline mr-1 h-4'
@@ -702,6 +704,7 @@ function Lic(props: { info, ind, setItem, setPage } ){
                         <div className='flex fl-space ml-2  mr-1 h-4'
                             onClick={()=>{
                                 delAccont()
+                                setPop( false )
                             }}  
                         >
                             <div>Удалить</div>
@@ -791,19 +794,26 @@ function Lic(props: { info, ind, setItem, setPage } ){
                 >
                     Квитанция 
                 </IonButton>
-                <IonButton
-                    className='mt-1'
-                    mode = "ios"
-                    color = "tertiary"
-                    expand='block'
-                    fill = "outline"
-                    onClick={()=>{
-                        props.setItem( info )
-                        props.setPage( 6 )
-                    }}
-                >
-                    Внести показания
-                </IonButton>
+                {/* {
+                    info.routers.length > 0
+                        ? <>
+                            <IonButton
+                                className='mt-1'
+                                mode = "ios"
+                                color = "tertiary"
+                                expand='block'
+                                fill = "outline"
+                                onClick={()=>{
+                                    props.setItem( info )
+                                    props.setPage( 6 )
+                                }}
+                            >
+                                Внести показания
+                            </IonButton>                        
+                        </>
+                        : <></>
+                } */}
+
             </div>
         </IonCard>
         <IonModal
