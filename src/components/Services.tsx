@@ -487,6 +487,7 @@ function Address( props: { info, setUpd }){
                         value={ value } 
                         filterLocations={[{ region: "Саха /Якутия/" }]}
                         onChange={(e)=>{
+                            console.log( e )
                             const hs : any = e?.data;
                             info[ props.info.name ][0] = ""
                             if( 
@@ -506,7 +507,7 @@ function Address( props: { info, setUpd }){
                                     + ", " + (e?.data.city_with_type         === null ? "" : e?.data.city_with_type)
                                     + ", " + (e?.data.settlement_with_type   === null ? "" : e?.data.settlement_with_type)
                                     + ", " + (e?.data.street_with_type       === null ? "" : e?.data.street_with_type)
-                                    + ", " + (e?.data.house                  === null ? "" : e?.data.house)
+                                    + ", " + (e?.data.house                  === null ? "" : e?.data.house) + (e?.data.block === null ? "" : " " + e?.data.block_type + " " + e?.data.block )
                                     + ", " + (e?.data.flat                   === null ? "" : e?.data.flat)
                                     + ", " + (e?.data.house_fias_id          === null ? "" : e?.data.house_fias_id)
                                 

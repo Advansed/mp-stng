@@ -1090,7 +1090,7 @@ function PaymentsTO(props:{ item, setPage }){
                         }}
                     >   
                         <img src="assets/sberEQ.png" alt="sberEQ"  className='w-25 h-25'/>
-                        <IonLabel className = "">Сбербанк</IonLabel>
+                        <IonLabel className = "">Карта</IonLabel>
                     </div>        
                 </div>
                 <div
