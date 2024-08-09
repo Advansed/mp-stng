@@ -87,6 +87,7 @@ export function News(){
                                if(typeof res.data.image === "string" )
                                   if(res.data.image.substring(0, 1) === "/")
                                     res.data.image = "https://aostng.ru" + res.data.image
+                              console.log( res.data )
                                setModal(res.data)
                             }
                             load()

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Store, getData, getLics, getProfile } from './Store'
 import './Lics.css'
-import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLoading, IonModal, IonPopover, IonRow, IonText } from '@ionic/react'
+import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRow, IonText } from '@ionic/react'
 import { chevronForwardOutline, documentTextOutline, ellipsisVerticalOutline, newspaperOutline, pencilOutline, trashBinOutline } from 'ionicons/icons'
 import { PDFDoc } from './Files'
 
@@ -643,7 +643,6 @@ function Lic(props: { info, ind, setItem, setPage } ){
 
     const info = props.info 
     
-    console.log( info )
     async function delAccont() {
         setLoad( true)
         const res = await  getData("DelAccount", {
@@ -794,8 +793,8 @@ function Lic(props: { info, ind, setItem, setPage } ){
                 >
                     Квитанция 
                 </IonButton>
-                {/* {
-                    info.routers.length > 0
+                {
+                    info.counters.length !== 0
                         ? <>
                             <IonButton
                                 className='mt-1'
@@ -812,7 +811,7 @@ function Lic(props: { info, ind, setItem, setPage } ){
                             </IonButton>                        
                         </>
                         : <></>
-                } */}
+                }
 
             </div>
         </IonCard>
@@ -963,11 +962,8 @@ function Payments(props:{ item, setPage }){
                 />
             </div>
             <div className='flex fl-space ml-1 mr-1'>
-                <div className='w-70'>
-                    <IonButton
-                        color = "tertiary"
-                        expand='block'
-                        mode = "ios"
+                <div className='w-50 mt-1'>
+                    <div className='ls-item'
                         onClick={()=>{
                             item.order = new Object()
                             item.order.token    = Store.getState().login.token
@@ -979,17 +975,13 @@ function Payments(props:{ item, setPage }){
                             item.order.ios      = false
                             props.setPage( 7 )
                         }}
-                    >   {
-                            "Оплатить"
-                        }
-                    </IonButton>        
+                    >   
+                        <img src="assets/sberEQ.png" alt="sberEQ"  className='w-25 h-25'/>
+                        <IonLabel className = "">Сбербанк</IonLabel>
+                    </div>        
                 </div>
-                <IonButton
-                    color = "tertiary"
-                    expand='block'
-                    mode = "ios"
-                    fill = "clear"
-
+                <div
+                    className='ls-item mt-1 w-50 ml-1'
                     onClick={()=>{
                         item.order = new Object()
                         item.order.token    = Store.getState().login.token
@@ -1002,8 +994,9 @@ function Payments(props:{ item, setPage }){
                         props.setPage( 8 )
                 }}
                 >   
-                    <IonImg alt = "" src="assets/SberPay.png" className='h-3' />
-                </IonButton>               
+                    <IonImg alt = "" src="assets/sbermobile.png" className='h-25 w-25' />
+                    <IonLabel className = "">СберМобайл</IonLabel>
+                </div>               
             </div>
 
         </IonCard>
@@ -1031,14 +1024,14 @@ function PaymentsTO(props:{ item, setPage }){
                 <b>{ "Задолженность" }</b>
             </div>
             {
-                item.debts.map((e)=>{
+                item.debtsto.map((e)=>{
                     return <>
                         <div className='ml-2 mt-1 mr-1 flex fl-space'>
                             <div><b>{ e.label }</b></div>
                             <div className='cl-prim fs-11'>
                                 <b>
                                     { 
-                                        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( e.sumto  )
+                                        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( e.sum  )
                                     }
                                 </b>
                             </div>
@@ -1082,11 +1075,8 @@ function PaymentsTO(props:{ item, setPage }){
                 />
             </div>
             <div className='flex fl-space ml-1 mr-1'>
-                <div className='w-70'>
-                    <IonButton
-                        color = "tertiary"
-                        expand='block'
-                        mode = "ios"
+                <div className='w-50 mt-1'>
+                    <div className='ls-item'
                         onClick={()=>{
                             item.order = new Object()
                             item.order.token    = Store.getState().login.token
@@ -1098,17 +1088,13 @@ function PaymentsTO(props:{ item, setPage }){
                             item.order.ios      = false
                             props.setPage( 7 )
                         }}
-                    >   {
-                            "Оплатить"
-                        }
-                    </IonButton>        
+                    >   
+                        <img src="assets/sberEQ.png" alt="sberEQ"  className='w-25 h-25'/>
+                        <IonLabel className = "">Сбербанк</IonLabel>
+                    </div>        
                 </div>
-                <IonButton
-                    color = "tertiary"
-                    expand='block'
-                    mode = "ios"
-                    fill = "clear"
-
+                <div
+                    className='ls-item mt-1 w-50 ml-1'
                     onClick={()=>{
                         item.order = new Object()
                         item.order.token    = Store.getState().login.token
@@ -1121,8 +1107,9 @@ function PaymentsTO(props:{ item, setPage }){
                         props.setPage( 8 )
                 }}
                 >   
-                    <IonImg alt = "" src="assets/SberPay.png" className='h-3' />
-                </IonButton>               
+                    <IonImg alt = "" src="assets/sbermobile.png" className='h-25 w-25' />
+                    <IonLabel className = "">СберМобайл</IonLabel>
+                </div>               
             </div>
 
         </IonCard>

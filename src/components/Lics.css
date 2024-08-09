@@ -65,3 +65,14 @@
 }
 
 
+.ls-item {
+    background-color:#3f64a9;
+    color: white;
+    height: 4em;
+    display: flex;
+    align-items: center;
+    padding-left: 0.5em;
+    border-radius: 15px;
+    padding-right: 1em;
+
+}
