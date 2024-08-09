@@ -976,8 +976,8 @@ function Payments(props:{ item, setPage }){
                             props.setPage( 7 )
                         }}
                     >   
-                        <img src="assets/sberEQ.png" alt="sberEQ"  className='w-25 h-25'/>
-                        <IonLabel className = "">Сбербанк</IonLabel>
+                        <img src="assets/SberEQ.png" alt="sberEQ"  className='w-25 h-25'/>
+                        <IonLabel className = "">Карта</IonLabel>
                     </div>        
                 </div>
                 <div
