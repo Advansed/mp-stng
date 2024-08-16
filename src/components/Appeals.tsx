@@ -94,7 +94,7 @@ function Panel(props: { info, setItem }){
             <div className="flex fl-space mr-1 ml-1 mt-1 apl-string">
                 <div className="w-90 apl-string"> { 
                         info.Картинка 
-                            ? info.Картинка 
+                            ? <div className="flex"><IonIcon icon={ imageOutline }  className="w-15 h-15"/> <span className="ml-05">Картинка</span> </div>
                             : info.Текст 
                     } 
                 </div>    
