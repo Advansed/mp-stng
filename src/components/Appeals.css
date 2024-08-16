@@ -1,5 +1,9 @@
 
-  
+  .bg-4 {
+    border-radius: 15px;
+    background-color: #0e78cf;
+    color: white;
+  }
   .apl-input {
     background-color: white;
     padding-left: 1em;
@@ -41,8 +45,8 @@
     margin-top: 0.5em;
     padding: 1em;
     border-radius: 15px;
-    background-color: rgb(1, 170, 1);
-    color: white;
+    background-color: white;
+    color: #3f64a9;
   }
 
   .apl-bg1 {

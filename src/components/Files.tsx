@@ -14,7 +14,7 @@ import '@react-pdf-viewer/zoom/lib/styles/index.css';
 
 defineCustomElements(window)
 
-async function    takePicture() {
+export async function    takePicture() {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
@@ -78,6 +78,7 @@ export async function toPDF( pages, name ) {
 export function Files(props: { info, name, check, title }) {
     const [ upd,    setUpd] = useState( 0 )
     const [ modal,  setModal] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ modal1, setModal1] = useState( false )
     const [ load ] = useState( false)
 
     async function getFoto(){
@@ -122,19 +123,10 @@ export function Files(props: { info, name, check, title }) {
 
     const elem = <>
         <div>
-            <div className="flex fl-space t-underline ml-1 mr-1">
+            <div className="flex fl-space t-underline ml-1 mr-1 fs-09">
                 <div className= { props.check ? "mr-1" : "mr-1" }>
                     { props.check ? " * " + props.title : props.title }
                 </div>
-                <IonButton
-                    fill="clear"
-                    onClick = {()=>{ 
-                        props.info.pop();    
-                        setUpd(upd + 1)
-                    }}
-                >
-                    <IonIcon icon = { playSkipBackCircleOutline } color={ "tertiary" } className="w-2 h-2"/>
-                </IonButton>
             </div>
                 
             <div className={ "flex fl-wrap" }>
@@ -151,19 +143,11 @@ export function Files(props: { info, name, check, title }) {
                     })}
                     
                 <div
-                    onClick={()=>{ getFoto() }}
+                    onClick={()=>{ setModal1( true ) }}
                     className="ml-1 mt-1 s-photo"
                 >
                     <IonIcon icon = { cameraOutline } color="warning" slot="icon-only" className="w-3 h-3 "/>
                 </div>                        
-
-                <img key = { 100 } src = "assets/pdf.png" alt="pdf"  className="ml-1 s-photo-1 mt-1"
-                    onClick={()=>{
-                        if(props.info.length > 1)
-                            PDF()
-                        else openPDF()
-                    }}              
-                />
 
             </div>
         </div> 
@@ -181,14 +165,94 @@ export function Files(props: { info, name, check, title }) {
                 }
             </div>
         </IonModal>
- 
+        <IonModal
+            className="w-100 h-100"
+            isOpen = { modal1 }
+            onDidDismiss={ () => setModal1( false )}
+        >
+            <div className="w-100 h-100">
+                <div className="ml-1 mt-1 mr-1 cl-prim fs-09">
+                    { props.title }
+                </div>
+                <div className="ml-1 mt-1 mr-1 cl-prim">
+                    <div className="flex fl-space fs-09">
+                        <div>
+                            <b>Прикрепите заранее подготовленный pdf-файл</b>
+                        </div>
+                        <img src="assets/addPDF1.png" alt="addPDF" className="s-photo-3"/>
+                    </div>
+                    <div className="flex fl-space fs-09">
+                        <div className="mt-05">
+                            <b>или сфотографируйте все страницы документа</b>
+                        </div>
+                        <div className="s-photo-3">
+                            <IonIcon icon = { cameraOutline } color="warning" slot="icon-only" className="w-2 h-2 "/>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex fl-wrap">
+                    <img key = { 100 } src = "assets/addPDF1.png" alt="pdf"  className="ml-1 s-photo-1 mt-1"
+                        onClick={()=>{
+                            openPDF()
+                            setModal1( false )
+                        }}              
+                    />
+                    <div
+                        onClick={()=>{ 
+                            getFoto() 
+                        }}
+                        className="ml-1 mt-1 s-photo"
+                    >
+                        <IonIcon icon = { cameraOutline } color="warning" slot="icon-only" className="w-3 h-3 "/>
+                    </div>   
+                    <div
+                        onClick={()=>{ 
+                            props.info.pop();    
+                            setUpd(upd + 1)
+                        }}
+                        className="ml-1 mt-1 s-photo"
+                    >
+                        <img src="assets/delFile.png" alt="delFile"  className="w-3 h-3"/>
+                    </div>   
+                </div>
+                <div className="ml-1 mt-1 mr-1 cl-prim">
+                </div>
+                <div className="flex fl-wrap">
+                    { props.info.map((e, ind) =>{
+                        return e.format === "pdf"
+                            ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
+                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                            />
+                            : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
+                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                            />
+                            
+                        })
+                    }
+                </div>
+                <div className="ml-1 mt-1 mr-1">
+                    <IonButton
+                        expand = "block"
+                        onClick={()=>{ 
+                            if(props.info.length > 1 )
+                                PDF()
+                            setModal1( false )}
+                        }
+                    >
+                        Закрыть
+                    </IonButton>
+                </div>
+            </div>
+        </IonModal>
+
     </>
     return elem
 }
 
 export function Files1(props: { info, name, check, title, onMode }) {
     const [ upd,    setUpd] = useState( 0 )
-    const [ modal,  setModal] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ modal,  setModal] = useState<any>() 
+    const [ modal1, setModal1] = useState( false )
     const [ load ] = useState( false)
 
     async function getFoto(){
@@ -237,20 +301,10 @@ export function Files1(props: { info, name, check, title, onMode }) {
 
     const elem = <>
         <div>
-            <div className="flex fl-space t-underline ml-1 mr-1">
+            <div className="flex fl-space t-underline ml-1 mr-1 fs-09">
                 <div className= { props.check ? "mr-1" : "mr-1" }>
                     { props.check ? " * " + props.title : props.title }
                 </div>
-                <IonButton
-                    fill="clear"
-                    onClick = {()=>{ 
-                        props.info.pop();    
-                        setUpd(upd + 1)
-                        props.onMode( true )
-                    }}
-                >
-                    <IonIcon icon = { playSkipBackCircleOutline } color={ "tertiary" } className="w-2 h-2"/>
-                </IonButton>
             </div>
                 
             <div className={ "flex fl-wrap" }>
@@ -267,19 +321,13 @@ export function Files1(props: { info, name, check, title, onMode }) {
                     })}
                     
                 <div
-                    onClick={()=>{ getFoto() }}
+                    onClick={()=>{ 
+                        setModal1( true )
+                    }}
                     className="ml-1 mt-1 s-photo"
                 >
                     <IonIcon icon = { cameraOutline } color="warning" slot="icon-only" className="w-3 h-3 "/>
                 </div>                        
-
-                <img key = { 100 } src = "assets/pdf.png" alt="pdf"  className="ml-1 s-photo-1 mt-1"
-                    onClick={()=>{
-                        if(props.info.length > 1)
-                            PDF()
-                        else openPDF()
-                    }}              
-                />
 
             </div>
         </div> 
@@ -295,6 +343,86 @@ export function Files1(props: { info, name, check, title, onMode }) {
                         ? <PDFDoc url = { modal?.dataUrl } name  = { props.name } title = { props.title }/>
                         : <img src={ modal?.dataUrl } alt = "" />
                 }
+            </div>
+        </IonModal>
+        <IonModal
+            className="w-100 h-100"
+            isOpen = { modal1 }
+            onDidDismiss={ () => setModal1( false )}
+        >
+            <div className="w-100 h-100">
+                <div className="ml-1 mt-1 mr-1 cl-prim fs-09">
+                    { props.title }
+                </div>
+                <div className="ml-1 mt-1 mr-1 cl-prim">
+                    <div className="flex fl-space fs-09">
+                        <div>
+                            <b>Прикрепите заранее подготовленный pdf-файл</b>
+                        </div>
+                        <img src="assets/addPDF1.png" alt="addPDF" className="s-photo-3"/>
+                    </div>
+                    <div className="flex fl-space fs-09">
+                        <div className="mt-05">
+                            <b>или сфотографируйте все страницы документа</b>
+                        </div>
+                        <div className="s-photo-3">
+                            <IonIcon icon = { cameraOutline } color="warning" slot="icon-only" className="w-2 h-2 "/>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex fl-wrap">
+                    <img key = { 100 } src = "assets/addPDF1.png" alt="pdf"  className="ml-1 s-photo-1 mt-1"
+                        onClick={()=>{
+                            openPDF()
+                            setModal1( false )
+                        }}              
+                    />
+                    <div
+                        onClick={()=>{ 
+                            getFoto() 
+                        }}
+                        className="ml-1 mt-1 s-photo"
+                    >
+                        <IonIcon icon = { cameraOutline } color="warning" slot="icon-only" className="w-3 h-3 "/>
+                    </div>   
+                    <div
+                        onClick={()=>{ 
+                            props.info.pop();    
+                            setUpd(upd + 1)
+                            props.onMode( true )
+                        }}
+                        className="ml-1 mt-1 s-photo"
+                    >
+                        <img src="assets/delFile.png" alt="delFile"  className="w-3 h-3"/>
+                    </div>   
+                </div>
+                <div className="ml-1 mt-1 mr-1 cl-prim">
+                </div>
+                <div className="flex fl-wrap">
+                    { props.info.map((e, ind) =>{
+                        return e.format === "pdf"
+                            ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
+                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                            />
+                            : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
+                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                            />
+                            
+                        })
+                    }
+                </div>
+                <div className="ml-1 mt-1 mr-1">
+                    <IonButton
+                        expand = "block"
+                        onClick={()=>{ 
+                            if(props.info.length > 1 )
+                                PDF()
+                            setModal1( false )}
+                        }
+                    >
+                        Закрыть
+                    </IonButton>
+                </div>
             </div>
         </IonModal>
  

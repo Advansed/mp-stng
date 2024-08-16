@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { IonButton, IonCard, IonIcon, IonLabel, IonLoading, IonText } from "@ionic/react"
 import { Store, getApps, getData } from "./Store"
-import { Agrees, Filess, Filesss } from "./Files";
+import { Agrees, Filess, Filesss, toPDF } from "./Files";
 import { chevronDownCircleOutline, chevronUpCircleOutline } from "ionicons/icons";
-
 
 export function Apps_(){
     const [ load ] = useState( false )
@@ -54,11 +53,11 @@ export function Apps_(){
             <IonCard className="pl-1 pr-1 pb-1 cl-prim fs-bold">
                 <div className="mt-1 t-underline"> <b> { info.service } </b></div>
                 <div className="flex">
-                    <div className="flex fl-space ml-1 mt-1 w-50"> 
+                    <div className="flex ml-1 mt-1 w-50"> 
                         <div className="cl-gray">Дата</div>
                         <div>{ info.date }</div>
                     </div>
-                    <div className="flex fl-space ml-1 mt-1 w-50"> 
+                    <div className="flex ml-1 mt-1 w-50"> 
                         <div className="cl-gray">Номер</div>
                         <div>{ info.number }</div>
                     </div>
@@ -156,7 +155,7 @@ export function Apps():JSX.Element {
 
 
     function App(props: { info }):JSX.Element{
-        const [ load ]         = useState( false )
+        const [ load, setLoad ]         = useState( false )
         const [ message, setMessage ]   = useState("")
         const [ mode, setMode ]         = useState(false)
 
@@ -165,7 +164,8 @@ export function Apps():JSX.Element {
         function onSetMode( mod ){
             setMode( mod )
         }        
-    
+        
+        
         const elem = <>
             <IonCard className="pb-1 pr-1 s-card">
                 <div className="mt-1 ml-1 t-underline"> <b> { info.service } </b></div>
@@ -216,17 +216,16 @@ export function Apps():JSX.Element {
                                             </IonButton>
                                             <IonButton
                                                 onClick={()=>{
+                                                    setLoad( true)
                                                     async function upload(){
-                                                        const res = await getData("s_files", {
+                                                        await getData("s_files", {
                                                             token:  Store.getState().login.token,
                                                             id:     info.id,
                                                             files:  info.files
                                                         })
-                                                        if(!res.error) {
-                                                            setMessage(res.message);
-                                                            info.files = new Object()
-                                                        }
                                                         
+                                                        setMode( false )
+                                                        setLoad( false )
                                                     }
                                                     upload()
                                                 }}

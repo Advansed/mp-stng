@@ -2,6 +2,23 @@
 import { combineReducers  } from 'redux'
 import axios from 'axios'
 import { Reducer } from 'react';
+import localForage from "localforage";
+
+export function setItem(key, value){
+    localForage.setItem(key, value)
+}
+
+export async function getItem( key ){
+    try {
+        const value = await localForage.getItem( key );
+        return value
+    } catch (err) {
+        // This code runs if there were any errors.
+        console.log(err);
+        return null
+    }
+
+}
 
 const reducers: Array<Reducer<any, any>> = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -287,7 +304,7 @@ export async function   getNotifications( page ){
 }
 
 export async function   getAppeals(){
-    const res = await getData("getMessages", {
+    const res = await getData("getChannels", {
         token: Store.getState().login.token
     })
     if(!res.error) Store.dispatch({ type: "appeals", appeals: res.data})
@@ -298,7 +315,7 @@ export async function   getServices() {
     const res = await getData("S_Details", {
         token: Store.getState().login.token
     })
-    
+    console.log( res )
     if(!res.error) Store.dispatch({ type: "services", services: res.data })
 
 }
