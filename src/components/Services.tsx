@@ -494,7 +494,7 @@ function Address( props: { info, setUpd }){
                                      hs?.fias_level === "9" 
                                 || (    
                                         hs?.fias_level === "8" 
-                                        && hs?.house_flat_count === "0"
+                                        && (hs?.house_flat_count === "0" || hs?.house_flat_count === null )
                                     ) 
                                 || (    
                                         hs?.fias_level === "7" 

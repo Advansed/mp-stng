@@ -276,6 +276,7 @@ export function Profile() {
                                 onIonChange={(e)=>{
                                     info.consenttoemail = e.detail.checked
                                     mode.consenttoemail = e.detail.checked
+                                    setUpd(upd + 1)
                                 }}
                             >   
                                 <span className="wrap">
@@ -294,6 +295,7 @@ export function Profile() {
                     onIonChange={(e)=>{
                         info.consenttosms = e.detail.checked
                         mode.consenttosms = e.detail.checked
+                        setUpd(upd + 1)
                     }}
     >   
                     <span className="wrap">
@@ -333,5 +335,6 @@ export function Profile() {
             </div>    
         </div>
     </>
+    
     return elem
 }

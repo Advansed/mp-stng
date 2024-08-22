@@ -36,8 +36,10 @@ const App: React.FC = () => {
 
   
   function OneSignalInit(): void {
+    console.log(" OneSignalInit start")
 
     OneSignal.initialize( "daff2bee-e428-4bd3-9f47-ac3c914113d6" );
+    console.log(" OneSignalInit  initialized")
 
     const myClickListener = async function(event) {
           const notificationData = JSON.stringify(event);
@@ -49,7 +51,12 @@ const App: React.FC = () => {
       console.log("User accepted notifications: " + accepted);
     })
 
+    console.log(" OneSignalInit  login")
+    OneSignal.login( Store.getState().login.id )
+    console.log(" OneSignalInit  addAlias")
     OneSignal.User.addAlias("external_id", Store.getState().login.id)
+    
+    console.log( OneSignal.User )
   }
 
   useEffect(()=>{
