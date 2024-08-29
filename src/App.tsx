@@ -67,7 +67,12 @@ const App: React.FC = () => {
     setAuth( Store.getState().auth ) 
     if( Store.getState().auth)
      if( isPlatform("mobile") )
-       OneSignalInit();
+      try {
+        OneSignalInit(); 
+      } catch (error) {
+        console.log( JSON.stringify( error ) );
+      }
+       
     
   }})
 

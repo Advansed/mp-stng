@@ -226,7 +226,7 @@ export function Login() {
 }
 
 export function Registration():JSX.Element {
-    const [ info, setInfo] = useState<any>({ phone: "", password: "", password1: "", terms: false, token: "", SMS: ""}) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ info, setInfo] = useState<any>({ id: "", phone: "", password: "", password1: "", terms: false, token: "", SMS: ""}) // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ error, setError] = useState("")
     const [ upd, setUpd] = useState( 0 )
     const [ page, setPage] = useState( 0 )
@@ -241,7 +241,8 @@ export function Registration():JSX.Element {
                 setError( res.message)
                 
             } else {
-                info.token = res.data.token;
+                info.token  = res.data.token;
+                info.id     = res.data.guid;
                 setUpd(upd + 1)
             }    
         } else {
@@ -252,6 +253,7 @@ export function Registration():JSX.Element {
                 if(res.message === "СМС верен") setUpd(upd + 1)
                 else 
                 if(res.message === "Пользователь создан") {
+                    console.log( info )
                     Store.dispatch({ type: "login", login:  info })
                     Store.dispatch({ type: "auth",  auth:   true })
                 }
