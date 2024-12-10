@@ -130,10 +130,10 @@ const Page: React.FC = () => {
               <div className='h-2'>Лицевые счета</div>
             </IonTabButton>
 
-            <IonTabButton tab="queye" href="/page/queye">
+            {/* <IonTabButton tab="queye" href="/page/queye">
               <IonIcon icon={ createOutline } className='w-1 h-1'/>
               <div className='h-2'>E-запись</div>
-            </IonTabButton>
+            </IonTabButton> */}
 
             <IonTabButton tab="news" href="/page/news">
               <IonIcon icon={ chatboxEllipsesOutline } className='w-1 h-1'/>
