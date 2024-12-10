@@ -4,7 +4,24 @@ import './Lics.css'
 import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRow, IonText } from '@ionic/react'
 import { chevronForwardOutline, documentTextOutline, ellipsisVerticalOutline, newspaperOutline, pencilOutline, trashBinOutline } from 'ionicons/icons'
 import { PDFDoc } from './Files'
+import { createWidget } from '@sber-ecom-core/sberpay-widget';
 
+type WidgetParams = {
+    bankInvoiceId: string;
+    backUrl: string;
+    lifeTime?: number;
+    expirationDate?: number;
+};
+
+const widget = createWidget("PRODUCTION");
+
+function openWidget( info ){
+    const params = {
+        bankInvoiceId: info.externalParams.sbolBankInvoiceId,
+        backUrl: 'https://fhd.aostng.ru/paymentSuccess',
+    };
+    widget.open(params);
+}
 
 export function Lics() {
     const [ info,   setInfo ]   = useState<any>([])
@@ -69,6 +86,7 @@ export function Lics() {
 
 async function Add( params, setMessage, setPage ){
     const res = await getData("AddAccount", params )
+    console.log( res )
     if(res.error){
         setMessage(res.message);
     } else {
@@ -216,6 +234,7 @@ function AddLic2(props:{ setPage }){
             const res = await getData("getSettlements", {
                 token : Store.getState().login.token,
             })
+            console.log(res)
             setInfo( res.data)
         }
         load()
@@ -238,6 +257,7 @@ function AddLic2(props:{ setPage }){
             token   : Store.getState().login.token,
             ids    : e.ids
         })
+        console.log( res )
         if(res.error) setMessage( res.message )
         else {
             e.houses = res.data;
@@ -663,6 +683,7 @@ function Lic(props: { info, ind, setItem, setPage } ){
             token : Store.getState().login.token,
             LC :    info.code
         })
+        console.log(res)
         if(!res.error) {
             setModal( res.data )
         }
@@ -839,10 +860,15 @@ function History(props: { item }){
     const item = props.item
     
     async function Load(){
+        console.log({
+            token: Store.getState().login.token,
+            LC: item.code 
+        })
         const res = await getData("GetPayments", { 
             token: Store.getState().login.token,
             LC: item.code 
         })  
+        console.log(res)
         if(!res.error){
             if(res.data.length > 0 ){
                 setInfo( res.data[0].payments )
@@ -896,6 +922,8 @@ function Payments(props:{ item, setPage }){
     const item  = props.item
     const [ value, setValue ] = useState( item.sum > 0 ? item.sum : 0)
 
+
+    
     const elem = <>
         <IonCard className='pb-1'>
             <div className='flex fl-space mt-1 ml-1'>
@@ -962,7 +990,7 @@ function Payments(props:{ item, setPage }){
                 />
             </div>
             <div className='flex fl-space ml-1 mr-1'>
-                <div className='w-50 mt-1'>
+                <div className='w-70 mt-1'>
                     <div className='ls-item'
                         onClick={()=>{
                             item.order = new Object()
@@ -974,14 +1002,15 @@ function Payments(props:{ item, setPage }){
                             item.order.email    = Store.getState().login.email,
                             item.order.ios      = false
                             props.setPage( 7 )
+                           
                         }}
                     >   
-                        <img src="assets/SberEQ.png" alt="sberEQ"  className='w-25 h-25'/>
-                        <IonLabel className = "">Карта</IonLabel>
+                        <img src="assets/Sbermobile.png" alt="sberEQ"  className='h-3'/>
+                        <IonLabel className = " ml-05"><b>Оплата картой</b></IonLabel>
                     </div>        
                 </div>
                 <div
-                    className='ls-item mt-1 w-50 ml-1'
+                    className='mt-1 w-50 ml-1'
                     onClick={()=>{
                         item.order = new Object()
                         item.order.token    = Store.getState().login.token
@@ -994,8 +1023,8 @@ function Payments(props:{ item, setPage }){
                         props.setPage( 8 )
                 }}
                 >   
-                    <IonImg alt = "" src="assets/sbermobile.png" className='h-25 w-25' />
-                    <IonLabel className = "">СберМобайл</IonLabel>
+                    <IonImg alt = "" src="assets/sberPay.png" className='h-3' />
+                    {/* <IonLabel className = "">СберМобайл</IonLabel> */}
                 </div>               
             </div>
 
@@ -1126,11 +1155,14 @@ function SberPay(props: { item, setPage }){
     useEffect(()=>{
         async function load(){
             setLoad( true)
+            console.log(item.order)
             const res = await getData("SBOL", item.order )
             if(res.error){ 
                 props.setPage( 4 )
             } else {
-                window.open( res.data.externalParams.sbolDeepLink,  "_system" )
+               window.open( res.data.externalParams.sbolDeepLink,  "_system" )
+               // openWidget( res.data )
+
             }
             setLoad( false )
         }
@@ -1153,14 +1185,18 @@ function Equaring(props: { item, setPage }){
     useEffect(()=>{
         async function load(){
             setLoad( true )
+            console.log(item.order)
             const res = await getData("SBOL", item.order )
-
+            console.log( res )
             if(res.error){ 
 
                 props.setPage( 4 )
 
             } else {
-                setInfo( res.data )
+                console.log( res.data )
+               // setInfo( res.data )
+               window.open( res.data.formUrl )
+
             }
             setLoad( false )
         }
@@ -1391,10 +1427,15 @@ function HistoryIndices(props: { item }){
     const item = props.item
     
     async function Load(){
+        console.log({
+            token: Store.getState().login.token,
+            counterId: item.selected.counterId 
+        } )
         const res = await getData("GetIndices", { 
             token: Store.getState().login.token,
             counterId: item.selected.counterId 
         })  
+        console.log(res )
         if(!res.error){
             if(res.data.length > 0 ){
                 setInfo( res.data[0].indications )
@@ -1404,6 +1445,7 @@ function HistoryIndices(props: { item }){
     }
 
     useEffect(()=>{
+        console.log( 'useeffect')
         Load()
     },[])
     

@@ -36,7 +36,7 @@ export function Login() {
         } else {
 
             const res = await getData("authorization", info)
-
+            console.log(res)
             if(!res.error){
 
                 localStorage.setItem( "stngul.phone", info.phone )
@@ -236,7 +236,9 @@ export function Registration():JSX.Element {
         setLoad( true)
         setError("")
         if( info.token === "" ) {
+            console.log(info)
             const res = await getData("registration", info )
+            console.log(res)
             if(res.error) {
                 setError( res.message)
                 
@@ -246,8 +248,9 @@ export function Registration():JSX.Element {
                 setUpd(upd + 1)
             }    
         } else {
+            console.log(info)
             const res = await getData("registration", info )
-
+            console.log(res)
             if(res.error) { info.SMS = "";setError(res.message) }
             else {
                 if(res.message === "СМС верен") setUpd(upd + 1)

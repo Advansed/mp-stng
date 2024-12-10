@@ -9,6 +9,7 @@ export function Contacts(){
     useEffect(()=>{
         async function load() {
             const res = await getData("Contacts",{})
+            console.log( res )
             if(!res.error)
             setInfo( res.data )
         }

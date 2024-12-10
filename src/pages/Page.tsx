@@ -1,5 +1,5 @@
 import React, { useEffect, useState }        from 'react';
-import { IonAlert, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg, IonMenuButton, IonPage, IonTabBar, IonTabButton, isPlatform } from '@ionic/react';
+import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonTabBar, IonTabButton, isPlatform } from '@ionic/react';
 import { useHistory, useParams, useLocation } from 'react-router';
 import './Page.css';
 import { Lics }     from '../components/Lics';
@@ -19,6 +19,7 @@ import { Appeals } from '../components/Appeals';
 
 const Page: React.FC = () => {
   const [ alert, setAlert ] = useState( false )
+  const [ error, setError ] = useState("")
 
   const { name } = useParams<{ name: string; }>();
 
@@ -26,6 +27,7 @@ const Page: React.FC = () => {
 
   async function check() {
     const res = await getData("getVersion", {})
+    console.log(res)
     if( res.message !== version ){
       setAlert( true )
     }
@@ -42,6 +44,10 @@ const Page: React.FC = () => {
         hist.push( route )
     }
   
+  }})
+
+  Store.subscribe({ num: 4, type: "error", func: ()=>{
+    setError( Store.getState().error )
   }})
 
   useEffect(()=>{
@@ -66,6 +72,7 @@ const Page: React.FC = () => {
   function Main():JSX.Element {
     let elem = <></>
       switch ( name ) {
+
         case "":                  elem = <></>; break;
         case "lics":              elem = <Lics />; break;
         case "news":              elem = <News />; break;
@@ -79,6 +86,7 @@ const Page: React.FC = () => {
         case "appeals":           elem = <Appeals />; break;
         case "contacts":          elem = <Contacts />; break;
         case "push":              elem = <Notifications />; break;
+
         default: elem = <></>
       }
 
@@ -155,9 +163,25 @@ const Page: React.FC = () => {
               console.log('Обновить');
               if(isPlatform("android"))
                 window.open("https://play.google.com/store/apps/details?id=io.ionic.stng")
-              if(isPlatform("ios"))
-                
+
+              if(isPlatform("ios"))               
                 window.open("itms-apps://apps.apple.com/ru/app/%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-%D1%81%D0%B0%D1%85%D0%B0%D1%82%D1%80%D0%B0%D0%BD%D1%81%D0%BD%D0%B5%D1%84%D1%82%D0%B5%D0%B3%D0%B0%D0%B7/id6445904988")
+
+            },
+          },
+        ]}
+      ></IonAlert>
+      <IonAlert
+        header="Ошибка"
+        message={ error }
+        isOpen = { error !== "" }
+        onDidDismiss={()=> setError( "" ) }
+        buttons={[
+          {
+            text: 'Закрыть',
+            role: 'cancel',
+            handler: () => {
+              console.log('Alert canceled');
             },
           },
         ]}

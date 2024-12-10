@@ -48,7 +48,7 @@ export function Services(){
     }})
 
     useEffect(()=>{
-
+        console.log( Store.getState().services  )
         setInfo( Store.getState().services )
         setUpd( upd + 1)
         
@@ -62,7 +62,9 @@ export function Services(){
     async function Save()   {
         setLoad(true)
         order.token = Store.getState().login.token
+        console.log(order)
         const res = await getData("Services", order )
+        console.log(res)
         order.result = res
         if(res.error) setPage(98)
         else setPage(99)
@@ -396,7 +398,7 @@ function Date( props: { info }) {
     return elem
 }
 
-function Box(props: { info }) {
+export function Box(props: { info }) {
     
     const info = props.info.info
 
@@ -468,7 +470,7 @@ function Address( props: { info, setUpd }){
 
         return elem
     }
-
+    console.log("adddresss")
     async function load( arg){
         const res = await getData( arg[5], {
             token:  Store.getState().login.token,

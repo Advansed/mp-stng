@@ -547,6 +547,7 @@ export function PDFDoc( props ){
                                 email: Store.getState().profile.email,
                                 image: props.url,
                             } )
+                            console.log(res)
                             setMessage(res.message)
                         }
                         send()

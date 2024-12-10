@@ -40,6 +40,7 @@ export const i_state = {
     notices:                            [],
     appeals:                            [],  
     services:                           [],  
+    error:                              "",
 
 }
 
@@ -72,11 +73,14 @@ export async function   getData(method : string, params){
             URL + method, params
     ).then(response => response.data)
         .then((data) => {
-            if(data.Код === 200) console.log(data) 
+            console.log(data)
+            if(data.error)
+                Store.dispatch({type: "error", error:  data.message })
             return data
         }).catch(error => {
           console.log(error)
-          return {error: true, message: error}
+          Store.dispatch({type: "error", error: "Упс.. сервер не отвечает (" + error.message + ")" })
+          return {error: true, message: "Упс.. сервер не отвечает (" + error.message + ")" }
         })
     return res
 
@@ -164,7 +168,8 @@ const                   rootReducer = combineReducers( reduct )
 export const Store   =  create_Store(rootReducer, i_state)
 
 //export const URL = "https://fhd.aostng.ru/vesta_storage/hs/API_STNG/V2/"
-export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/"
+//export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/"
+export const URL = "https://fhd.aostng.ru/node/"
 
 
 export function Phone(phone): string {
@@ -214,12 +219,14 @@ return res
 
 export async function   getProfile( params){
     const res = await getData("profile", params)
+    console.log(res)
     if(res.error) console.log(res.message)
     else Store.dispatch({ type: "profile", profile: res.data})
 }
 
 export async function   getLics( params){
     const res = await getData("getAccount", params)
+    console.log(res)
     if(res.error) console.log(res.message)
     else res.data.forEach(elem => {
         elem.sum = elem.debts.reduce(function(a, b){
@@ -237,6 +244,7 @@ export async function   getLics( params){
 
 export async function   getApps( params){
     const res = await getData("ListServices", params)
+    console.log(res)
     if(res.error) console.log(res.message)
     else Store.dispatch({ type: "apps", apps: res.data})
 }
@@ -298,7 +306,6 @@ export async function   getNotifications( page ){
         token: Store.getState().login.token,
         page : page
     })
-    console.log( res )
     if(!res.error) Store.dispatch({ type: "notices", notices: res.data})
 
 }

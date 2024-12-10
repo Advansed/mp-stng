@@ -628,6 +628,7 @@ function Notes(props:{ setModal }) {
         const res = await getData('elQueye', {
             token: Store.getState().login.token
         })
+        console.log( res )
         if(!res.error)
             setInfo(res.data)
     }

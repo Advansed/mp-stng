@@ -66,8 +66,8 @@
 
 
 .ls-item {
-    background-color:#3f64a9;
-    color: white;
+    /* background-color:#3f64a9; */
+    color: #3f64a9;
     height: 4em;
     display: flex;
     align-items: center;
