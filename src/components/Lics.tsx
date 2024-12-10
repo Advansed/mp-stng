@@ -4,7 +4,7 @@ import './Lics.css'
 import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRow, IonText } from '@ionic/react'
 import { chevronForwardOutline, documentTextOutline, ellipsisVerticalOutline, newspaperOutline, pencilOutline, trashBinOutline } from 'ionicons/icons'
 import { PDFDoc } from './Files'
-import { createWidget } from '@sber-ecom-core/sberpay-widget';
+//import { createWidget } from '@sber-ecom-core/sberpay-widget';
 
 type WidgetParams = {
     bankInvoiceId: string;
@@ -13,15 +13,15 @@ type WidgetParams = {
     expirationDate?: number;
 };
 
-const widget = createWidget("PRODUCTION");
+//const widget = createWidget("PRODUCTION");
 
-function openWidget( info ){
-    const params = {
-        bankInvoiceId: info.externalParams.sbolBankInvoiceId,
-        backUrl: 'https://fhd.aostng.ru/paymentSuccess',
-    };
-    widget.open(params);
-}
+// function openWidget( info ){
+//     const params = {
+//         bankInvoiceId: info.externalParams.sbolBankInvoiceId,
+//         backUrl: 'https://fhd.aostng.ru/paymentSuccess',
+//     };
+//     widget.open(params);
+// }
 
 export function Lics() {
     const [ info,   setInfo ]   = useState<any>([])
