@@ -168,8 +168,8 @@ const                   rootReducer = combineReducers( reduct )
 export const Store   =  create_Store(rootReducer, i_state)
 
 //export const URL = "https://fhd.aostng.ru/vesta_storage/hs/API_STNG/V2/"
-//export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/"
-export const URL = "https://fhd.aostng.ru/node/"
+export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/"
+//export const URL = "https://fhd.aostng.ru/node/"
 
 
 export function Phone(phone): string {
