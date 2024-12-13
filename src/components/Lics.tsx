@@ -15,7 +15,6 @@ type WidgetParams = {
 };
 
 
-
 function openWidget( info ){
 
     const widget = createWidget("PRODUCTION");    
