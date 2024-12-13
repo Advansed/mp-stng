@@ -8,18 +8,24 @@ import { createWidget } from '@sber-ecom-core/sberpay-widget';
 
 type WidgetParams = {
     bankInvoiceId: string;
-    backUrl: string;
     lifeTime?: number;
     expirationDate?: number;
+    isFinishPage?: true;
+    finishPageTimeOut?: 10;
 };
 
-const widget = createWidget("PRODUCTION");
+
 
 function openWidget( info ){
+
+    const widget = createWidget("PRODUCTION");    
+
     const params = {
-        bankInvoiceId: info.externalParams.sbolBankInvoiceId,
-        backUrl: 'https://fhd.aostng.ru/paymentSuccess',
+        bankInvoiceId: info.orderId,
+        backUrl: '',
+        isEmbedded: true
     };
+
     widget.open(params);
 }
 
@@ -1160,8 +1166,8 @@ function SberPay(props: { item, setPage }){
             if(res.error){ 
                 props.setPage( 4 )
             } else {
-               window.open( res.data.externalParams.sbolDeepLink,  "_system" )
-               // openWidget( res.data )
+               //window.open( res.data.externalParams.sbolDeepLink,  "_system" )
+                openWidget( res.data )
 
             }
             setLoad( false )

@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     namespace "io.ionic.stng"
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 34
     defaultConfig {
         applicationId "io.ionic.stng"
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion 22
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2210
+        versionCode 2212
         versionName "2.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
