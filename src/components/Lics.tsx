@@ -232,20 +232,24 @@ function AddLic2(props:{ setPage }){
     const [ lc,         setLc ]         = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ fio,        setFio ]        = useState("")
     const [ message,    setMessage ]    = useState("")
+    const [ load,       setLoad ]       = useState( false )
 
 
     useEffect(()=>{
         async function load(){
+            setLoad(true)
             const res = await getData("getSettlements", {
                 token : Store.getState().login.token,
             })
             console.log(res)
             setInfo( res.data)
+            setLoad(false)
         }
         load()
     },[])
 
     async function getStreets( e ){
+        setLoad(true)
         const res = await getData("getStreets", {
             token   : Store.getState().login.token,
             s_id    : e.s_id
@@ -255,9 +259,11 @@ function AddLic2(props:{ setPage }){
             e.streets = res.data;
             setNaspunkt( e )
         }
+        setLoad(false)
     }
 
     async function getHouses( e ){
+        setLoad(true)
         const res = await getData("getHouses", {
             token   : Store.getState().login.token,
             ids    : e.ids
@@ -268,6 +274,7 @@ function AddLic2(props:{ setPage }){
             e.houses = res.data;
             setStreet( e )
         }
+        setLoad(false)
     }
 
     function Item1(props: { info }){
@@ -575,6 +582,7 @@ function AddLic2(props:{ setPage }){
 
     const elem = <>
         <IonCard className='pb-1 mt-1'>
+            <IonLoading isOpen = {load} message={"Подождите"}/>
             <div className='flex fl-space mt-1 ml-1'>
                 <div className='cl-black'> <h4><b>{ "Узнать свой лицевой счет" }</b></h4></div>
             </div>
@@ -1010,7 +1018,7 @@ function Payments(props:{ item, setPage }){
                            
                         }}
                     >   
-                        <img src="assets/Sbermobile.png" alt="sberEQ"  className='h-3'/>
+                        <img src="assets/SberMobile.png" alt="sberEQ"  className='h-3'/>
                         <IonLabel className = " ml-05"><b>Оплата картой</b></IonLabel>
                     </div>        
                 </div>
@@ -1028,7 +1036,7 @@ function Payments(props:{ item, setPage }){
                         props.setPage( 8 )
                 }}
                 >   
-                    <IonImg alt = "" src="assets/sberPay.png" className='h-3' />
+                    <IonImg alt = "" src="assets/SberPay.png" className='h-3' />
                     {/* <IonLabel className = "">СберМобайл</IonLabel> */}
                 </div>               
             </div>
@@ -1109,7 +1117,7 @@ function PaymentsTO(props:{ item, setPage }){
                 />
             </div>
             <div className='flex fl-space ml-1 mr-1'>
-                <div className='w-50 mt-1'>
+                <div className='w-60 mt-1'>
                     <div className='ls-item'
                         onClick={()=>{
                             item.order = new Object()
@@ -1123,12 +1131,12 @@ function PaymentsTO(props:{ item, setPage }){
                             props.setPage( 7 )
                         }}
                     >   
-                        <img src="assets/sberEQ.png" alt="sberEQ"  className='w-25 h-25'/>
-                        <IonLabel className = "">Карта</IonLabel>
+                        <img src="assets/SberMobile.png" alt="sberEQ"  className='h-3'/>
+                        <IonLabel className = " ml-05"><b>Оплата картой</b></IonLabel>
                     </div>        
                 </div>
                 <div
-                    className='ls-item mt-1 w-50 ml-1'
+                    className='mt-1 w-40 ml-1'
                     onClick={()=>{
                         item.order = new Object()
                         item.order.token    = Store.getState().login.token
@@ -1141,8 +1149,7 @@ function PaymentsTO(props:{ item, setPage }){
                         props.setPage( 8 )
                 }}
                 >   
-                    <IonImg alt = "" src="assets/sbermobile.png" className='h-25 w-25' />
-                    <IonLabel className = "">СберМобайл</IonLabel>
+                    <IonImg alt = "" src="assets/SberPay.png" className='h-3' />
                 </div>               
             </div>
 
