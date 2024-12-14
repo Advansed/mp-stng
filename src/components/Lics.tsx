@@ -21,7 +21,7 @@ function openWidget( info ){
 
     const params = {
         bankInvoiceId: info.orderId,
-        backUrl: '',
+        backUrl: 'https://fhd.aostng.ru/paymentSuccess',
         isEmbedded: true
     };
 
