@@ -5,6 +5,7 @@ import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonI
 import { chevronForwardOutline, documentTextOutline, ellipsisVerticalOutline, newspaperOutline, pencilOutline, trashBinOutline } from 'ionicons/icons'
 import { PDFDoc } from './Files'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
+import { Browser } from '@capacitor/browser'
 
 type WidgetParams = {
     bankInvoiceId: string;
@@ -26,6 +27,10 @@ function openWidget( info ){
     };
 
     widget.open(params);
+}
+
+const openUrl = async (url) =>{
+    await Browser.open({ url: url })
 }
 
 export function Lics() {
@@ -1018,7 +1023,7 @@ function Payments(props:{ item, setPage }){
                            
                         }}
                     >   
-                        <img src="assets/SberMobile.png" alt="sberEQ"  className='h-3'/>
+                        <img src="assets/sbermobile.png" alt="sberEQ"  className='h-3'/>
                         <IonLabel className = " ml-05"><b>Оплата картой</b></IonLabel>
                     </div>        
                 </div>
@@ -1131,7 +1136,7 @@ function PaymentsTO(props:{ item, setPage }){
                             props.setPage( 7 )
                         }}
                     >   
-                        <img src="assets/SberMobile.png" alt="sberEQ"  className='h-3'/>
+                        <img src="assets/sbermobile.png" alt="sberEQ"  className='h-3'/>
                         <IonLabel className = " ml-05"><b>Оплата картой</b></IonLabel>
                     </div>        
                 </div>
@@ -1207,8 +1212,9 @@ function Equaring(props: { item, setPage }){
             } else {
                 console.log( res.data )
                // setInfo( res.data )
-               window.open( res.data.formUrl )
-
+              // window.open( res.data.formUrl, '_blank' )
+              openUrl( res.data.formUrl )
+  
             }
             setLoad( false )
         }

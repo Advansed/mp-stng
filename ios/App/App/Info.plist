@@ -12,8 +12,6 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -22,6 +20,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>use camera</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>use location</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>use gallery</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
