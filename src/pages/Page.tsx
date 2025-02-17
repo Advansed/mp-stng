@@ -60,7 +60,6 @@ const Page: React.FC = () => {
   },[name])
 
   useEffect(()=>{
-    
     check()
 
     return ()=>{ Store.unSubscribe( 3 )}

@@ -73,7 +73,6 @@ export async function   getData(method : string, params){
             URL + method, params
     ).then(response => response.data)
         .then((data) => {
-            console.log(data)
             if(data.error)
                 Store.dispatch({type: "error", error:  data.message })
             return data
@@ -306,6 +305,8 @@ export async function   getNotifications( page ){
         token: Store.getState().login.token,
         page : page
     })
+    console.log("notification")
+    console.log(res)
     if(!res.error) Store.dispatch({ type: "notices", notices: res.data})
 
 }

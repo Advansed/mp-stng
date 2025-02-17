@@ -12,11 +12,12 @@ import "./Bonuse.css"
         const res = await getData("spClient", {
             token: Store.getState().login.token
         })
-
+        console.log( res )
         if(res.error) setInfo( new Object())
         else {
             setInfo( res.data )
             setUpd( upd + 1 )
+            console.log( upd )
         } 
     }
     async function CreateClient(){

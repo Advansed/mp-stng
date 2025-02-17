@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IonApp, IonRouterOutlet, IonSplitPane, isPlatform, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useLocation } from 'react-router-dom';
 import Menu from './components/Menu';
 import Page from './pages/Page';
 
@@ -34,7 +34,6 @@ const App: React.FC = () => {
   const [ auth, setAuth ] = useState( Store.getState().auth )
   const [ reg,  setReg ]  = useState( Store.getState().reg )
 
-  
   function OneSignalInit(): void {
     console.log(" OneSignalInit start")
 

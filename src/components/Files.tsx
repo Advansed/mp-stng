@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { cameraOutline, playSkipBackCircleOutline, sendOutline } from "ionicons/icons";
+import { cameraOutline, sendOutline } from "ionicons/icons";
 import { jsPDF } from "jspdf";
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { IonButton, IonChip, IonIcon, IonLoading, IonModal } from "@ionic/react";
