@@ -98,7 +98,7 @@ export function Files(props: { info, name, check, title }) {
 
     async function openPDF(){
         try {
-            const res = await FilePicker.pickFiles({types: ['application/pdf'], multiple: false, readData: true})
+            const res = await FilePicker.pickFiles({types: ['application/pdf'], readData: true})
 
             if(res.files[0]?.data){
                 props.info.length = 0
@@ -274,7 +274,7 @@ export function Files1(props: { info, name, check, title, onMode }) {
 
     async function openPDF(){
         try {
-            const res = await FilePicker.pickFiles({types: ['application/pdf'], multiple: false, readData: true})
+            const res = await FilePicker.pickFiles({types: ['application/pdf'],  readData: true})
 
             if(res.files[0]?.data){
                 props.info.length = 0
@@ -558,7 +558,7 @@ export function PDFDoc( props ){
         <p className="m-stack fs-bold fs-2 cl-prim">{ message }</p>
         <div className="f-scroll"> 
             {/* <Viewer fileUrl={ url } plugins={ [ zoomPluginInstance ] } /> */}
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
+            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.js">
                 <div>
                     <Viewer
                         fileUrl={ url }
