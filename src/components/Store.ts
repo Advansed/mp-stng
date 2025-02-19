@@ -88,7 +88,7 @@ export async function   getData(method : string, params){
 export async function   getCameras(){
 
     const res = await axios.get(
-            'https://api.aostng.ru/api/v2/camera/get'
+            'https://aostng.ru/api/v2/camera/get'
     ).then(response => response.data)
         .then((data) => {
             if(data.error) console.log(data) 
