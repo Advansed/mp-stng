@@ -1,6 +1,6 @@
 import React, { IonButton, IonCard, IonIcon, IonInput, IonLoading, IonModal, IonText } from "@ionic/react"
 import { addCircleOutline, arrowBackCircleOutline, buildOutline, calculatorOutline, callOutline, closeOutline, documentTextOutline, gitBranchOutline, gitMergeOutline, removeCircleOutline } from "ionicons/icons"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AddressSuggestions, FioSuggestions } from "react-dadata"
 import { Store, getData } from "./Store"
 import "./Services.css"
@@ -29,10 +29,10 @@ export function Services(){
     const [ messages, setMessages ]     = useState<any>([])
     const [ upd, setUpd]                = useState( 0 )
 
-    
     let elem = <></>
 
     Store.subscribe({num: 21, type: "back", func: ()=>{
+        console.log("subscibe 21")
         if( page > 0 ) {
             setMessages([])
             if( page > 9) setPage( 0 )
@@ -48,15 +48,17 @@ export function Services(){
     }})
 
     useEffect(()=>{
-        console.log( Store.getState().services  )
-        setInfo( Store.getState().services )
-        setUpd( upd + 1)
-        
-        return ()=>{
-            Store.unSubscribe( 21 )
-            Store.unSubscribe( 22 )
-        }
-
+            console.log("useeffect services")
+            console.log( Store.getState().services  )
+            setInfo( Store.getState().services )
+            setUpd( upd + 1)
+            
+            return ()=>{
+                console.log("useeffect services dismount")
+                Store.unSubscribe( 21 )
+                Store.unSubscribe( 22 )
+            }
+    
     },[])
 
     async function Save()   {

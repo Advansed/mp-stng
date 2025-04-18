@@ -78,8 +78,8 @@ export async function   getData(method : string, params){
             return data
         }).catch(error => {
           console.log(error)
-          Store.dispatch({type: "error", error: "Упс.. сервер не отвечает (" + error.message + ")" })
-          return {error: true, message: "Упс.. сервер не отвечает (" + error.message + ")" }
+          Store.dispatch({type: "error", error: "Cервер не отвечает (" + error.message + ")" })
+          return {error: true, message: "Cервер не отвечает (" + error.message + ")" }
         })
     return res
 
@@ -145,12 +145,13 @@ function                create_Store(reducer, initialState) {
             }
         },
         unSubscribe(index) {
-            const ind = listeners.findIndex(function(b) { 
+           const ind = listeners.findIndex(function(b) { 
                 return b.num === index; 
             });
             if(ind >= 0){
                 listeners.splice(ind, 1)
-            }        
+            }   
+            
         }
     };
 }
@@ -224,7 +225,7 @@ export async function   getProfile( params){
 }
 
 export async function   getLics( params){
-    const res = await getData("getAccount", params)
+    const res = await getData("getAccount1", params)
     console.log(res)
     if(res.error) console.log(res.message)
     else res.data.forEach(elem => {

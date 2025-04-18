@@ -24,7 +24,10 @@ import "./Bonuse.css"
         const res = await getData("spCreateClient", {
             token: Store.getState().login.token
         })
-        if(res.error) setInfo( new Object())
+        if(res.error){
+            setInfo( new Object())
+            Store.dispatch({type: "error", data: res.message })
+        }
         else setInfo( res.data )
     }
 

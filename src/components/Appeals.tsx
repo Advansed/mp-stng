@@ -1,6 +1,6 @@
 import { IonCard, IonIcon, IonInput, IonLoading, IonModal, IonText } from "@ionic/react"
 import React, { useEffect, useState } from "react"
-import { getAppeals, getData, getItem, setItem, Store } from "./Store"
+import { getAppeals, getData, getItem, listeners, setItem, Store } from "./Store"
 import "./Appeals.css"
 import { cameraOutline, imageOutline, syncCircleOutline } from "ionicons/icons"
 import { takePicture } from "./Files"
@@ -30,6 +30,7 @@ export function Appeals() {
         setInfo( Store.getState().appeals )
         getAppeals()
         return ()=>{ 
+            console.log("return appeals")
             Store.unSubscribe( 101 )
             Store.unSubscribe( 102 )
         }

@@ -137,6 +137,7 @@ export function Apps():JSX.Element {
     let elem = <></>
 
     useEffect(()=>{
+        console.log("apps use effect")
         getApps({ token: Store.getState().login.token })
         setInfo( Store.getState().apps )
         return ()=>{

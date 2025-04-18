@@ -76,3 +76,89 @@
     padding-right: 1em;
 
 }
+
+.ls-item1 {
+    margin-top: 0.5em;
+    background-color: #e5f1f8;
+    height: 4em;
+    display: flex;
+    align-items: center;
+    padding-left: 0.5em;
+    border-radius: 5px;
+    padding-right: 1em;
+
+}
+.ls-item2 {
+    margin-top: 0.5em;
+    background-color: #f5f1b6;
+    height: 4em;
+    display: flex;
+    align-items: center;
+    padding-left: 0.5em;
+    border-radius: 5px;
+    padding-right: 1em;
+
+}
+
+.ls-item3 {
+    height: 4em; 
+    border: 1px solid silver;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ls-button {
+    font-size: 1em;
+    min-height: 2.5em;
+    border-radius: 5px;
+    /* --padding-top: 0.5em; */
+    /* --padding-bottonm: 0.5em; */
+}
+
+.ls-button1 {
+    background-color: #3f64a9;  
+    padding: 0.5em;
+    display: flex;
+    color: white;
+    font-size: 1em;
+    border-radius: 5px;
+}
+
+.ls-panel {
+    width: 50%;
+    background-color: #e5f1f8;
+    border-radius: 5px;
+    padding: 0.5em;
+}
+
+.ls-input {
+    border:         1px solid silver;
+    padding-right:  1em;
+    border-radius: 5px;
+    min-height: 3em!;
+    color: black;
+}
+
+.custom-input {
+    min-height: 2em; /* Общая высота контейнера */
+    --padding-top: 0;
+    --padding-bottom: 0;
+}
+  
+.custom-input ion-input {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+}
+  
+.custom-input .input-wrapper {
+    min-height: 2em !important;
+}
+  
+.custom-input .native-input {
+    min-height: 2em !important;
+    padding: 8px 0 !important; /* Регулируйте по необходимости */
+}

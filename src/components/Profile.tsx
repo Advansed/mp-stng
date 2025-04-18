@@ -1,10 +1,11 @@
-import { IonCard, IonCheckbox, IonIcon, IonInput, IonText } from "@ionic/react"
+import { IonButton, IonCard, IonCheckbox, IonIcon, IonInput, IonLabel, IonText, IonTextarea } from "@ionic/react"
 import React, { useEffect, useState } from "react"
 import { FioSuggestions } from "react-dadata"
 import '../../node_modules/react-dadata/dist/react-dadata.css'
 import { KemVydan, Store, getData } from "./Store"
 import MaskedInput from "../mask/reactTextMask"
-import { saveOutline } from "ionicons/icons"
+import { atOutline, barcodeOutline, businessOutline, calendarOutline, callOutline, codeWorkingOutline, ellipseOutline, ellipsisHorizontalOutline, eyeOffOutline, eyeOutline, saveOutline } from "ionicons/icons"
+import { Maskito } from "./Classes"
 
 
 export function Profile() {
@@ -45,7 +46,7 @@ export function Profile() {
         const elem = <>
             <div className=" ml-1 mr-1 t-underline mt-1 cl-prim flex fl-space"> 
                 <b>ФИО</b> 
-                <IonIcon icon = { saveOutline } className="w-2 h-2" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
+                <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
                     onClick={()=>{
                         Save( mode )
                         setMode( { token: Store.getState().login.token } );
@@ -84,16 +85,8 @@ export function Profile() {
             </div>
             <div className="cl-prim"  onClick={()=>{ setEdit(!edit); console.log( mode ) }} >
                 <div className='flex fl-space ml-2 mt-1 mr-1'>
-                    <div><b> Фамилия</b> </div>
-                    <div> { info?.surname }</div>
-                </div>
-                <div className='flex fl-space ml-2 mt-1 mr-1'>
-                    <div> <b>Имя</b>  </div>
-                    <div> { info?.name }</div>
-                </div>
-                <div className='flex fl-space ml-2 mt-1 mr-1'>
-                    <div> <b>Отчество</b> </div>
-                    <div> { info?.lastname }</div>
+                    <div><b> ФИО</b> </div>
+                    <div> { info?.surname  + ' ' + info?.name + ' ' + info?.lastname }</div>
                 </div>
             </div>
         </>
@@ -104,102 +97,107 @@ export function Profile() {
         const [ upd,    setUpd ]  = useState( 0 )
         const [ mode,   setMode ] = useState<any>({ token: Store.getState().login.token })
 
-        const elem = <>
+
+        async function Save(){
+            const res = await getData("profile", {
+                token:      Store.getState().login.token,
+                passport:   info?.passport
+            })
+            console.log( {
+                token: Store.getState().login.token,
+                passport: info?.passport
+            })
+            console.log( res )
+            if(res.error){ console.log(res.message)}
+            else Store.dispatch({ type: "profile", profile: res.data })
+        }
+            const elem = <>
             <div className=" ml-1 mr-1 t-underline mt-1 flex fl-space"> 
                 <b>Паспортные данные</b> 
-                <IonIcon icon = { saveOutline } className="w-2 h-2" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
+                <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
                     onClick={()=>{
-                        Save( mode )
+                        Save()
                         setMode( { token: Store.getState().login.token } );
                     }}
                 />
             </div>
-            <div className='flex fl-space ml-2 mt-1 mr-1 cl-prim'>
-                <div> <b>Серия </b> </div>
-                <div className='s-input a-right pr-1'>
+            <div className=" flex cl-black">
+                <IonIcon icon = { barcodeOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline">
+                    <div className="flex">
+                        <div className="w-30">
+                            <Maskito
+                                mask = { [ /\d/, /\d/, /\d/, /\d/ ] }
+                                placeholder="Серия"
+                                value={ info?.passport?.serial }
+                                onIonInput = {(e)=>{
+                                    info.passport.serial = e.detail.value;
+                                    mode.serial = e.target.value  
+                                    setUpd( upd + 1)      
+                                }}
+                            />
+                        </div>
+                        <div className="w-10">{ " № " }</div>
+                        <div>
+                            <Maskito
+                                mask = { [ /\d/, /\d/, /\d/, /\d/, /\d/, /\d/ ] }
+                                placeholder="Номер"
+                                value={ info?.passport?.number }
+                                onIonInput = {(e)=>{
+                                    info.passport.number = e.detail.value;
+                                    mode.number = e.target.value  
+                                    setUpd( upd + 1)      
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>                    
+            </div>
+
+            <div className=" flex cl-black">
+                <IonIcon icon = { calendarOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline">
                     <IonInput
-                        class='s-input-1'
-                        value={ info?.passport?.serial }
-                        placeholder="Серия"
-                        onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-                            info.passport.serial = e.target.value    
-                            if(mode.passport === undefined) mode.passport = new Object
-                            mode.passport.serial = e.target.value  
+                        type = "date"
+                        placeholder="Когда выдан"
+                        value={ info?.passport?.issuedDate }
+                        onIonInput = {(e)=>{
+                            info.passport.issuedDate = e.detail.value;
+                            mode.issuedDate = e.target.value  
                             setUpd( upd + 1)      
                         }}
                     />
-                </div>
+                </div>                    
             </div>
-            <div className='flex fl-space ml-2 mt-1 mr-1'>
-                <div> <b>Номер</b> </div>
-                <div className='s-input a-right pr-1'>
-                    <IonInput
-                        class='s-input-1'
-                        value={ info?.passport?.number }
-                        placeholder="Номер"
-                        onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-                            if(mode.passport === undefined) mode.passport = new Object
-                            info.passport.number = e.target.value   
-                            mode.passport.number = e.target.value   
-                            setUpd( upd + 1)    
-                        }}
-                    />
-                </div>
-            </div>
-            <div className='flex fl-space ml-2 mt-1 mr-1'>
-                <div> <b>Когда выдан</b> </div>
-                <div className='s-input a-right pr-1'>
-                    <MaskedInput
-                        mask={[ /[0-9]/, /\d/, '.', /\d/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
-                        className="m-input-1 a-right"
-                        id='10'
-                        value={ info?.passport.issuedDate }
-                        placeholder = "__.__.____"
-                        type='text'
-                        onChange={(e) => {
-                            info.passport.issuedDate = e.target.value    
-                            if(mode.passport === undefined) mode.passport = new Object
-                            mode.passport.issuedDate = e.target.value    
-                            setUpd( upd + 1)    
-                        }}
-                    />
-
-                </div>
-            </div>
-            <div className='flex fl-space ml-2 mt-1 mr-1'>
-                <div> <b>Код подразделения</b> </div>
-                <div className='s-input a-right pr-1'>
-                    <IonInput
-                        class='s-input-1'
-                        value={ info?.passport?.codePodr }
+            <div className=" flex cl-black">
+                <IonIcon icon = { codeWorkingOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline">
+                    <Maskito
+                        mask = { [ /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/ ] }
                         placeholder="Код подразделения"
-                        onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-                            if(mode.passport === undefined) mode.passport = new Object
-                            info.passport.codePodr = e.target.value    
-                            if(mode.passport === undefined) mode.passport = new Object
-                            mode.passport.codePodr = e.target.value   
-                            setUpd( upd + 1)     
-                        }}
-                        onIonChange={(e)=>{
-                            async function load(){
-                                const res: any = await KemVydan( e.detail.value ) // eslint-disable-line @typescript-eslint/no-explicit-any
-                                
-                                if(res?.suggestions !== undefined ){
-                                    if(mode.passport === undefined) mode.passport = new Object
-                                    info.passport.issuedBy = res?.suggestions[0]?.value
-                                    if(mode.passport === undefined) mode.passport = new Object
-                                    mode.passport.issuedBy = res?.suggestions[0]?.value
-                                    setUpd( upd + 1)
-                                }
-                            }
-                            load()
+                        value={ info?.passport?.codePodr }
+                        onIonInput = {(e)=>{
+                            info.passport.codePodr = e.detail.value;
+                            mode.codePodr = e.target.value  
+                            setUpd( upd + 1)      
                         }}
                     />
-                </div>
+                </div>                    
             </div>
-            <div className="ml-2 mt-1 mr-1">
-               { info?.passport?.issuedBy }
+            <div className=" flex cl-black">
+                <IonIcon icon = { businessOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline">
+                    <IonTextarea
+                        placeholder="Кем выдан"
+                        value={ info?.passport?.issuedBy }
+                        onIonInput = {(e)=>{
+                            info.passport.issuedBy = e.detail.value;
+                            mode.issuedBy = e.target.value  
+                        }}
+                    />
+                </div>                    
             </div>
+
         </>
         return elem 
     }
@@ -207,28 +205,34 @@ export function Profile() {
     function Contacts(props: { info }) {
         const [ upd,    setUpd ]  = useState( 0 )
         const [ mode,   setMode ] = useState<any>({ token: Store.getState().login.token })
+        const [ show,   setShow ] = useState( false)
+
+        const togglePasswordVisibility = () => {
+            setShow( !show );
+          };
 
         const elem = <>
             <div className=" ml-1 mr-1 t-underline mt-1 flex fl-space"> 
                 <b>Настройки</b> 
-                <IonIcon icon = { saveOutline } className="w-2 h-2" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
+                <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
                     onClick={()=>{
                         Save( mode )
                         setMode( { token: Store.getState().login.token } );
                     }}
                 />
             </div>
-            <div className='flex fl-space ml-2 mt-1 mr-1'>
-                <div> <b>Эл. почта</b> </div>
-                <div className='s-input a-right pr-1'>
+
+            <div className=" flex cl-black">
+                <IonIcon icon = { atOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline">
                     <IonInput
-                        class='s-input-1'
+                        type = "text"
+                        placeholder="Когда выдан"
                         value={ info?.email }
-                        placeholder="email"
-                        onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-                            info.email = e.target.value    
-                            mode.email = e.target.value    
-                            setUpd( upd + 1)
+                        onIonInput = {(e)=>{
+                            info.email = e.detail.value;
+                            mode.email = e.target.value  
+                            setUpd( upd + 1)      
                         }}
                         onIonChange={()=>{
                             if(info.email === ""){
@@ -237,32 +241,41 @@ export function Profile() {
                             setUpd( upd + 1)
                         }}
                     />
-                </div>
+                </div>                    
             </div>
-            <div className='flex fl-space ml-2 mt-1 mr-1'>
-                <div> <b>Телефон</b> </div>
-                <div className='s-input a-right pr-1'>
+
+            <div className=" flex cl-black">
+                <IonIcon icon = { callOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline">
                     <div className="mt-05 pb-05 ml-1">
                         { Store.getState().login.phone }     
                     </div>
-                </div>
+                </div>                    
             </div>
-            <div className='flex fl-space ml-2 mt-1 mr-1'>
-                <div> <b>Пароль</b> </div>
-                <div className='s-input a-right pr-1'>
+
+            
+
+            <div className=" flex cl-black">
+                <IonIcon icon = { ellipsisHorizontalOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline flex">
                     <IonInput
-                        class='s-input-1'
-                        value={ info?.password }
+                        type = { show ? "text" : "password" }
                         placeholder="Пароль"
-                        type="password"
-                        onIonInput={(e: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-                            info.password = e.target.value    
-                            mode.password = e.target.value    
-                            setUpd( upd + 1 )
+                        value={ info?.password }
+                        onIonInput = {(e)=>{
+                            info.password = e.detail.value;
+                            mode.password = e.target.value  
+                            setUpd( upd + 1)      
                         }}
-                    />
-                </div>
+                    >
+                    </IonInput>
+                    <IonIcon icon = { show ? eyeOutline : eyeOffOutline }  slot = 'icon-only' className="w-15 h-15" color = "primary"
+                        onClick={ togglePasswordVisibility}
+                    />     
+                    
+                </div>                    
             </div>
+
             {
                 info?.email === undefined || info?.email === ""
                     ?<></>

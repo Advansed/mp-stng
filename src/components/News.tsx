@@ -29,13 +29,15 @@ export function News(){
         const res = select === 0 ? await getNews( page + 1 ) : await getNotice( page + 1 )
       
       if(res.status) {
-        res.data.forEach(elem => {
-          if(typeof elem.image === "string")
-            if(elem.image.substring(0, 1) === "/")
-              elem.image = "https://aostng.ru" + elem.image          
-        });
-          const jarr = [...info, ...res.data]
-          setInfo( jarr )
+        if(res.data !== undefined) {
+          res.data.forEach(elem => {
+            if(typeof elem.image === "string")
+              if(elem.image.substring(0, 1) === "/")
+                elem.image = "https://aostng.ru" + elem.image          
+          });
+            const jarr = [...info, ...res.data]
+            setInfo( jarr )
+        }
       }
       setPage( page + 1 )
     }

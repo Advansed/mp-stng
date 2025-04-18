@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Store, getData, getLics, getProfile } from './Store'
 import './Lics.css'
-import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRow, IonText } from '@ionic/react'
-import { chevronForwardOutline, documentTextOutline, ellipsisVerticalOutline, newspaperOutline, pencilOutline, trashBinOutline } from 'ionicons/icons'
+import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonText } from '@ionic/react'
+import { alertCircleOutline, cardOutline, chevronForwardOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, ellipsisVerticalOutline, locationOutline, newspaperOutline, pencilOutline, personCircleOutline, personOutline, trashBinOutline } from 'ionicons/icons'
 import { PDFDoc } from './Files'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
@@ -16,24 +16,24 @@ type WidgetParams = {
 };
 
 
-function openWidget( info ){
+function            openWidget( info ){
 
     const widget = createWidget("PRODUCTION");    
 
     const params = {
         bankInvoiceId: info.orderId,
-        backUrl: 'https://fhd.aostng.ru/paymentSuccess',
+        backUrl: 'https://fhd.aostng.ru',
         isEmbedded: true
     };
 
     widget.open(params);
 }
 
-const openUrl = async (url) =>{
+const               openUrl = async (url) =>{
     await Browser.open({ url: url })
 }
 
-export function Lics() {
+export function     Lics() {
     const [ info,   setInfo ]   = useState<any>([])
     const [ upd,    setUpd ]    = useState( 0 )
     const [ page,   setPage ]   = useState( 0 )
@@ -94,7 +94,7 @@ export function Lics() {
     return elem
 }
 
-async function Add( params, setMessage, setPage ){
+async function      Add( params, setMessage, setPage ){
     const res = await getData("AddAccount", params )
     console.log( res )
     if(res.error){
@@ -106,7 +106,7 @@ async function Add( params, setMessage, setPage ){
     }
 }   
 
-function Items(props: { info, setItem, setPage }) {
+function            Items(props: { info, setItem, setPage }) {
 
     const info = props.info
 
@@ -123,37 +123,37 @@ function Items(props: { info, setItem, setPage }) {
     return elem 
 }
 
-function AddLic(props:{ setPage}) {
+function            AddLic(props:{ setPage}) {
 
     return <>
         <IonCard>
-            <div className='flex pl-1 pr-1 pt-1 mb-1'
-                onClick={()=>{  props.setPage( 1 )  }}
-            >
-                <div className='flex pb-1'>
-                    <div> <IonIcon icon = { pencilOutline }  className='w-2 h-2' color='primary'/></div>
-                </div>
-                <div className='flex fl-space w-100 pb-1 t-underline'> 
-                    <div> <IonText className='fs-12 ml-1'><b>Добавить лицевой счет</b></IonText> </div>
-                    <IonIcon icon = { chevronForwardOutline } className='w-2 h-2' color='primary'/>
+        <div className='ml-05 mr-05'>
+                <div className='ls-item1'
+                   onClick={()=>{  props.setPage( 1 )  }} 
+                >
+                    <div> <IonIcon icon = { pencilOutline }  className='w-15 h-15 ml-05' color='tertiary' mode = "ios" /></div>
+                    <div> 
+                        <div className='fs-09 ml-1'><b>Добавить лицевой счет</b></div> 
+                        <div className='fs-08 ml-1'>Добавление лицевого счета по коду </div>
+                    </div>
                 </div>
             </div>
-            <div className='flex pl-1 pr-1 pt-1 mb-1'
+            <div className='ml-05 mr-05'
                 onClick={()=>{  props.setPage( 2 )  }}                
             >
-                <div className='flex pb-1'>
-                    <div> <IonIcon icon = { documentTextOutline }  className='w-2 h-2' color='primary'/></div>
-                </div>
-                <div className='flex fl-space w-100 pb-1'> 
-                    <div> <IonText className='fs-12 ml-1'><b>Узнать лицевой счет</b></IonText> </div>
-                    <IonIcon icon = { chevronForwardOutline } className='w-2 h-2' color='primary'/>
+                <div className='ls-item1'>
+                    <div> <IonIcon icon = { documentTextOutline }  className='w-15 h-15 ml-05' color='tertiary' mode = "ios" /></div>
+                    <div> 
+                        <div className='fs-09 ml-1'><b>Узнать лицевой счет</b></div> 
+                        <div className='fs-08 ml-1'>Добавить лицевой счет по адресу </div>
+                    </div>
                 </div>
             </div>
         </IonCard>
     </>
 }
 
-function AddLic1(props:{ setPage }){
+function            AddLic1(props:{ setPage }){
     const [ info ] = useState({
         token:      Store.getState().login.token,
         LC :        "",
@@ -186,7 +186,6 @@ function AddLic1(props:{ setPage }){
                         className='s-input-1 ml-1'
                         placeholder='Первые три буквы фамилии'
                         value={ info.fio }
-                        size={ 3 }
                         maxlength={ 3 }
                         onIonInput={(e)=>{
                             info.fio = e.detail.value as string;
@@ -227,7 +226,7 @@ function AddLic1(props:{ setPage }){
     return elem
 }
 
-function AddLic2(props:{ setPage }){
+function            AddLic2(props:{ setPage }){
     const [ info,       setInfo]        = useState<any>([]) // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ ulus,       setUlus ]       = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ naspunkt,   setNaspunkt ]   = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -630,7 +629,6 @@ function AddLic2(props:{ setPage }){
                                 className='s-input-1 ml-1 mt-1'
                                 placeholder='Первые три буквы фамилии'
                                 value={ fio }
-                                size={ 3 }
                                 maxlength={ 3 }
                                 onIonInput={(e)=>{
                                     setFio( e.detail.value  as string );
@@ -674,7 +672,7 @@ function AddLic2(props:{ setPage }){
     return elem
 }
 
-function Lic(props: { info, ind, setItem, setPage } ){
+function            Lic(props: { info, ind, setItem, setPage } ){
     const [ load,   setLoad ]   = useState(false)
     const [ modal,  setModal ]  = useState<any>()
     const [ pop,    setPop ]    = useState( false )
@@ -712,7 +710,7 @@ function Lic(props: { info, ind, setItem, setPage } ){
         <IonLoading isOpen = { load } message = { "Подождите..." }/>
         <IonCard className='pb-1'>
             <div className='flex fl-space mt-1 ml-1'>
-                <div className='cl-black'> <h4><b>{ "Лицевой счет №" + info.code }</b></h4></div>
+                <div className='cl-black fs-12'> <b>{ "л/с № " + info.code }</b></div>
                 <IonButton
                     fill    = "clear"
                     onClick={()=>{ setPop( true )}}
@@ -755,103 +753,150 @@ function Lic(props: { info, ind, setItem, setPage } ){
                     </IonContent>
                 </IonPopover>
             </div>
-            <div className='ml-1 mr-1 t-underline pb-1'>
-                { info.name}
-            </div>    
-            <div className='ml-1 mr-1 t-underline pb-1 mt-1'>
-                { info.address}
-            </div>    
-            <div className='ml-1 mr-1 pb-1 mt-1 flex fl-space'>
-                <div>
-                    { 
-                        ( info.sum ) < 0 ? "Аванс за газ" : "Задолженность за газ" 
-                    }
+            <div className='ml-1 mr-1 t-underline pb-05 fs-09 flex'>
+                <div className=''>
+                    <IonIcon icon = { personOutline }  className='h-15 w-15' color='tertiary'/>
                 </div>
-                <div className='cl-prim fs-11'>
-                    <b>
-                        { 
-                            ( info.sum ) < 0 
-                                ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( -( info.sum ) )
-                                : new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( info.sum ) )
-                        }
-                    </b>
-                </div>                        
-            </div>    
-            <div className='ml-1 mr-1 pb-1 mt-1 flex fl-space'>
-                <div>
-                    { 
-                        ( info.sumto ) < 0 ? "Аванс за ТО" : "Задолженность за ТО" 
-                    }
+                
+                <div className=' ml-1'>
+                    { info.name}
+                </div>    
+            </div>
+            <div className='ml-1 mr-1 t-underline pb-05 mt-1 flex fs-09'>
+                <div className=''>
+                    <IonIcon icon = { locationOutline }  className='h-15 w-15' color='tertiary'/>
                 </div>
-                <div className='cl-prim fs-11'>
-                    <b>
-                        { 
-                            ( info.sumto ) < 0 
-                                ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( -( info.sumto ) )
-                                : new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( info.sumto ) )
-                        }
-                    </b>
-                </div>                        
-            </div>    
-            <div className='ml-1 mr-1'>
-                <div className='flex fl-space'>
-                    <IonButton
-                        className='w-50'
-                        color = "tertiary"
-                        mode = "ios"
-                        expand='block'
-                        onClick={()=>{
-                            props.setItem( info )
-                            props.setPage( 4 )
-                        }}
-                    >
-                        Оплата за газ
-                    </IonButton>
-                    <IonButton
-                        className='w-50'
-                        color = "tertiary"
-                        mode = "ios"
-                        expand='block'
-                        onClick={()=>{
-                            props.setItem( info )
-                            props.setPage( 5 )
-                        }}
-                    >
-                        Оплата за ТО
-                    </IonButton>
-                </div>
-                <IonButton
-                    className='mt-1'
-                    mode = "ios"
-                    color = "tertiary"
-                    expand='block'
-                    fill = "outline"
-                    onClick={()=>{
-                        Quits()   
-                    }}
-                >
-                    Квитанция 
-                </IonButton>
-                {
-                    info.counters.length !== 0
-                        ? <>
-                            <IonButton
-                                className='mt-1'
-                                mode = "ios"
-                                color = "tertiary"
-                                expand='block'
-                                fill = "outline"
+                
+                <div className=' ml-1'>
+                    { info.address}
+                </div>    
+            </div>   
+            <div className='pl-1 pr-1 pt-1'>
+                <IonSegment value="first" mode = "ios">
+                    <IonSegmentButton value="first" contentId={ "first" + info.id }>
+                    <IonLabel>Счета</IonLabel>
+                    </IonSegmentButton>
+                    <IonSegmentButton value="second" contentId={ "second" + info.id }>
+                    <IonLabel>Действия</IonLabel>
+                    </IonSegmentButton>
+                </IonSegment>
+                <IonSegmentView>
+                    <IonSegmentContent id={ "first" + info.id }>
+                        <div className='flex mt-05'>
+                            <div className='ls-panel'
                                 onClick={()=>{
                                     props.setItem( info )
-                                    props.setPage( 6 )
+                                    props.setPage( 4 )
                                 }}
                             >
-                                Внести показания
-                            </IonButton>                        
-                        </>
-                        : <></>
-                }
+                                <div className='a-center fs-09'>
+                                    {
+                                        info.sum < 0 ? "Аванс за газ" : "Долг за газ" 
+                                    }
+                                    
+                                </div>
+                                <div className='cl-prim fs-11 mt-05 mb-05 ml-1'>
+                                    <b>
+                                        { 
+                                            info.sum < 0 
+                                                ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( -info.sum ) ) 
+                                                : new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( info.sum ) ) 
+                                        }
+                                    </b>
+                                </div>
+                                <div className='ls-button1 mt-05'>
+                                    <IonIcon icon = { cardOutline } className='pr-05'/>
+                                    <IonLabel className='fs-09'>
+                                        {
+                                            info.sum > 0 ? "Оплатить" : "Внести аванс" 
+                                        }
+                                    </IonLabel>
 
+                                </div>
+                            </div>
+                            <div className='ls-panel ml-05'
+                                onClick={()=>{
+                                    props.setItem( info )
+                                    props.setPage( 5 )
+                                }}
+                            >
+                                <div className='a-center fs-09'>
+                                    {
+                                        info.sumto < 0 ? "Аванс за ТО" : "Долг за ТО"
+                                    }
+                                </div>
+                                <div className='cl-prim fs-11 mt-05 mb-05 ml-1'><b>{ new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( info.sumto ) ) }</b></div>
+                                <div className='ls-button1 mt-05'>
+                                    <IonIcon icon = { cardOutline } className='pr-05'/>
+                                    <IonLabel className='fs-09'>
+                                        {
+                                            info.sum > 0 ? "Оплатить" : "Внести аванс" 
+                                        }
+                                    </IonLabel>
+
+                                </div>
+                            </div>
+                        </div>
+                        {
+                            info.counters.length > 0
+                                ? <>
+                                    <div className='ls-item2'
+                                        onClick={()=>{
+                                            Quits()
+                                        }}
+                                    >
+                                        <div className='ml-05'>
+                                            <IonIcon icon = { alertCircleOutline }  className='h-15 w-15' color="primary"/>
+                                        </div>
+                                        <div className='ml-1'>
+                                            <div className='fs-09'><b>Напоминание: </b> Пожалуйста, вносите показания счетчика ежемесячно  </div>
+                                        </div>
+                                    </div> 
+                                </>
+                                : <></>
+                        }
+                    </IonSegmentContent>
+                    <IonSegmentContent id={ "second" + info.id }>
+                        <div>
+                            {
+                                info.counters.length > 0
+                                    ? <>
+                                        <div className='ls-item1'
+                                            onClick={()=>{
+                                                props.setItem( info )
+                                                props.setPage( 6 )                                   
+                                            }}
+                                        >
+                                            <div className='ml-05'>
+                                                <IonIcon icon = { codeWorkingOutline }  className='h-15 w-15' color="primary"/>
+                                            </div>
+                                            <div className='ml-1'>
+                                                <div className='fs-09'><b>Внести показания </b>  </div>
+                                                <div className='fs-08'>Передать текущие показания счетчика</div>
+                                            </div>
+
+                                        </div> 
+                                    </>
+                                    : <>
+                                    </>
+                            }
+                            <div className='ls-item1'
+                                onClick={()=>{
+                                    Quits()
+                                }}
+                            >
+                                <div className='ml-05'>
+                                    <IonIcon icon = { documentAttachOutline }  className='h-15 w-15' color="primary"/>
+                                </div>
+                                <div className='ml-1'>
+                                    <div className='fs-09'><b>Квитанция </b>  </div>
+                                    <div className='fs-08'>Просмотр, скачивание квитанции</div>
+                                </div>
+
+                            </div> 
+                        </div>
+                    </IonSegmentContent>
+                </IonSegmentView>            
             </div>
         </IonCard>
         <IonModal
@@ -872,7 +917,7 @@ function Lic(props: { info, ind, setItem, setPage } ){
     return elem 
 }
 
-function History(props: { item }){
+function            History(props: { item }){
     const [ info, setInfo ] = useState<any>([])
 
     const item = props.item
@@ -882,7 +927,7 @@ function History(props: { item }){
             token: Store.getState().login.token,
             LC: item.code 
         })
-        const res = await getData("GetPayments", { 
+        const res = await getData("GetPayments1", { 
             token: Store.getState().login.token,
             LC: item.code 
         })  
@@ -898,15 +943,45 @@ function History(props: { item }){
     useEffect(()=>{
         Load()
     },[])
+
+
+    function Items(props:{ info }){
+
+        let elem = <></>
+
+        for(let i = 0; i < props.info.length; i++){
+            elem = <>
+                { elem }
+                <div className='flex fl-space ml-2 mr-2 mt-05'>
+                    <div className='fs-09'>{ props.info[i].number }</div>
+                    <div className='fs-1'>
+                        <b>
+                            { 
+                                new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( props.info[i].summ )    
+                            }
+                        </b>
+                    </div>
+                </div>
+            </>
+        }
+
+
+        return elem
+    }
     
     let items = <></>
     for(let i = 0; i < info.length; i++ ){
+        
         items = <>
             { items }
-            <IonRow className='ml-2 mt-1 mr-2 cl-prim'>
-                <IonCol size = "8" > { info[i].number + " от " + info[i].date } </IonCol>
-                <IonCol size = "4"  className= "a-right"><b> { new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( info[i].summ )}</b> </IonCol>
-            </IonRow>
+            <div className='ml-1 cl-prim'>
+                <div className='mt-1 '> <b>{ info[i].date }</b> </div>
+                <Items info = { info[i].pays }/>
+                <div className='flex fl-space ml-2 mr-2 t-upperline pt-05'>
+                    <div className='fs-09'> <b>Итого</b></div>
+                    <div><b>{ new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( info[i].summ )  }</b></div>
+                </div>
+            </div>
         </>
     }
 
@@ -936,86 +1011,76 @@ function History(props: { item }){
 
 }
 
-function Payments(props:{ item, setPage }){
+function            Payments(props:{ item, setPage }){
     const item  = props.item
-    const [ value, setValue ] = useState( item.sum > 0 ? item.sum : 0)
+    const [ upd, setUpd ] = useState( 0 )
 
+    let items = <>
+        <div className='ml-1 mt-1 fs-09 cl-black'>
+            <b>
+                {
+                    item.sum >= 0
+                        ? "Оплатить"
+                        : "Внести аванс"
+                }
+            </b>
+        </div>
+    </>
+    
+    for( let i = 0; i < item.debts.length; i++ ){
+        if( item.debts[i].pay === undefined ) item.debts[i].pay = item.debts[i].sum > 0 ? item.debts[i].sum : 0
+        if( item.debts[i].sum >= 0) {
+            items = <>
+                { items }
+                <div className='flex fl-space ml-2 fs-09 mr-1 mt-05'>
+                    <div className='w-50'><b>{ item.debts[i].label }</b></div>      
+                    <div className='w-50 ls-input a-right'>
+                        <IonInput
+                            className='custom-input'
+                            value={ item.debts[i].pay }
+                            placeholder= { '0.00' }
+                            inputMode = "numeric"
+                            debounce={ 1000 }
+                            onIonInput={(e)=>{
+                                 let val = (e.detail.value as string)
+                                 if( val === '') val = '0'
+                                item.debts[i].pay = parseFloat( val )
+                                setUpd( upd + 1)
+                            }}
+                            
+                        >
+
+                        </IonInput>
+                    </div>
+                </div>
+            </>
+        }
+    }
+
+    items = <>
+        { items }
+        <div className='ml-1 mr-1 t-upperline mt-05 pt-05 flex fl-space' >
+            <div className='fs-09 cl-black'><b>Итого</b></div>
+            <div className='mr-1 cl-black'><b>{ item.debts.reduce((total, item) => total + item.pay, 0) }</b></div>
+        </div>
+    </>
 
     
     const elem = <>
         <IonCard className='pb-1'>
-            <div className='flex fl-space mt-1 ml-1'>
-                <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
-            </div>
-            <div className='ml-2 mr-1'>
-                { item.name}
-            </div>    
-            <div className='ml-2 mr-1 pb-1 mt-1'>
-                { item.address}
-            </div>    
-            <div className='mt-1 ml-1 mr-1 t-underline'>
-                <b>{ "Задолженность" }</b>
-            </div>
-            {
-                item.debts.map((e)=>{
-                    return <>
-                        <div className='ml-2 mt-1 mr-1 flex fl-space'>
-                            <div><b>{ e.label }</b></div>
-                            <div className='cl-prim fs-11'>
-                                <b>
-                                    { 
-                                        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( e.sum  )
-                                    }
-                                </b>
-                            </div>
-                        </div>
-                    </>
-                })
-            }
-            <div className='mt-1 ml-1 mr-1 t-underline'>
-                <b>{ "Итого" }</b>
-            </div>
-            <div className='ml-2 mt-1 mr-1 flex fl-space'>
-                <div></div>
-                <div className='cl-prim fs-11'>
-                    <b>
-                        { 
-                            new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.sum  )
-                        }
-                    </b>
-                </div>
-            </div>
-        </IonCard>
-        <IonCard className='pb-1'>
-            <div className='ml-1 mt-1 pb-1 '>
-                <b>
-                    {
-                        item.sum >= 0
-                            ? "Оплатить сумму"
-                            : "Внести аванс"
-                    }
-                </b>
-            </div>
-            <div className='s-input pl-1 pr-1 ml-1 mr-1'>
-                <IonInput
-                    className='s-input-1'
-                    placeholder='Сумма'
-                    type='number'
-                    value = { value }
-                    onIonInput={(e)=>{
-                        setValue( parseFloat( e.detail.value as string ))
-                    }}
-                />
-            </div>
+            
+            { items }
+
+            <div className='mt-2 ml-1 fs-09'>Способы оплаты</div>
             <div className='flex fl-space ml-1 mr-1'>
-                <div className='w-70 mt-1'>
-                    <div className='ls-item'
+                <div className='ls-item3 w-50'>
+                    <div className=''
                         onClick={()=>{
                             item.order = new Object()
                             item.order.token    = Store.getState().login.token
-                            item.order.sum      = value,
+                            item.order.sum      = item.debts,
                             item.order.LC       = item.code,
-                            item.order.sumto    = 0,
+                            item.order.sumto    = [],
                             item.order.phone    = Store.getState().login.phone,
                             item.order.email    = Store.getState().login.email,
                             item.order.ios      = false
@@ -1023,27 +1088,29 @@ function Payments(props:{ item, setPage }){
                            
                         }}
                     >   
-                        <img src="assets/sbermobile.png" alt="sberEQ"  className='h-3'/>
-                        <IonLabel className = " ml-05"><b>Оплата картой</b></IonLabel>
+                        <img src="assets/cards1.webp" alt="sberEQ"  className='w-3'/>
+                        <IonLabel className = " ml-05"></IonLabel>
                     </div>        
                 </div>
-                <div
-                    className='mt-1 w-50 ml-1'
-                    onClick={()=>{
-                        item.order = new Object()
-                        item.order.token    = Store.getState().login.token
-                        item.order.LC       = item.code,
-                        item.order.sum      = value,
-                        item.order.sumto    = 0,
-                        item.order.phone    = Store.getState().login.phone,
-                        item.order.email    = Store.getState().login.email,
-                        item.order.ios      = false
-                        props.setPage( 8 )
-                }}
-                >   
-                    <IonImg alt = "" src="assets/SberPay.png" className='h-3' />
-                    {/* <IonLabel className = "">СберМобайл</IonLabel> */}
-                </div>               
+                <div className='ls-item3 ml-05 w-50'>
+                    <div
+                        className=''
+                        onClick={()=>{
+                            item.order = new Object()
+                            item.order.token    = Store.getState().login.token
+                            item.order.LC       = item.code,
+                            item.order.sum      = item.debts,
+                            item.order.sumto    = [],
+                            item.order.phone    = Store.getState().login.phone,
+                            item.order.email    = Store.getState().login.email,
+                            item.order.ios      = false
+                            props.setPage( 8 )
+                    }}
+                    >   
+                        <IonImg alt = "" src="assets/sberpay.png" className='h-2' />
+                        {/* <IonLabel className = "">СберМобайл</IonLabel> */}
+                    </div>               
+                </div>
             </div>
 
         </IonCard>
@@ -1052,110 +1119,106 @@ function Payments(props:{ item, setPage }){
     return elem
 }
 
-function PaymentsTO(props:{ item, setPage }){
+function            PaymentsTO(props:{ item, setPage }){
     const item  = props.item
-    const [ value, setValue ] = useState( item.sumto > 0 ? item.sumto : 0)
+    const [ upd, setUpd ] = useState( 0 )
 
+    let items = <>
+        <div className='ml-1 mt-1 fs-09 cl-black'>
+            <b>
+                {
+                    item.sumto >= 0
+                        ? "Оплатить"
+                        : "Внести аванс"
+                }
+            </b>
+        </div>
+    </>
+    
+    for( let i = 0; i < item.debts.length; i++ ){
+        if( item.debtsto[i].pay === undefined ) item.debtsto[i].pay = item.debtsto[i].sum > 0 ? item.debtsto[i].sum : 0
+        if( item.debtsto[i].sum >= 0) {
+            items = <>
+                { items }
+                <div className='flex fl-space ml-2 fs-09 mr-1 mt-05'>
+                    <div className='w-50'><b>{ item.debtsto[i].label }</b></div>      
+                    <div className='w-50 ls-input a-right'>
+                        <IonInput
+                            className='custom-input'
+                            value={ item.debtsto[i].pay }
+                            placeholder= { '0.00' }
+                            inputMode = "numeric"
+                            debounce={ 1000 }
+                            onIonInput={(e)=>{
+                                 let val = (e.detail.value as string)
+                                 if( val === '') val = '0'
+                                item.debtsto[i].pay = parseFloat( val )
+                                setUpd( upd + 1)
+                            }}
+                            
+                        >
+
+                        </IonInput>
+                    </div>
+                </div>
+            </>
+        }
+    }
+
+    items = <>
+        { items }
+        <div className='ml-1 mr-1 t-upperline mt-05 pt-05 flex fl-space' >
+            <div className='fs-09 cl-black'><b>Итого</b></div>
+            <div className='mr-1 cl-black'><b>{ item.debtsto.reduce((total, item) => total + item.pay, 0) }</b></div>
+        </div>
+    </>
+
+    
     const elem = <>
         <IonCard className='pb-1'>
-            <div className='flex fl-space mt-1 ml-1'>
-                <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
-            </div>
-            <div className='ml-2 mr-1'>
-                { item.name}
-            </div>    
-            <div className='ml-2 mr-1 pb-1 mt-1'>
-                { item.address}
-            </div>    
-            <div className='mt-1 ml-1 mr-1 t-underline'>
-                <b>{ "Задолженность" }</b>
-            </div>
-            {
-                item.debtsto.map((e)=>{
-                    return <>
-                        <div className='ml-2 mt-1 mr-1 flex fl-space'>
-                            <div><b>{ e.label }</b></div>
-                            <div className='cl-prim fs-11'>
-                                <b>
-                                    { 
-                                        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( e.sum  )
-                                    }
-                                </b>
-                            </div>
-                        </div>
-                    </>
-                })
-            }
-            <div className='mt-1 ml-1 mr-1 t-underline'>
-                <b>{ "Итого" }</b>
-            </div>
-            <div className='ml-2 mt-1 mr-1 flex fl-space'>
-                <div></div>
-                <div className='cl-prim fs-11'>
-                    <b>
-                        { 
-                            new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.sumto  )
-                        }
-                    </b>
-                </div>
-            </div>
-        </IonCard>
-        <IonCard className='pb-1'>
-            <div className='ml-1 mt-1 pb-1 '>
-                <b>
-                    {
-                        item.sum >= 0
-                            ? "Оплатить сумму"
-                            : "Внести аванс"
-                    }
-                </b>
-            </div>
-            <div className='s-input pl-1 pr-1 ml-1 mr-1'>
-                <IonInput
-                    className='s-input-1'
-                    placeholder='Сумма'
-                    type='number'
-                    value = { value }
-                    onIonInput={(e)=>{
-                        setValue( parseFloat( e.detail.value as string ))
-                    }}
-                />
-            </div>
+            
+            { items }
+
+            <div className='mt-2 ml-1 fs-09'>Способы оплаты</div>
             <div className='flex fl-space ml-1 mr-1'>
-                <div className='w-60 mt-1'>
-                    <div className='ls-item'
+                <div className='ls-item3 w-50'>
+                    <div className=''
                         onClick={()=>{
                             item.order = new Object()
                             item.order.token    = Store.getState().login.token
-                            item.order.sum      = 0,
+                            item.order.sum      = [],
                             item.order.LC       = item.code,
-                            item.order.sumto    = value,
+                            item.order.sumto    = item.debtsto,
                             item.order.phone    = Store.getState().login.phone,
                             item.order.email    = Store.getState().login.email,
                             item.order.ios      = false
                             props.setPage( 7 )
+                           
                         }}
                     >   
-                        <img src="assets/sbermobile.png" alt="sberEQ"  className='h-3'/>
-                        <IonLabel className = " ml-05"><b>Оплата картой</b></IonLabel>
+                        <img src="assets/cards1.webp" alt="sberEQ"  className='w-3'/>
+                        <IonLabel className = " ml-05"></IonLabel>
                     </div>        
                 </div>
-                <div
-                    className='mt-1 w-40 ml-1'
-                    onClick={()=>{
-                        item.order = new Object()
-                        item.order.token    = Store.getState().login.token
-                        item.order.LC       = item.code,
-                        item.order.sum      = 0,
-                        item.order.sumto    = value,
-                        item.order.phone    = Store.getState().login.phone,
-                        item.order.email    = Store.getState().login.email,
-                        item.order.ios      = false
-                        props.setPage( 8 )
-                }}
-                >   
-                    <IonImg alt = "" src="assets/SberPay.png" className='h-3' />
-                </div>               
+                <div className='ls-item3 ml-05 w-50'>
+                    <div
+                        className=''
+                        onClick={()=>{
+                            item.order = new Object()
+                            item.order.token    = Store.getState().login.token
+                            item.order.LC       = item.code,
+                            item.order.sum      = [],
+                            item.order.sumto    = item.debtsto,
+                            item.order.phone    = Store.getState().login.phone,
+                            item.order.email    = Store.getState().login.email,
+                            item.order.ios      = false
+                            props.setPage( 8 )
+                    }}
+                    >   
+                        <IonImg alt = "" src="assets/sberpay.png" className='h-2' />
+                        {/* <IonLabel className = "">СберМобайл</IonLabel> */}
+                    </div>               
+                </div>
             </div>
 
         </IonCard>
@@ -1164,7 +1227,7 @@ function PaymentsTO(props:{ item, setPage }){
     return elem
 }
 
-function SberPay(props: { item, setPage }){
+function            SberPay(props: { item, setPage }){
     const [ load, setLoad ] = useState( false)
 
     const item = props.item
@@ -1193,7 +1256,7 @@ function SberPay(props: { item, setPage }){
     return elem
 }
 
-function Equaring(props: { item, setPage }){
+function            Equaring(props: { item, setPage }){
     const [ load, setLoad ] = useState( false)
     const [ info, setInfo ] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -1203,7 +1266,7 @@ function Equaring(props: { item, setPage }){
         async function load(){
             setLoad( true )
             console.log(item.order)
-            const res = await getData("SBOL", item.order )
+            const res = await getData("SBOL1", item.order )
             console.log( res )
             if(res.error){ 
 
@@ -1246,13 +1309,14 @@ function Equaring(props: { item, setPage }){
     return elem
 }
 
-function Indices(props: { item, setPage}){
+function            Indices(props: { item, setPage}){
 
     const item = props.item
 
     function Counter(props:{ info, setPage }){
-        const [ mode, setMode ]         = useState( false )
-        const [ avail, setAvail ]       = useState( 0 )
+        const [ mode,   setMode ]   = useState( false )
+        const [ avail,  setAvail ]  = useState( 0 )
+        const [ delta,  setDelta ]  = useState( -1 )
         const [ bord ]    = useState( Store.getState().login.borders )
     
         function monthDiff(dateFrom, dateTo) {
@@ -1284,6 +1348,8 @@ function Indices(props: { item, setPage}){
             }
         
             item.current = d + "." + m + "." + y
+
+            setAvail( 0 )
             
         },[])
     
@@ -1336,7 +1402,7 @@ function Indices(props: { item, setPage}){
                 : avail === 4
                     ? <>
                         <div className='ml-1 mt-2 fs-09 pb-1'>
-                            <b>Показания приняты</b>                            
+                            <b>Ваши показания приняты, сумму начислений Вы увидите после 05 числа следующего месяца</b>                            
                         </div>
                     </>
                 : <>
@@ -1351,11 +1417,27 @@ function Indices(props: { item, setPage}){
                                     info.period = item.current
                                     if(info.indice >= info.predIndice && (info.indice - info.predIndice) < 3001 ) setMode(true);
                                     else setMode(false);
-    
+
+                                    setDelta( info.indice - info.predIndice )
                                 }}
                             />
                         </div>
                     </div>
+                    <p className={ 'a-right fs-09' }> <b>{ 
+                        delta === 0 ? ""
+                        : delta > 0 ? "Разность показаний " + delta.toString()
+                        : delta < 0 ? ""
+                        : <></>
+                    } </b> </p>
+                    <p className={ 'a-right fs-08' }> <b>{ 
+                        delta === 0  ? "Передать нулевое показание"
+                        : delta > 3000 ? "Нельзя передать слишком большое показание"
+                        : delta < 0 ? ""
+                        : <></>
+                    } </b> </p>
+                    <p className='fs-09'>
+                        { "С 20 марта 2025 года показания должны быть введены не более 5 знаков, а также разница не должна превышать объем в 10 000 м3, в противном случае Вам необходимо вызвать инспекторов для снятия показаний" }
+                    </p>
                 </>
             }
             <div className='mt-1'>
@@ -1439,7 +1521,7 @@ function Indices(props: { item, setPage}){
     return elem
 }
 
-function HistoryIndices(props: { item }){
+function            HistoryIndices(props: { item }){
     const [ info, setInfo ] = useState<any>([])
 
     const item = props.item

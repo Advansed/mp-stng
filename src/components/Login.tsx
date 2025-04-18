@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Store, getData, version } from "./Store"
 import "./Login.css"
 import MaskedInput from "../mask/reactTextMask"
-import { arrowBackOutline } from "ionicons/icons"
+import { arrowBackOutline, eyeOffOutline, eyeOutline } from "ionicons/icons"
 
 
 
@@ -61,6 +61,8 @@ export function Login() {
     }
 
     function Body(){
+        const [ show, setShow ] = useState(false)
+
         const elem = <>
             <div className="l-header mt-1">
                 <IonImg className="logo" src="assets/img/logoSTNG.png" alt="test"></IonImg>
@@ -89,14 +91,20 @@ export function Login() {
                         }}
                     />
                 </div>
-                <div className="l-input mt-1">
+                <div className="l-input mt-1 flex">
                     <IonInput 
                         className="l-input-1 ml-1"
                         placeholder="Пароль" 
-                        value={ info?.password} type="password"  
+                        value={ info?.password} 
+                        type={ show ? "text" : "password" }
                         onIonChange={(e)=>{
                             info.password = e.target.value;
                             setInfo( info )
+                        }}
+                    />
+                    <IonIcon icon = { show ? eyeOutline : eyeOffOutline } color="primary" className="w-15 h-15 mr-1"
+                        onClick={()=>{
+                            setShow(!show)
                         }}
                     />
                 </div>
@@ -127,6 +135,10 @@ export function Login() {
                     Store.dispatch({type: "reg", reg : true })
                 }}
             > Пройдите регистрацию </IonButton>
+
+            <div className="cl-white fs-09 ml-1 mt-4">
+                { "Версия " + version }
+            </div>
         </>     
         
         return elem

@@ -1,5 +1,5 @@
 import React, { useEffect, useState }        from 'react';
-import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonTabBar, IonTabButton, isPlatform } from '@ionic/react';
+import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonTabBar, IonTabButton, isPlatform, useIonRouter } from '@ionic/react';
 import { useHistory, useParams, useLocation } from 'react-router';
 import './Page.css';
 import { Lics }     from '../components/Lics';
@@ -22,6 +22,10 @@ const Page: React.FC = () => {
   const [ error, setError ] = useState("")
 
   const { name } = useParams<{ name: string; }>();
+
+  const ionRouter = useIonRouter();
+
+  console.log("page " + name)
 
   const lct = useLocation()
 
@@ -51,7 +55,6 @@ const Page: React.FC = () => {
   }})
 
   useEffect(()=>{
-
     if( !lct.pathname.includes("page")){
       Store.dispatch({ type: "auth", auth: false})
     } 
@@ -116,31 +119,32 @@ const Page: React.FC = () => {
 
       <IonContent>
         <Main />
-        <div className='p-footer'>
+         <div className='p-footer'>
           <IonTabBar slot="bottom">
 
-            <IonTabButton tab="services" href="/page/services">
+            <IonTabButton tab="services" href="/page/services"
+              onClick={()=>{ hist.push('/page/services')}}
+            >
               <IonIcon icon={ contractOutline } className='w-1 h-1'/>
               <div className='h-2'> Услуги </div>
             </IonTabButton>
 
-            <IonTabButton tab="lics" href="/page/lics">
-              <IonIcon icon={ documentTextOutline } className='w-1 h-1'/>
+            <IonTabButton tab="lics" href="/page/lics"
+              onClick={()=>{ hist.push('/page/lics')}}
+            >
+                <IonIcon icon={ documentTextOutline } className='w-1 h-1'/>
               <div className='h-2'>Лицевые счета</div>
             </IonTabButton>
-
-            {/* <IonTabButton tab="queye" href="/page/queye">
-              <IonIcon icon={ createOutline } className='w-1 h-1'/>
-              <div className='h-2'>E-запись</div>
-            </IonTabButton> */}
-
-            <IonTabButton tab="news" href="/page/news">
+            
+            <IonTabButton tab="news" href="/page/news"
+              onClick={()=>{ hist.push('/page/news')}}
+            >
               <IonIcon icon={ chatboxEllipsesOutline } className='w-1 h-1'/>
               <div className='h-2'>Новости объявления</div>
             </IonTabButton>
             
           </IonTabBar>
-        </div>
+        </div> 
       </IonContent>
       <IonAlert
         header="Внимание!!!"

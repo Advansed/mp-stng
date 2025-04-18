@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonApp, IonRouterOutlet, IonSplitPane, isPlatform, setupIonicReact } from '@ionic/react';
+import { IonApp, IonPage, IonRouterOutlet, IonSplitPane, isPlatform, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route, useLocation } from 'react-router-dom';
 import Menu from './components/Menu';
@@ -85,12 +85,23 @@ const App: React.FC = () => {
         <IonReactRouter>
           <IonSplitPane contentId="main">
             <Menu />
-            <IonRouterOutlet id="main">
+            <IonRouterOutlet 
+              id="main"
+              animated = { false }
+              ionPage = { true }
+
+            >
               <Route path="/" exact={true}>
                 <Redirect to="/page/lics" />
               </Route>
-              <Route path="/page/:name" exact={true}>
-                <Page />
+              <Route 
+                path="/page/:name" 
+                exact={true}
+               render={({match})=><>
+                  <Page key = { match.params.name  }/>
+                </>}
+              >
+                
               </Route>
             </IonRouterOutlet>
           </IonSplitPane>
