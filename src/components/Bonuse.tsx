@@ -1,48 +1,48 @@
-import { IonButton, IonCard, IonCardContent, IonCardHeader } from "@ionic/react";
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonIcon, IonLoading } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import { Store, getData } from "./Store";
 import "./Bonuse.css"
+import { saveOutline } from "ionicons/icons";
+import { FioSuggestions } from "react-dadata";
 
  export function Bonuses(){
     const [ info, setInfo ] = useState<any>(new Object())
     const [ upd, setUpd ]  = useState( 0 )
+    const [ message, setMessage ] = useState("")
+    const [ load, setLoad] = useState( false)
 
-    async function Client(){
-        const res = await getData("spClient", {
-            token: Store.getState().login.token
-        })
-        console.log( res )
-        if(res.error) setInfo( new Object())
-        else {
-            setInfo( res.data )
-            setUpd( upd + 1 )
-            console.log( upd )
-        } 
-    }
     async function CreateClient(){
+        setLoad( true)
         const res = await getData("spCreateClient", {
             token: Store.getState().login.token
         })
         if(res.error){
             setInfo( new Object())
-            Store.dispatch({type: "error", data: res.message })
+            Store.dispatch({type: "error", error: res.message })
         }
         else setInfo( res.data )
+
+        setLoad(false)
     }
 
     useEffect(()=>{
 
-            Client()
+            setInfo( Store.getState().card )
             
         return ()=>{
             Store.unSubscribe( 91 )
+            Store.unSubscribe( 92 )
         }
     },[])
 
     
     Store.subscribe({num : 91, type: "back", func: ()=>{
         Store.dispatch({type: "route", route: "back"})
+    } })
+
+    Store.subscribe({num : 92, type: "card", func: ()=>{
+        setInfo( Store.getState().card )
     } })
 
     function BonusCard(){
@@ -92,6 +92,62 @@ import "./Bonuse.css"
         return st
     }
 
+    function FIO(){
+        const info = Store.getState().profile
+        const [ upd, setUpd ] = useState( 0 )
+
+        async function Save(){
+            const res = await getData("profile",{
+                token: Store.getState().login.token,
+                surname:    info.surname, 
+                name:       info.name,
+                lastname:   info.lastname
+            })
+            console.log( res )
+            if(res.error){ console.log(res.message)}
+            else Store.dispatch({ type: "profile", profile: res.data })
+        }
+
+        const elem = <>
+
+            <div className={ "ml-1 mr-1 mt-1 cl-prim fs-bold"}>
+                <div>ФИО</div>
+                <div className="ml-1">
+                    <FioSuggestions  token="50bfb3453a528d091723900fdae5ca5a30369832"
+                        value={ 
+                            { 
+                                value: 
+                                      info?.surname + " "
+                                    + info?.name + " " 
+                                    + info?.lastname, 
+                                unrestricted_value: info?.surname + " " + info?.name + " " + info?.lastname,
+                                data: {
+                                    surname:            info?.surname,
+                                    name:               info?.name,
+                                    patronymic:         info?.lastname,
+                                    gender:             "MALE",
+                                    source:             null,
+                                    qc:                 "0"
+                                }
+                            }
+                
+                        }
+                        onChange={(e)=>{
+                            info.surname            = e?.data.surname;  
+                            info.name               = e?.data.name;  
+                            info.lastname           = e?.data.patronymic;  
+
+                            setUpd( upd + 1)
+
+                            Save()
+
+                        }}/>
+                </div>
+            </div>
+        </>
+        return elem
+    }
+
 
     let elem = <></>
 
@@ -102,13 +158,22 @@ import "./Bonuse.css"
                     Бонусы АГЗС
                 </IonCardHeader>
                 <IonCardContent>
+                    <FIO />
+                    
+                    <p>{ message }</p>
                     <div className="mt-1">
                         <IonButton
                             expand="block"
                             mode="ios"
                             color="tertiary"
                             onClick={()=>{
-                                CreateClient()    
+                                setMessage( "" )
+                                const info = Store.getState().profile
+                                if((info.surname + info.name + info.lastname).length > 0){
+                                    CreateClient()    
+                                }
+                                else 
+                                    setMessage( "Заполните ФИО" )
                             }}
                         >
                             Создать бонусную карту
@@ -140,6 +205,7 @@ import "./Bonuse.css"
         </>
 
     return <>
+        <IonLoading isOpen={load} message={"Подождите"}/>
         {/* <IonCard className="pb-2">
             <IonCardHeader>QR-code</IonCardHeader>
             <div className="flex fl-center">

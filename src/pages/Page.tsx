@@ -1,10 +1,10 @@
 import React, { useEffect, useState }        from 'react';
-import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonTabBar, IonTabButton, isPlatform, useIonRouter } from '@ionic/react';
+import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonRefresher, IonRefresherContent, IonTabBar, IonTabButton, isPlatform, useIonRouter } from '@ionic/react';
 import { useHistory, useParams, useLocation } from 'react-router';
 import './Page.css';
 import { Lics }     from '../components/Lics';
 import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, createOutline, documentTextOutline } from 'ionicons/icons';
-import { Store, getData, version }    from '../components/Store';
+import { Store, getApps, getData, getLics, getNotifications, getProfile, getServices, version }    from '../components/Store';
 import { Profile }  from '../components/Profile';
 import { Agzs }     from '../components/AGZS';
 import { Apps }     from '../components/Apps';
@@ -51,7 +51,8 @@ const Page: React.FC = () => {
   }})
 
   Store.subscribe({ num: 4, type: "error", func: ()=>{
-    setError( Store.getState().error )
+    // setError( Store.getState().error )
+    console.log(error)
   }})
 
   useEffect(()=>{
@@ -99,6 +100,14 @@ const Page: React.FC = () => {
     </>
   }
 
+    const handleRefresh = async (event: CustomEvent) => {
+        // Здесь ваша логика обновления, например, запрос к API
+        setTimeout(() => {
+          console.log("refresh")
+            getLics( { token: Store.getState().login.token } )
+          event.detail.complete();
+        }, 1500);
+    };
 
   return (
     <IonPage>
@@ -118,7 +127,27 @@ const Page: React.FC = () => {
         </div>
 
       <IonContent>
-        <Main />
+        {
+          name === 'lics'
+            ? <>
+                <IonRefresher
+                    slot="fixed" 
+                    pullMin ={ 120 }              
+                    onIonRefresh={handleRefresh}
+                >
+                    <IonRefresherContent
+                      pullingIcon="arrow-down-outline"
+                      pullingText="Потяните вниз для обновления"
+                      refreshingSpinner="crescent"
+                      refreshingText="Обновление..."
+                    />
+                </IonRefresher>        
+            </>
+            : <></>
+        }
+          
+          <Main />
+
          <div className='p-footer'>
           <IonTabBar slot="bottom">
 
@@ -189,7 +218,8 @@ const Page: React.FC = () => {
           },
         ]}
       ></IonAlert>
-    </IonPage>  );
+    </IonPage>  
+  );
 };
 
 export default Page;

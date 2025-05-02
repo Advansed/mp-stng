@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Store, getData, getLics, getProfile } from './Store'
+import { Store, getApps, getData, getLics, getProfile } from './Store'
 import './Lics.css'
-import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonText } from '@ionic/react'
+import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRefresher, IonRefresherContent, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonText } from '@ionic/react'
 import { alertCircleOutline, cardOutline, chevronForwardOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, ellipsisVerticalOutline, locationOutline, newspaperOutline, pencilOutline, personCircleOutline, personOutline, trashBinOutline } from 'ionicons/icons'
 import { PDFDoc } from './Files'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
@@ -33,6 +33,7 @@ const               openUrl = async (url) =>{
     await Browser.open({ url: url })
 }
 
+
 export function     Lics() {
     const [ info,   setInfo ]   = useState<any>([])
     const [ upd,    setUpd ]    = useState( 0 )
@@ -42,6 +43,7 @@ export function     Lics() {
     Store.subscribe({num : 22, type: "lics", func: ()=>{
         setInfo( Store.getState().lics )
         setUpd( upd + 1)
+        console.log( "subscribe lics ")
     } })
 
     Store.subscribe({num : 21, type: "back", func: ()=>{
@@ -62,7 +64,6 @@ export function     Lics() {
 
         }    
     } })
-
 
     useEffect(()=>{
 
@@ -91,10 +92,13 @@ export function     Lics() {
         default: <></>
     }
 
-    return elem
+    return <>
+        { elem }
+    </>
 }
 
 async function      Add( params, setMessage, setPage ){
+
     const res = await getData("AddAccount", params )
     console.log( res )
     if(res.error){
@@ -238,6 +242,19 @@ function            AddLic2(props:{ setPage }){
     const [ message,    setMessage ]    = useState("")
     const [ load,       setLoad ]       = useState( false )
 
+    async function      Add1( params ){
+        setLoad( true )
+        const res = await getData("AddAccount", params )
+        console.log( res )
+        if(res.error){
+            setMessage(res.message);
+        } else {
+            getLics({ token: Store.getState().login.token })
+            getProfile({ token: Store.getState().login.token })
+            props.setPage( 0 )
+        }
+        setLoad(false)
+    }   
 
     useEffect(()=>{
         async function load(){
@@ -651,11 +668,11 @@ function            AddLic2(props:{ setPage }){
                     onClick={()=>{
                         setMessage("")
                         if(  lc !== undefined && fio !== "" ) 
-                            Add( {
+                            Add1( {
                                 token:  Store.getState().login.token,
                                 LC:     lc.code,
                                 fio:    fio,    
-                            }, setMessage, props.setPage )
+                            })
                         else props.setPage( 0 )
                     }}
                 >   {
@@ -1061,7 +1078,9 @@ function            Payments(props:{ item, setPage }){
         { items }
         <div className='ml-1 mr-1 t-upperline mt-05 pt-05 flex fl-space' >
             <div className='fs-09 cl-black'><b>Итого</b></div>
-            <div className='mr-1 cl-black'><b>{ item.debts.reduce((total, item) => total + item.pay, 0) }</b></div>
+            <div className='mr-1 cl-black'><b>{ 
+                new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts.reduce((total, item) => total + item.pay, 0) ) 
+           }</b></div>
         </div>
     </>
 
@@ -1135,7 +1154,7 @@ function            PaymentsTO(props:{ item, setPage }){
         </div>
     </>
     
-    for( let i = 0; i < item.debts.length; i++ ){
+    for( let i = 0; i < item.debtsto.length; i++ ){
         if( item.debtsto[i].pay === undefined ) item.debtsto[i].pay = item.debtsto[i].sum > 0 ? item.debtsto[i].sum : 0
         if( item.debtsto[i].sum >= 0) {
             items = <>
@@ -1169,7 +1188,9 @@ function            PaymentsTO(props:{ item, setPage }){
         { items }
         <div className='ml-1 mr-1 t-upperline mt-05 pt-05 flex fl-space' >
             <div className='fs-09 cl-black'><b>Итого</b></div>
-            <div className='mr-1 cl-black'><b>{ item.debtsto.reduce((total, item) => total + item.pay, 0) }</b></div>
+            <div className='mr-1 cl-black'><b>{ 
+                new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debtsto.reduce((total, item) => total + item.pay, 0) ) 
+            }</b></div>
         </div>
     </>
 
@@ -1349,8 +1370,6 @@ function            Indices(props: { item, setPage}){
         
             item.current = d + "." + m + "." + y
 
-            setAvail( 0 )
-            
         },[])
     
         const info = props.info
@@ -1384,14 +1403,14 @@ function            Indices(props: { item, setPage}){
                     </>
                 : avail === 2
                     ? <>
-                        <div className='ml-1 mt-2 fs-09 pb-1'
-                            onClick={()=>{
-                                Store.dispatch({type: "route", route: "services"})
-                            }}
-                        >
-                            <b>Нарушен срок подачи показаний, в разделе услуги вам необходимо оформить</b>                            
-                            <b className='cl-prim fs-11'>{ " Вызов инспектора" }</b>                            
-                        </div>
+                            <div className='ml-1 mt-2 fs-09 pb-1'
+                                onClick={()=>{
+                                    Store.dispatch({type: "route", route: "services"})
+                                }}
+                            >
+                                <b>Нарушен срок подачи показаний, в разделе услуги вам необходимо обратиться в </b>                            
+                                <b className='cl-prim fs-11'>{ " Единый контакт-центр 509-555" }</b>                            
+                            </div>
                     </>
                 : avail === 3 
                     ? <>
@@ -1402,7 +1421,7 @@ function            Indices(props: { item, setPage}){
                 : avail === 4
                     ? <>
                         <div className='ml-1 mt-2 fs-09 pb-1'>
-                            <b>Ваши показания приняты, сумму начислений Вы увидите после 05 числа следующего месяца</b>                            
+                            <b>Ваши показания приняты, сумму начислений Вы увидите после 01 числа следующего месяца</b>                            
                         </div>
                     </>
                 : <>

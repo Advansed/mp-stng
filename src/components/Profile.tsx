@@ -81,7 +81,7 @@ export function Profile() {
 
                         console.log( Object.keys(mode).length )
 
-                    }}/>
+                }}/>
             </div>
             <div className="cl-prim"  onClick={()=>{ setEdit(!edit); console.log( mode ) }} >
                 <div className='flex fl-space ml-2 mt-1 mr-1'>
@@ -101,7 +101,10 @@ export function Profile() {
         async function Save(){
             const res = await getData("profile", {
                 token:      Store.getState().login.token,
-                passport:   info?.passport
+                passport:   info?.passport,
+                surname:    mode.surname,
+                name:       mode.name,
+                lastname:   mode.lastname,
             })
             console.log( {
                 token: Store.getState().login.token,
@@ -121,6 +124,37 @@ export function Profile() {
                     }}
                 />
             </div>
+
+            <div className={ "ml-1 mr-1 mt-1 cl-prim fs-bold" }>
+                <FioSuggestions  token="50bfb3453a528d091723900fdae5ca5a30369832"
+                    value={{ 
+                        value: info?.surname + " " + info?.name + " " + info?.lastname, 
+                        unrestricted_value: info?.surname + " " + info?.name + " " + info?.lastname,
+                        data: {
+                            surname:            info?.surname,
+                            name:               info?.name,
+                            patronymic:         info?.lastname,
+                            gender:             "MALE",
+                            source:             null,
+                            qc:                 "0"
+                        }
+                    }}
+                    onChange={(e)=>{
+                        info.surname            = e?.data.surname;  
+                        info.name               = e?.data.name;  
+                        info.lastname           = e?.data.patronymic;  
+
+                        mode.surname            = e?.data.surname;  
+                        mode.name               = e?.data.name;  
+                        mode.lastname           = e?.data.patronymic;  
+
+                        setUpd( upd + 1)
+
+                        console.log( Object.keys(mode).length )
+
+                }}/>
+            </div>  
+
             <div className=" flex cl-black">
                 <IonIcon icon = { barcodeOutline } className="w-15 h-15 ml-1" color="primary"/>
                 <div className="ml-1 w-80 mr-1 t-underline">
@@ -169,6 +203,7 @@ export function Profile() {
                     />
                 </div>                    
             </div>
+
             <div className=" flex cl-black">
                 <IonIcon icon = { codeWorkingOutline } className="w-15 h-15 ml-1" color="primary"/>
                 <div className="ml-1 w-80 mr-1 t-underline">
@@ -184,6 +219,7 @@ export function Profile() {
                     />
                 </div>                    
             </div>
+
             <div className=" flex cl-black">
                 <IonIcon icon = { businessOutline } className="w-15 h-15 ml-1" color="primary"/>
                 <div className="ml-1 w-80 mr-1 t-underline">
@@ -334,9 +370,6 @@ export function Profile() {
             <div
                 className='l-content'
             >
-                <IonCard className="pb-1">
-                    <FIO info = { info }/>
-                </IonCard>
 
                 <IonCard className="pb-1 cl-prim">
                     <Passport info = { info }/>

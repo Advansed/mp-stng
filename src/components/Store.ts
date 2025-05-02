@@ -41,6 +41,7 @@ export const i_state = {
     appeals:                            [],  
     services:                           [],  
     error:                              "",
+    card:                               new Object()
 
 }
 
@@ -327,6 +328,14 @@ export async function   getServices() {
     console.log( res )
     if(!res.error) Store.dispatch({ type: "services", services: res.data })
 
+}
+
+export async function Client(){
+    const res = await getData("spClient", {
+        token: Store.getState().login.token
+    })
+    console.log( res )
+    if(!res.error) Store.dispatch({ type: "card", card: res.data })
 }
 
 Store.subscribe({ num: 1001, type: "login", func: ()=>{
