@@ -10,11 +10,11 @@ export function Queye1(){
 
     useEffect(()=>{
         return ()=>{
-            Store.unSubscribe( 61 )
+            Store.unSubscribe( 404 )
         }
     },[])
    
-    Store.subscribe({num : 61, type: "back", func: ()=>{
+    Store.subscribe({num : 404, type: "back", func: ()=>{
         Store.dispatch({type: "route", route: "back"})
     } })
 

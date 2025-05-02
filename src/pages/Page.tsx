@@ -40,6 +40,7 @@ const Page: React.FC = () => {
   Store.subscribe({ num: 3, type: "route", func: ()=>{
 
     const route = Store.getState().route;
+    console.log( route)
 
     if( route === "back") {
       hist.goBack()
@@ -54,6 +55,7 @@ const Page: React.FC = () => {
     // setError( Store.getState().error )
     console.log(error)
   }})
+
 
   useEffect(()=>{
     if( !lct.pathname.includes("page")){
@@ -115,7 +117,10 @@ const Page: React.FC = () => {
           <IonButton
             fill = "clear"
             onClick = {()=>{ 
+              if(name === "lics")
                 Store.dispatch({ type: "back", back: Store.getState().back + 1})
+              else 
+                Store.dispatch({type: "route", route: "back"})
             }}
           >
             <IonIcon icon = { arrowBackOutline } slot = "icon-only" color="light"/>

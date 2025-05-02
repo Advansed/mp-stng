@@ -6,7 +6,7 @@ import { IonCard, IonText } from "@ionic/react"
 export function Notifications(){
     const [ info, setInfo ] = useState<any>([])
 
-    Store.subscribe({num : 91, type: "back", func: ()=>{
+    Store.subscribe({num : 404, type: "back", func: ()=>{
         Store.dispatch({type: "route", route: "back"})
     }})
 
@@ -17,7 +17,7 @@ export function Notifications(){
     useEffect(()=>{ 
             setInfo(Store.getState().notices)
         return ()=>{
-            Store.unSubscribe( 91 )
+            Store.unSubscribe( 404 )
         }
     },[])
 

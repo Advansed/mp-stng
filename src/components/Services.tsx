@@ -31,7 +31,7 @@ export function Services(){
 
     let elem = <></>
 
-    Store.subscribe({num: 21, type: "back", func: ()=>{
+    Store.subscribe({num: 404, type: "back", func: ()=>{
         console.log("subscibe 21")
         if( page > 0 ) {
             setMessages([])
@@ -55,7 +55,7 @@ export function Services(){
             
             return ()=>{
                 console.log("useeffect services dismount")
-                Store.unSubscribe( 21 )
+                Store.unSubscribe( 404 )
                 Store.unSubscribe( 22 )
             }
     

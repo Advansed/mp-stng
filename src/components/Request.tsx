@@ -9,12 +9,12 @@ export function Request(){
 
     useEffect(()=>{
         return ()=>{
-            Store.unSubscribe( 71 )
+            Store.unSubscribe( 404 )
         }
     },[])
 
     
-    Store.subscribe({num : 71, type: "back", func: ()=>{
+    Store.subscribe({num : 404, type: "back", func: ()=>{
         Store.dispatch({type: "route", route: "back"})
     } })
 

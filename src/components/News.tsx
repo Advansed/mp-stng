@@ -16,7 +16,7 @@ export function News(){
     },[])
 
   
-    Store.subscribe({num : 81, type: "back", func: ()=>{
+    Store.subscribe({num : 404, type: "back", func: ()=>{
         Store.dispatch({type: "route", route: "back"})
     } })
 

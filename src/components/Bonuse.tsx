@@ -31,13 +31,13 @@ import { FioSuggestions } from "react-dadata";
             setInfo( Store.getState().card )
             
         return ()=>{
-            Store.unSubscribe( 91 )
+            Store.unSubscribe( 404 )
             Store.unSubscribe( 92 )
         }
     },[])
 
     
-    Store.subscribe({num : 91, type: "back", func: ()=>{
+    Store.subscribe({num : 404, type: "back", func: ()=>{
         Store.dispatch({type: "route", route: "back"})
     } })
 

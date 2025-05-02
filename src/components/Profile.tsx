@@ -11,7 +11,7 @@ import { Maskito } from "./Classes"
 export function Profile() {
     const [ info, setInfo ] = useState<any>() 
 
-    Store.subscribe({num: 31, type: "back", func:()=>{
+    Store.subscribe({num: 404, type: "back", func:()=>{
         Store.dispatch({type:"route", route: "back"})
     }})
 
@@ -24,7 +24,7 @@ export function Profile() {
         setInfo( Store.getState().profile )        
 
         return ()=>{
-            Store.unSubscribe(31);
+            Store.unSubscribe(404);
             Store.unSubscribe(32);
         }
 

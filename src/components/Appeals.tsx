@@ -10,7 +10,7 @@ export function Appeals() {
     const [ item, setItem ]     = useState<any>()
     const [ upd, setUpd]        = useState( 0 )
   
-    Store.subscribe({num : 101, type: "back", func: ()=>{
+    Store.subscribe({num : 404, type: "back", func: ()=>{
 
         if(item !== undefined) {
             setItem( undefined )
@@ -31,7 +31,7 @@ export function Appeals() {
         getAppeals()
         return ()=>{ 
             console.log("return appeals")
-            Store.unSubscribe( 101 )
+            Store.unSubscribe( 404 )
             Store.unSubscribe( 102 )
         }
     },[])

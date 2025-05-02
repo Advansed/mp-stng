@@ -3,6 +3,8 @@ import { combineReducers  } from 'redux'
 import axios from 'axios'
 import { Reducer } from 'react';
 import localForage from "localforage";
+import { createBrowserHistory } from 'history';
+const hist = createBrowserHistory();
 
 export function setItem(key, value){
     localForage.setItem(key, value)
@@ -24,7 +26,7 @@ const reducers: Array<Reducer<any, any>> = [] // eslint-disable-line @typescript
 
 export const listeners: Array<any>  = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
-export const version = '2.3.2'
+export const version = '2.3.4'
 
 export const i_state = {
 
@@ -219,6 +221,7 @@ return res
 }
 
 export async function   getProfile( params){
+    console.log( params )
     const res = await getData("profile", params)
     console.log(res)
     if(res.error) console.log(res.message)
@@ -338,11 +341,21 @@ export async function Client(){
     if(!res.error) Store.dispatch({ type: "card", card: res.data })
 }
 
-Store.subscribe({ num: 1001, type: "login", func: ()=>{
 
-    getLics( { token: Store.getState().login.token } )
-    getProfile( { token: Store.getState().login.token } )
-    getApps( { token: Store.getState().login.token } )
+function goProfile(){
+    hist.push("/page/profile")
+    console.log("change")
+}
+
+Store.subscribe({ num: 1001, type: "login", func: ()=>{
+    const login = Store.getState().login
+    const params = { token: Store.getState().login.token }
+
+    if( login.change ) goProfile()
+
+    getLics( params )
+    getProfile( params )
+    getApps( params )
     getServices(  );
     getNotifications( 0 )
 

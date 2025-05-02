@@ -12,8 +12,11 @@ export function Login() {
     const [ info,   setInfo]    = useState<any>({ phone: "", password: "", version: version, mode: "android"}) // eslint-disable-line @typescript-eslint/no-explicit-any
     const [ error,  setError]   = useState("")
     const [ upd,    setUpd]     = useState( 0 )
+    const [ message, setMessage ] = useState( "" )
     const [ load,   setLoad ]   = useState( false)
     const [ page,   setPage ]   = useState( 0 )
+    const [ order1, setOrder1 ] = useState({ call: "", id: "" })
+    const [ namer,  setNamer ]  = useState( "Проверить" )
 
     useEffect(()=>{
 
@@ -145,7 +148,6 @@ export function Login() {
     }
 
     function Restore(){
-        const [ info, setInfo ] = useState<any>( new Object())  // eslint-disable-line @typescript-eslint/no-explicit-any
 
         async function Restore(){
             setLoad( true)
@@ -158,61 +160,182 @@ export function Login() {
             setLoad( false)
         }
 
+        function Page1(){
+            
+            return <div>
+                 <IonText>
+                     <p className="l-text a-center ml-1 mr-1">
+                         Для восстановления пароля используйте номер вашего мобильного телефона
+                     </p>
+                 </IonText>
+                 <div className="l-input pl-1">
+                     <MaskedInput
+                         mask={['+', /[1-9]/, '(', /\d/, /\d/, /\d/, ')', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
+                         className="m-input"
+                         id='4'
+                         value={ info?.phone }
+                         placeholder = "Телефон"
+                         type='text'
+                         onChange={(e) => {
+                             info.phone = e.target.value as string;
+                                 setInfo( info )
+                         }}
+                     />
+                 </div>
+ 
+                 <IonText >
+                     <p className="ion-text-start error ml-1 cl-red">
+                         
+                         { message }
+                     </p>
+                 </IonText>
+ 
+                 <div className="ml-1 mr-1 l-button"
+                     onClick={ async ()=>{
+ 
+                         setLoad( true )
+                         console.log( info )
+                         const res = await getData("getPhone", {
+                             phone:     info.phone,
+                             type:      "restore",
+                         })
+                         console.log( res )
+                         if(!res.error){
+                            if( res.data.status_code === 100 ){
+                                console.log( "call: " + res.data.call_phone )
+                                console.log( "id: " + res.data.check_id )
+                                setOrder1({ call: res.data.call_phone, id: res.data.check_id })
+                                setPage( 2 )
+                                setMessage("")
+                            }
+                            else {
+                                setMessage( res.message )
+                                setUpd( upd + 1)
+                            }   
+                         } else {
+                            console.log("error message")
+                            setMessage( res.message )
+                            setUpd( upd + 1)
+                         }
+                             
+                         setLoad( false)
+ 
+                     }}
+                 >
+                     Запросить звонок
+                 </div>        
+                 <IonButton className="l-textURL ion-text-wrap" fill="clear"
+                     onClick={()=>{ setPage( page + 1 )}}                
+                 >Пользовательское соглашение</IonButton>
+ 
+                 <div className="a-center">
+                     <IonText className="l-text">Уже зарегистрированы? </IonText>        
+                 </div>
+                     
+                 <IonButton fill="clear" className="l-textURL ion-text-wrap" 
+                     onClick={()=>{ 
+                         Store.dispatch({type: "reg", reg : false })
+                     }}
+                 > Авторизируйтесь </IonButton>
+             </div>
+ 
+        }
+ 
+        function Page2(){
+ 
+             const elem = <>
+                 <IonText>
+                     <p className="l-text a-center ml-1 mr-1">
+                         Для подтверждения телефона позвоните по этому номеру
+                     </p>
+                 </IonText>
+                 <IonText>
+                     <p className="l-title">{ order1.call }</p>
+                 </IonText>                
+                 <div className="ml-1 mr-1 l-button"
+                     onClick={ async ()=>{
+                        console.log("Звонок")
+                        console.log( order1 )
+                        window.open('tel:' + order1.call )
+                         setMessage("")
+                         setPage( 3 )
+                     }}
+                 >
+                     Звонок
+                 </div>        
+             </>
+             return elem
+        }
+ 
+         function Page3(){
+ 
+             const elem = <>
+                 <IonText>
+                     <p className="l-text a-center ml-1 mr-1">
+                         Проверьте результат звонка 
+                     </p>
+                 </IonText>
+                 <IonText>
+                     <p className="l-title">{ order1.call }</p>
+                 </IonText>      
+                 <IonText >
+                     <p className="ion-text-start error ml-1 cl-red">
+                         { message }
+                     </p>
+                 </IonText>
+                 <div className="ml-1 mr-1 l-button"
+                     onClick={ async ()=>{
+                         setLoad( true)
+                         console.log( info )
+                         const res = await getData("checkPhone", {
+                            phone:  info.phone,
+                            id:     order1.id,
+                            type:   "restore"
+                         })
+                         console.log( res )
+                         if(!res.error){
+                            res.data.change = true
+                            Store.dispatch({ type: "login", login: res.data })
+                            Store.dispatch({ type: "auth",  auth: true })
+                            setPage( 3 )
+                        } else {
+                            setMessage( res.message )
+                            setNamer( "Повторить" )
+                        }
+                         console.log( res )
+                         setLoad( false)
+                     }}
+                 >
+                     { namer }
+                 </div>        
+             </>
+             return elem
+         }
+ 
 
         const elem = <>
-            <IonHeader>
-                <div className='p-header flex fl-space'>
-                    <IonButton
-                        fill = "clear"
-                        onClick = {()=>{ 
-                            setPage( 0 )
-                        }}
-                        >
-                        <IonIcon icon = { arrowBackOutline } slot = "icon-only" color="light"/>
-                    </IonButton>
-                    <div className='flex fl-center w-100 h-3'><IonImg class="p-menu" src="assets/img/logoSTNG.png" /></div>
-                </div>
-            </IonHeader>          
             <div className="l-header mt-1">
                 <IonImg className="logo" src="assets/img/logoSTNG.png" alt="test"></IonImg>
 
                 <IonText>
                     <p className="l-title">Восстановление пароля</p>
                 </IonText>
-                <IonText>
+                {/* <IonText>
                     <p className="l-text a-center ml-1 mr-1">
                         Если Вы забыли пароль введите номер телефона. Контрольная строка для пароля, а также регистрационные данные будут высланы по SMS. На Ваш номер телефона придет пароль
                     </p>
-                </IonText>
+                </IonText> */}
             </div>
-            <div>
-                <div className="l-input pl-1">
-                    <MaskedInput
-                        mask={['+', /[1-9]/, '(', /\d/, /\d/, /\d/, ')', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
-                        className="m-input"
-                        id='3'
-                        value={ info?.phone }
-                        placeholder = "Телефон"
-                        type='text'
-                        onChange={(e) => {
-                            info.phone = e.target.value as string;
-                                setInfo( info )
-                        }}
-                    />
-                </div>
 
-                <IonText >
-                    <p className="ion-text-start error ml-1 cl-red">
-                        { error }
-                    </p>
-                </IonText>
-
-                <div className="ml-1 mr-1 l-button"
-                    onClick={()=>{ Restore() }}
-                >
-                    Восстановить пароль
-                </div>        
-            </div>
+            {
+                page === 1 
+                    ? <Page1 />
+                : page === 2 
+                    ? <Page2 />
+                : page === 3
+                    ? <Page3 />
+                : <></>
+            }
 
         </>
         return elem
@@ -225,9 +348,7 @@ export function Login() {
                 {
                     page === 0
                         ? <Body />
-                    : page === 1 
-                        ? <Restore />
-                    : <></>
+                    : <Restore />
                 }
             </div>
         </div>
@@ -389,19 +510,25 @@ export function Registration():JSX.Element {
                         setLoad( true )
                         console.log( info )
                         const res = await getData("getPhone", {
-                            phone: info.phone
+                            phone:      info.phone,
+                            type:     "registration"
                         })
-                        console.log( res )
-                        if( res.status_code === 100 ){
-                            setOrder({ call: res.call_phone, id: res.check_id })
-                            setPage( 1 )
-                            setMessage("")
-                        }
-                        else {
-                            setUpd( upd + 1)
+                        console.log(res)
+                        if(!res.error){
+                            if( res.data.status_code === 100 ){
+                                setOrder({ call: res.data.call_phone, id: res.data.check_id })
+                                setPage( 1 )
+                                setMessage("")
+                            }
+                            else {
+                                setMessage( res.message )
+                                setUpd( upd + 1)
+                            }
+                                
+                        } else {
                             setMessage( res.message )
+                            setUpd( upd + 1)
                         }
-                            
                         setLoad( false)
 
                     }}
@@ -438,6 +565,7 @@ export function Registration():JSX.Element {
                 </IonText>                
                 <div className="ml-1 mr-1 l-button"
                     onClick={ async ()=>{
+                        console.log(order )
                         console.log("Звонок")
                         window.open('tel:' + order.call )
                         setMessage("")
@@ -471,7 +599,8 @@ export function Registration():JSX.Element {
                         setLoad( true)
                         console.log( order )
                         const res = await getData("checkPhone", {
-                            id: order.id
+                            id:     order.id,
+                            type:   "registration"
                         })
                         console.log( res )
                         if( res.status_code === 100){

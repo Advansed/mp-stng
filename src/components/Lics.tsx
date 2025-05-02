@@ -46,7 +46,7 @@ export function     Lics() {
         console.log( "subscribe lics ")
     } })
 
-    Store.subscribe({num : 21, type: "back", func: ()=>{
+    Store.subscribe({num : 404, type: "back", func: ()=>{
 
         switch (page) {
 
@@ -70,7 +70,7 @@ export function     Lics() {
         setInfo( Store.getState().lics )
 
         return ()=>{ 
-            Store.unSubscribe( 21 ) 
+            Store.unSubscribe( 404 ) 
             Store.unSubscribe( 22 ) 
         }
     },[])
