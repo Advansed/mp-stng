@@ -26,9 +26,28 @@ import { FioSuggestions } from "react-dadata";
         setLoad(false)
     }
 
+    async function Load(){
+        
+        setLoad( true)
+
+        const res = await getData("spClient", {
+            token: Store.getState().login.token
+        })
+        console.log( res )
+        if(!res.error) {
+            Store.dispatch({ type: "card", card: res.data })
+            setInfo( res.data )
+        } else {
+            setInfo( undefined )
+        }
+            
+
+        setLoad( false )
+
+    }
     useEffect(()=>{
 
-            setInfo( Store.getState().card )
+        Load()
             
         return ()=>{
             Store.unSubscribe( 404 )
@@ -41,9 +60,6 @@ import { FioSuggestions } from "react-dadata";
         Store.dispatch({type: "route", route: "back"})
     } })
 
-    Store.subscribe({num : 92, type: "card", func: ()=>{
-        setInfo( Store.getState().card )
-    } })
 
     function BonusCard(){
         let elem = <></>
@@ -151,58 +167,64 @@ import { FioSuggestions } from "react-dadata";
 
     let elem = <></>
 
-    if( info?.owner_id === undefined )
-        elem = <>
-            <IonCard>
-                <IonCardHeader className=" t-underline ml-1 mr-1">
-                    Бонусы АГЗС
-                </IonCardHeader>
-                <IonCardContent>
-                    <FIO />
-                    
-                    <p>{ message }</p>
-                    <div className="mt-1">
-                        <IonButton
-                            expand="block"
-                            mode="ios"
-                            color="tertiary"
-                            onClick={()=>{
-                                setMessage( "" )
-                                const info = Store.getState().profile
-                                if((info.surname + info.name + info.lastname).length > 0){
-                                    CreateClient()    
-                                }
-                                else 
-                                    setMessage( "Заполните ФИО" )
-                            }}
-                        >
-                            Создать бонусную карту
-                        </IonButton>
-                    </div>
-                </IonCardContent>                
-            </IonCard>
-        </>
-    else
-        elem = <>
-            <IonCard>
-                <IonCardHeader className=" t-underline ml-1 mr-1">
-                    Бонусы АГЗС
-                </IonCardHeader>
-                <IonCardContent>
-                    <div className="flex fl-center mt-1 cl-prim">
-                        <div>Накоплено</div>
-                        <div className="ml-1"><h1><b> { info.balance } </b></h1></div>
-                        <div className="ml-1">баллов</div>
-                    </div>
-                    <div className="flex fl-center mt-1">
-                        <div>
-                            <QRCode value={ info.QRCode } />
+    if(info !== undefined){
+        if( info?.owner_id === undefined )
+            elem = <>
+                <IonCard>
+                    <IonCardHeader className=" t-underline ml-1 mr-1">
+                        Бонусы АГЗС
+                    </IonCardHeader>
+                    <IonCardContent>
+                        <FIO />
+                        
+                        <p>{ message }</p>
+                        <div className="mt-1">
+                            <IonButton
+                                expand="block"
+                                mode="ios"
+                                color="tertiary"
+                                onClick={()=>{
+                                    setMessage( "" )
+                                    const info = Store.getState().profile
+                                    if((info.surname + info.name + info.lastname).length > 0){
+                                        CreateClient()    
+                                    }
+                                    else 
+                                        setMessage( "Заполните ФИО" )
+                                }}
+                            >
+                                Создать бонусную карту
+                            </IonButton>
                         </div>
-                    </div>
-                    <BonusCard />
-                </IonCardContent>
-            </IonCard>
+                    </IonCardContent>                
+                </IonCard>
+            </>
+        else
+            elem = <>
+                <IonCard>
+                    <IonCardHeader className=" t-underline ml-1 mr-1">
+                        Бонусы АГЗС
+                    </IonCardHeader>
+                    <IonCardContent>
+                        <div className="flex fl-center mt-1 cl-prim">
+                            <div>Накоплено</div>
+                            <div className="ml-1"><h1><b> { info.balance } </b></h1></div>
+                            <div className="ml-1">баллов</div>
+                        </div>
+                        <div className="flex fl-center mt-1">
+                            <div>
+                                <QRCode value={ info.QRCode } />
+                            </div>
+                        </div>
+                        <BonusCard />
+                    </IonCardContent>
+                </IonCard>
+            </>
+    } else {
+        elem = <>
+            <img src="assets/robot.jpg" alt="robot" />
         </>
+    }
 
     return <>
         <IonLoading isOpen={load} message={"Подождите"}/>
