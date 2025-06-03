@@ -1044,9 +1044,11 @@ function            Payments(props:{ item, setPage }){
         </div>
     </>
     
+    console.log(item.debts)
     for( let i = 0; i < item.debts.length; i++ ){
         if( item.debts[i].pay === undefined ) item.debts[i].pay = item.debts[i].sum > 0 ? item.debts[i].sum : 0
         if( item.debts[i].sum >= 0) {
+            console.log( item.debts[i] )
             items = <>
                 { items }
                 <div className='flex fl-space ml-2 fs-09 mr-1 mt-05'>

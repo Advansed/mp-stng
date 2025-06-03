@@ -6,7 +6,8 @@ import "./Bonuse.css"
 import { saveOutline } from "ionicons/icons";
 import { FioSuggestions } from "react-dadata";
 
- export function Bonuses(){
+ export function Bonuses( props: { name }){
+
     const [ info, setInfo ] = useState<any>(new Object())
     const [ upd, setUpd ]  = useState( 0 )
     const [ message, setMessage ] = useState("")
@@ -46,6 +47,9 @@ import { FioSuggestions } from "react-dadata";
 
     }
     useEffect(()=>{
+        console.log( window.location.pathname )
+
+        if (!window.location.pathname.includes('/page/bonuse')) return;
 
         Load()
             

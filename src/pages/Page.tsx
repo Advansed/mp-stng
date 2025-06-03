@@ -86,7 +86,7 @@ const Page: React.FC = () => {
         case "reqs":              elem = <Request />; break;
         case "apps":              elem = <Apps />; break;
         case "queye":             elem = <Queye />; break;
-        case "bonuse":            elem = <Bonuses />; break;
+        case "bonuse":            elem = <Bonuses name = { name }/>; break;
         case "services":          elem = <Services />; break;
         case "appeals":           elem = <Appeals />; break;
         case "contacts":          elem = <Contacts />; break;
