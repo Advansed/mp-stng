@@ -110,8 +110,7 @@ async function      Add( params, setMessage, setPage ){
     }
 }   
 
-function            Items(props: { info, setItem, setPage }) {
-
+function Items(props: { info, setItem, setPage }) {
     const info = props.info
 
     let elem = <></>
@@ -123,8 +122,11 @@ function            Items(props: { info, setItem, setPage }) {
         </>
     }
 
-
-    return elem 
+    return (
+        <div className="cards-container">
+            { elem }
+        </div>
+    )
 }
 
 function            AddLic(props:{ setPage}) {
@@ -1340,7 +1342,8 @@ function            Indices(props: { item, setPage}){
         const [ mode,   setMode ]   = useState( false )
         const [ avail,  setAvail ]  = useState( 0 )
         const [ delta,  setDelta ]  = useState( -1 )
-        const [ bord ]    = useState( Store.getState().login.borders )
+
+        const login    = Store.getState().login
     
         function monthDiff(dateFrom, dateTo) {
             let months = dateTo.getMonth() - dateFrom.getMonth() + 
@@ -1361,12 +1364,12 @@ function            Indices(props: { item, setPage}){
             const pred = new Date( info.predPeriod.substring(6, 10)  + "-" + info.predPeriod.substring(3, 5) + "-" + info.predPeriod.substring(0, 2) )
     
             if( pred.getFullYear() === date.getFullYear() && pred.getMonth() === date.getMonth() ) setAvail( 1 )     
-            else if( monthDiff(pred, date) > 3 ) setAvail( 2 )
+            else if( monthDiff(pred, date) >  ( login.monthes === 0 ? 999 : login.monthes ) ) setAvail( 2 )
             else {
-                if( bord.from < bord.to ){
-                    if(date.getDate() < bord.from || date.getDate() > bord.to) setAvail(  3 )
+                if( login.borders.from < login.borders.to ){
+                    if(date.getDate() < login.borders.from || date.getDate() > login.borders.to) setAvail(  3 )
                 } else {
-                    if(date.getDate() > bord.to || date.getDate() < bord.from ) setAvail(  3 )
+                    if(date.getDate() > login.borders.to || date.getDate() < login.borders.from ) setAvail(  3 )
                 }
             }
         
@@ -1516,6 +1519,7 @@ function            Indices(props: { item, setPage}){
         </>
     }
     const elem = <>
+
         <IonCard className='pb-1'>
             <div className='flex fl-space mt-1 ml-1'>
                 <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
@@ -1538,6 +1542,7 @@ function            Indices(props: { item, setPage}){
             </div>
 
         </IonCard>
+        
     </>
     return elem
 }

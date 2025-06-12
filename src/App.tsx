@@ -24,9 +24,10 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import { Store } from './components/Store';
-import { Login, Registration } from './components/Login';
+import { Login } from './components/Login';
 import OneSignal from 'onesignal-cordova-plugin'
 import './app.css'
+import { Registration } from './components/Registration';
 
 setupIonicReact();
 

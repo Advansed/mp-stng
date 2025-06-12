@@ -1,11 +1,17 @@
+/* Lics.css - Universal Version */
+/* Работает для мобильного приложения И веб-сайта */
+
+/* Базовые стили (для мобильного приложения) */
 .l-fon {
     background-image: url('pattern.png');
 }
+
 .fone {
     background: linear-gradient(156.39deg, #1B80B9 7.75%, #0E3977 100.99%);
     position: relative;
 }
 
+/* Базовые стили инпутов (мобильные) */
 .s-input {
     width: auto !important;
     border-radius: 4px;
@@ -26,26 +32,25 @@
     font-size: 12px;
     padding-right: 1em;
 }
+
 .s-input-1 {
     min-height: 3em !important;
     border-radius: 5px;
 }
-  
+
+/* Базовый паттерн (мобильный) */
 .pattern {
     position: absolute;
     height: fit-content;
     width: 350px;
     bottom: 0;
-    /* padding:0 15px; */
     left: 0;
     right: 0;
-    /* margin-left: auto; */
     margin-right: auto;
-  }
-  
+}
 
-  
-  .header {
+/* Базовый заголовок (мобильный) */
+.header {
     padding: 15px;
     padding-top: 34px;
     padding-bottom: 56px;
@@ -64,9 +69,8 @@
     height: 100%;
 }
 
-
+/* Базовые элементы списков (мобильные) */
 .ls-item {
-    /* background-color:#3f64a9; */
     color: #3f64a9;
     height: 4em;
     display: flex;
@@ -74,7 +78,6 @@
     padding-left: 0.5em;
     border-radius: 15px;
     padding-right: 1em;
-
 }
 
 .ls-item1 {
@@ -86,8 +89,8 @@
     padding-left: 0.5em;
     border-radius: 5px;
     padding-right: 1em;
-
 }
+
 .ls-item2 {
     margin-top: 0.5em;
     background-color: #f5f1b6;
@@ -97,7 +100,6 @@
     padding-left: 0.5em;
     border-radius: 5px;
     padding-right: 1em;
-
 }
 
 .ls-item3 {
@@ -109,12 +111,11 @@
     justify-content: center;
 }
 
+/* Базовые кнопки (мобильные) */
 .ls-button {
     font-size: 1em;
     min-height: 2.5em;
     border-radius: 5px;
-    /* --padding-top: 0.5em; */
-    /* --padding-bottonm: 0.5em; */
 }
 
 .ls-button1 {
@@ -133,16 +134,26 @@
     padding: 0.5em;
 }
 
+/* ИСПРАВЛЕНИЯ ДЛЯ ls-input */
 .ls-input {
-    border:         1px solid silver;
-    padding-right:  1em;
+    border: 1px solid silver;
+    padding-right: 1em;
     border-radius: 5px;
-    min-height: 3em!;
+    min-height: 3em;
+    max-height: 3em; /* Ограничиваем максимальную высоту */
     color: black;
+    width: auto; /* Убираем растягивание по ширине */
+    max-width: 150px; /* Ограничиваем максимальную ширину */
+    display: flex;
+    align-items: center;
 }
 
+/* ИСПРАВЛЕНИЯ ДЛЯ custom-input */
 .custom-input {
-    min-height: 2em; /* Общая высота контейнера */
+    min-height: 2em;
+    max-height: 2em; /* Ограничиваем максимальную высоту */
+    width: auto; /* Убираем растягивание по ширине */
+    max-width: 150px; /* Ограничиваем максимальную ширину */
     --padding-top: 0;
     --padding-bottom: 0;
 }
@@ -152,13 +163,512 @@
     --padding-bottom: 0;
     --padding-start: 0;
     --padding-end: 0;
+    max-height: 2em;
 }
   
 .custom-input .input-wrapper {
     min-height: 2em !important;
+    max-height: 2em !important; /* Ограничиваем высоту wrapper */
 }
   
 .custom-input .native-input {
     min-height: 2em !important;
-    padding: 8px 0 !important; /* Регулируйте по необходимости */
+    max-height: 2em !important; /* Ограничиваем высоту native input */
+    padding: 8px 0 !important;
+}
+
+/* Базовые ion-card (только для мобильного приложения) */
+ion-card {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+/* ========================================= */
+/* WEB АДАПТАЦИИ - только для браузеров */
+/* ========================================= */
+
+/* Детекция веб-платформы через медиа-запросы */
+@media (hover: hover) and (pointer: fine) {
+    
+    /* Фоновые улучшения для веба */
+    .l-fon {
+        background-repeat: no-repeat;
+        background-position: center bottom;
+        background-size: contain;
+    }
+
+    .fone {
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Паттерн для веба */
+    .pattern {
+        max-width: 600px;
+        width: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0.1;
+        pointer-events: none;
+        margin-right: 0;
+    }
+
+    /* Заголовки для веба */
+    .header {
+        padding: 20px;
+        padding-top: 40px;
+        padding-bottom: 60px;
+        text-align: center;
+    }
+
+    .main-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .l-content {
+        min-height: 100vh;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Инпуты для веба */
+    .s-input {
+        width: 100% !important;
+        min-width: 250px;
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        font-size: 14px;
+        padding: 12px 16px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .s-input:focus-within {
+        border-color: #3f64a9;
+        box-shadow: 0 0 0 3px rgba(63, 100, 169, 0.1);
+        outline: none;
+    }
+
+    .s-input:hover {
+        border-color: #5a7bc8;
+    }
+
+    .s-input-1 {
+        min-height: 48px !important;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .s-input-2 {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        font-size: 14px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+    }
+
+    /* Элементы списков для веба */
+    .ls-item {
+        min-height: 60px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: white;
+        border: 1px solid #e0e0e0;
+    }
+
+    .ls-item:hover {
+        background-color: #f8fafe;
+        border-color: #3f64a9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(63, 100, 169, 0.15);
+    }
+
+    .ls-item1 {
+        margin-top: 12px;
+        min-height: 60px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+    .ls-item1:hover {
+        background-color: #d1e9f5;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(63, 100, 169, 0.15);
+        border-color: #3f64a9;
+    }
+
+    .ls-item2 {
+        margin-top: 12px;
+        min-height: 60px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+    .ls-item2:hover {
+        background-color: #f0eb9f;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 241, 182, 0.3);
+    }
+
+    .ls-item3 {
+        min-height: 60px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: white;
+        padding: 16px;
+    }
+
+    .ls-item3:hover {
+        border-color: #3f64a9;
+        background-color: #f8fafe;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(63, 100, 169, 0.15);
+    }
+
+    /* Кнопки для веба */
+    .ls-button {
+        font-size: 16px;
+        min-height: 48px;
+        border-radius: 8px;
+        border: none;
+        padding: 12px 24px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .ls-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .ls-button1 {
+        padding: 12px 16px; 
+        font-size: 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .ls-button1:hover {
+        background-color: #2d4a8a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(63, 100, 169, 0.3);
+    }
+
+    .ls-button1:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(63, 100, 169, 0.3);
+    }
+
+    /* Панели для веба */
+    .ls-panel {
+        width: 100%;
+        max-width: 300px;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+    .ls-panel:hover {
+        background-color: #d1e9f5;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(63, 100, 169, 0.15);
+        border-color: #3f64a9;
+    }
+
+    /* ИСПРАВЛЕНИЯ ДЛЯ ВЕБ ВЕРСИИ ls-input */
+    .ls-input {
+        border: 2px solid #e0e0e0;
+        padding: 12px 16px;
+        border-radius: 8px;
+        min-height: 48px;
+        max-height: 48px; /* Ограничиваем высоту для веба */
+        color: #333;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: white;
+        width: auto; /* Убираем растягивание */
+        max-width: 180px; /* Увеличиваем для веба */
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+    }
+
+    .ls-input:focus {
+        border-color: #3f64a9;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(63, 100, 169, 0.1);
+    }
+
+    .ls-input:hover {
+        border-color: #5a7bc8;
+    }
+
+    /* ИСПРАВЛЕНИЯ ДЛЯ ВЕБ ВЕРСИИ custom-input */
+    .custom-input {
+        min-height: 48px;
+        max-height: 48px; /* Ограничиваем высоту */
+        width: auto; /* Убираем растягивание */
+        max-width: 180px; /* Увеличиваем для веба */
+        --padding-top: 12px;
+        --padding-bottom: 12px;
+        --padding-start: 16px;
+        --padding-end: 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .custom-input ion-input {
+        --padding-top: 12px;
+        --padding-bottom: 12px;
+        --padding-start: 16px;
+        --padding-end: 16px;
+        font-size: 14px;
+        max-height: 48px;
+    }
+
+    .custom-input .input-wrapper {
+        min-height: 48px !important;
+        max-height: 48px !important;
+        border-radius: 8px;
+    }
+
+    .custom-input .native-input {
+        min-height: 48px !important;
+        max-height: 48px !important;
+        padding: 12px 16px !important;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    /* Ion-card для веба */
+    ion-card {
+        max-width: 35em;
+        margin: 20px auto;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        background: white;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    ion-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+
+    /* Состояния фокуса для доступности */
+    .ls-item:focus,
+    .ls-item1:focus,
+    .ls-item2:focus,
+    .ls-item3:focus,
+    .ls-panel:focus,
+    .ls-button1:focus {
+        outline: 2px solid #3f64a9;
+        outline-offset: 2px;
+    }
+}
+
+/* ========================================= */
+/* АДАПТИВНОСТЬ ДЛЯ РАЗНЫХ РАЗМЕРОВ ЭКРАНА */
+/* ========================================= */
+
+/* Планшеты и средние экраны */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+    .l-content {
+        padding: 0 40px;
+    }
+    
+    .header {
+        padding: 40px 20px 80px;
+    }
+    
+    .main-title {
+        font-size: 3rem;
+    }
+    
+    .ls-panel {
+        width: calc(50% - 8px);
+        max-width: none;
+    }
+    
+    .s-input {
+        min-width: 300px;
+    }
+}
+
+/* Десктоп */
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+    .fone {
+        padding: 40px;
+    }
+    
+    .l-content {
+        max-width: 1400px;
+        padding: 0 60px;
+    }
+    
+    .header {
+        padding: 60px 20px 100px;
+    }
+    
+    .main-title {
+        font-size: 3.5rem;
+    }
+    
+    .ls-item,
+    .ls-item1,
+    .ls-item2,
+    .ls-item3 {
+        min-height: 70px;
+        padding: 20px 24px;
+    }
+    
+    .ls-panel {
+        width: calc(50% - 12px);
+        padding: 24px;
+    }
+    
+    ion-card {
+        max-width: 35em;
+        margin: 30px auto;
+        border-radius: 20px;
+    }
+    
+    .s-input {
+        min-width: 350px;
+        font-size: 16px;
+    }
+    
+    .ls-button1 {
+        font-size: 16px;
+        min-height: 48px;
+        padding: 14px 20px;
+    }
+}
+
+/* Большие экраны */
+@media (hover: hover) and (pointer: fine) and (min-width: 1440px) {
+    .l-content {
+        max-width: 1600px;
+    }
+    
+    .main-title {
+        font-size: 4rem;
+    }
+}
+
+/* ========================================= */
+/* FLEX КОНТЕЙНЕР ДЛЯ КАРТОЧЕК */
+/* ========================================= */
+
+/* Базовый контейнер для мобильного приложения */
+.cards-container {
+    display: block;
+}
+
+/* Flex контейнер для веба */
+@media (hover: hover) and (pointer: fine) {
+    .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+    
+    /* Карточки в сетке для веба */
+    .cards-container ion-card {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 400px;
+        margin: 0; /* Убираем авто-отступы, используем gap */
+    }
+}
+
+/* Адаптивность для планшетов */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (max-width: 1023px) {
+    .cards-container ion-card {
+        flex: 1 1 100%;
+        min-width: 300px;
+    }
+}
+
+/* Для больших экранов - 3 колонки */
+@media (hover: hover) and (pointer: fine) and (min-width: 1200px) {
+    .cards-container {
+        justify-content: center;
+    }
+    
+    .cards-container ion-card {
+        flex: 1 1 calc(33.333% - 14px);
+        min-width: 350px;
+        max-width: 450px;
+    }
+}
+
+/* Очень большие экраны - ограничиваем максимум */
+@media (hover: hover) and (pointer: fine) and (min-width: 1600px) {
+    .cards-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+}
+
+/* ========================================= */
+/* МОБИЛЬНЫЕ УСТРОЙСТВА (ТАЧСКРИН) */
+/* ========================================= */
+
+/* Улучшения для мобильных тачскринов */
+@media (hover: none) and (pointer: coarse) {
+    /* Увеличиваем тапабельные области для пальцев */
+    .ls-item,
+    .ls-item1,
+    .ls-item2,
+    .ls-item3 {
+        min-height: 44px; /* Apple рекомендует минимум 44px */
+    }
+    
+    .ls-button,
+    .ls-button1 {
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+    
+    /* Убираем hover эффекты для мобильных */
+    .ls-item:hover,
+    .ls-item1:hover,
+    .ls-item2:hover,
+    .ls-item3:hover,
+    .ls-panel:hover,
+    .ls-button1:hover {
+        transform: none;
+        box-shadow: none;
+    }
 }
