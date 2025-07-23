@@ -2,7 +2,7 @@ import React, { useEffect, useState }        from 'react';
 import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonRefresher, IonRefresherContent, IonTabBar, IonTabButton, isPlatform, useIonRouter } from '@ionic/react';
 import { useHistory, useParams, useLocation } from 'react-router';
 import './Page.css';
-import { Lics }     from '../components/Lics';
+import { Lics }     from '../components/Lics/Lics';
 import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, createOutline, documentTextOutline } from 'ionicons/icons';
 import { Store, getApps, getData, getLics, getNotifications, getProfile, getServices, version }    from '../components/Store';
 import { Profile }  from '../components/Profile';

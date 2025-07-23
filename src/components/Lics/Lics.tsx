@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Store, getApps, getData, getLics, getProfile } from './Store'
+import { Store, getApps, getData, getLics, getProfile } from '../Store'
 import './Lics.css'
 import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRefresher, IonRefresherContent, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonText } from '@ionic/react'
 import { alertCircleOutline, cardOutline, chevronForwardOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, ellipsisVerticalOutline, locationOutline, newspaperOutline, pencilOutline, personCircleOutline, personOutline, trashBinOutline } from 'ionicons/icons'
-import { PDFDoc } from './Files'
+import { PDFDoc } from '../Files'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
 
