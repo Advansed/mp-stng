@@ -223,9 +223,6 @@ export function Login() {
                  >
                      Запросить звонок
                  </div>        
-                 <IonButton className="login-text-url ion-text-wrap" fill="clear"
-                     onClick={()=>{ setPage( page + 1 )}}                
-                 >Пользовательское соглашение</IonButton>
  
                  <div className="a-center">
                      <IonText className="login-text">Уже зарегистрированы? </IonText>        

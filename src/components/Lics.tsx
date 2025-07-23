@@ -50,16 +50,17 @@ export function     Lics() {
 
         switch (page) {
 
-            case 0: Store.dispatch({type: "route", route: "back"}); break;
-            case 1: setPage(0); break;
-            case 2: setPage(0); break;
-            case 3: setPage(0); break;
-            case 4: setPage(0); break;
-            case 5: setPage(0); break;
-            case 6: setPage(0); break;
-            case 7: setPage(0); break;
-            case 8: setPage(0); break;
-            case 9: setPage(6); break;
+            case  0: Store.dispatch({type: "route", route: "back"}); break;
+            case  1: setPage(0); break;
+            case  2: setPage(0); break;
+            case  3: setPage(0); break;
+            case  4: setPage(0); break;
+            case  5: setPage(0); break;
+            case  6: setPage(0); break;
+            case  7: setPage(0); break;
+            case  8: setPage(0); break;
+            case  9: setPage(6); break;
+            case 10: setPage(0); break;
             default: Store.dispatch({type: "route", route: "back"})
 
         }    
@@ -79,16 +80,17 @@ export function     Lics() {
     let elem = <></>
 
     switch(page) {
-        case 0: elem = <> <Items info = { info } setItem = { setItem } setPage = { setPage } /><AddLic setPage = { setPage } /> </>; break // main
-        case 1: elem = <AddLic1 setPage={ setPage }/>; break // Добавить лицевой счет 1 способ
-        case 2: elem = <AddLic2 setPage={ setPage }/>; break // Добавить лицевой счет 2 способ
-        case 3: elem = <History item = { item }/>; break // История
-        case 4: elem = <Payments item = { item } setPage = { setPage }/>; break // Оплата за газ
-        case 5: elem = <PaymentsTO item = { item } setPage = { setPage }/>; break // Оплата за ТО
-        case 6: elem = <Indices item = { item } setPage = { setPage }/>; break // Показания
-        case 7: elem = <Equaring item = { item } setPage={ setPage }/>; break // Страница оплаты сайт
-        case 8: elem = <SberPay  item =  { item } setPage = { setPage }/>; break // сберPay
-        case 9: elem = <HistoryIndices item = { item } />; break // История показаний
+        case 0:     elem = <> <Items info = { info } setItem = { setItem } setPage = { setPage } /><AddLic setPage = { setPage } /> </>; break // main
+        case 1:     elem = <AddLic1 setPage={ setPage }/>; break // Добавить лицевой счет 1 способ
+        case 2:     elem = <AddLic2 setPage={ setPage }/>; break // Добавить лицевой счет 2 способ
+        case 3:     elem = <History item = { item }/>; break // История
+        case 4:     elem = <Payments item = { item } setPage = { setPage }/>; break // Оплата за газ
+        case 5:     elem = <PaymentsTO item = { item } setPage = { setPage }/>; break // Оплата за ТО
+        case 6:     elem = <Indices item = { item } setPage = { setPage }/>; break // Показания
+        case 7:     elem = <Equaring item = { item } setPage={ setPage }/>; break // Страница оплаты сайт
+        case 8:     elem = <SberPay  item =  { item } setPage = { setPage }/>; break // сберPay
+        case 9:     elem = <HistoryIndices item = { item } />; break // История показаний
+        case 10:    elem = <AlfaBank item={item} setPage={ setPage } />; break // НОВАЯ СТРАНИЦА        
         default: <></>
     }
 
@@ -1096,7 +1098,8 @@ function            Payments(props:{ item, setPage }){
 
             <div className='mt-2 ml-1 fs-09'>Способы оплаты</div>
             <div className='flex fl-space ml-1 mr-1'>
-                <div className='ls-item3 w-50'>
+
+                <div className='ls-item3 w-30'>
                     <div className=''
                         onClick={()=>{
                             item.order = new Object()
@@ -1115,7 +1118,8 @@ function            Payments(props:{ item, setPage }){
                         <IonLabel className = " ml-05"></IonLabel>
                     </div>        
                 </div>
-                <div className='ls-item3 ml-05 w-50'>
+
+                <div className='ls-item3 ml-05 w-30'>
                     <div
                         className=''
                         onClick={()=>{
@@ -1134,6 +1138,27 @@ function            Payments(props:{ item, setPage }){
                         {/* <IonLabel className = "">СберМобайл</IonLabel> */}
                     </div>               
                 </div>
+                
+                {/* НОВАЯ КНОПКА АЛЬФА-БАНКА */}
+                <div className='ls-item3 ml-05 w-30'>
+                    <div className=''
+                        onClick={() => {
+                            item.order = new Object()
+                            item.order.token = Store.getState().login.token
+                            item.order.LC = item.code,
+                            item.order.sum = item.debts,
+                            item.order.sumto = [],
+                            item.order.phone = Store.getState().login.phone,
+                            item.order.email = Store.getState().login.email,
+                            item.order.ios = false
+                            props.setPage(10) // НОВАЯ СТРАНИЦА ДЛЯ АЛЬФА-БАНКА
+                        }}
+                    >   
+                        <img src="assets/alfabank.png" alt="Альфа-Банк" className='h-2'/>
+                        {/* <IonLabel className="ml-05 fs-08">Альфа-Банк</IonLabel> */}
+                    </div>               
+                </div>
+
             </div>
 
         </IonCard>
@@ -1431,8 +1456,8 @@ function            Indices(props: { item, setPage}){
                     </>
                 : <>
                     <div className='flex fl-space mt-1 ml-1 cl-prim'>
-                        <div> { "Передать"  }</div>
-                        <div className='s-input a-right'> 
+                        <div className='w-40'> { "Передать"  }</div>
+                        <div className=' w-50 s-input a-right '> 
                             <IonInput
                                 className='s-input-1'
                                 placeholder='Показание'
@@ -1610,4 +1635,40 @@ function            HistoryIndices(props: { item }){
 
     return elem
 
+}
+
+function            AlfaBank(props: { item, setPage }) {
+    const [load, setLoad] = useState(false)
+    const item = props.item
+
+    useEffect(() => {
+        async function load() {
+            setLoad(true)
+            console.log('Alfa order:', item.order)
+            
+            try {
+                const res = await getData("GAZPROM", item.order)
+                console.log('Alfa response:', res)
+                
+                if (res.error) { 
+                    props.setPage(4) // Возвращаемся к странице оплаты
+                } else {
+                    // Открываем форму оплаты Альфа-банка
+                    openUrl(res.data.formUrl)
+                }
+            } catch (error) {
+                console.error('Alfa payment error:', error)
+                props.setPage(4)
+            }
+            
+            setLoad(false)
+        }
+        load()
+    }, [])
+
+    const elem = <>
+        <IonLoading isOpen={load} message={"Переход к оплате через Альфа-Банк..."}/>
+    </>
+    
+    return elem
 }
