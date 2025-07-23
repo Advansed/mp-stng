@@ -9,7 +9,8 @@ import { Browser } from '@capacitor/browser'
 import { useLics } from './useLics'
 import { LicsPage } from './components/types'
 import { DEBUG_PREFIXES } from './components/constants'
-import { AddLics } from './components/AddLics'
+import { FindLic } from './components/FindLic'
+
 
 type WidgetParams = {
     bankInvoiceId: string;
@@ -64,8 +65,8 @@ export function     Lics(): JSX.Element {
                     );
                 case LicsPage.ADD_LIC_1:
                     return <AddLic1 setPage={setPage} />;
-                case LicsPage.ADD_LIC_2:
-                    return <AddLic2 setPage={setPage} />;
+                case LicsPage.FIND_LIC:
+                    return <FindLic setPage={setPage} />;
                 case LicsPage.HISTORY:
                     return <History item={item} />;
                 case LicsPage.PAYMENTS:

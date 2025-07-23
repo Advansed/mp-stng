@@ -37,13 +37,13 @@ export interface LicsState {
 }
 
 // ========================
-// ENUM ДЛЯ СТРАНИЦ
+// ENUM ДЛЯ СТРАНИЦ - ОБНОВЛЕННЫЙ
 // ========================
 
 export enum LicsPage {
   MAIN              = 0,
-  ADD_LIC_1         = 1,            // 🆕 Объединенная страница вместо ADD_LIC_1 и ADD_LIC_2
-  ADD_LIC_2         = 2,            // 🆕 Объединенная страница вместо ADD_LIC_1 и ADD_LIC_2
+  ADD_LIC_1         = 1,
+  FIND_LIC          = 2,    // 🔄 Переименовано с ADD_LIC_2
   HISTORY           = 3,
   PAYMENTS          = 4,
   PAYMENTS_TO       = 5,
@@ -128,46 +128,75 @@ export interface AddLicsState {
   uluses: Ulus[];                    // Список улусов
   selectedUlus?: Ulus;               // Выбранный улус
   settlements: Settlement[];          // Список населенных пунктов (может фильтроваться по улусу)
-  selectedSettlement?: Settlement;    // Выбранный населенный пункт
+  selectedSettlement?: Settlement;   // Выбранный населенный пункт
   selectedStreet?: Street;           // Выбранная улица
   selectedHouse?: House;             // Выбранный дом
 }
 
 // ========================
-// БАЗОВЫЕ ФУНКЦИОНАЛЬНЫЕ ТИПЫ
+// 🆕 ТИПЫ ДЛЯ FINDLIC
 // ========================
 
-export interface SetPageFunction {
-  (page: number): void;
+// Данные формы FindLic
+export interface FindLicData {
+  settlementId?: string;
+  settlementName?: string;
+  streetId?: string;
+  streetName?: string;
+  houseId?: string;
+  houseNumber?: string;
+  apartment?: string;           // Квартира (опционально)
+  licenseNumber: string;        // Номер лицевого счета
+  fio: string;                  // ФИО
 }
 
-export interface SetItemFunction {
-  (item: LicsItem): void;
+// Состояние компонента FindLic
+export interface FindLicState {
+  settlements: Settlement[];
+  selectedSettlement?: Settlement;
+  selectedStreet?: Street;
+  selectedHouse?: House;
+  formData: FindLicData;
+  loading: boolean;
+  loadingStep: string | null;   // Какой именно шаг загружается
+  message: string;              // Сообщение пользователю
+  currentStep: number;          // Текущий шаг (1-4)
+}
+
+// Props для компонента FindLic
+export interface FindLicProps {
+  setPage: SetPageFunction;
+}
+
+// Возвращаемые значения хука useFindLics
+export interface UseFindLicsReturn {
+  state: FindLicState;
+  selectSettlement: (settlement: Settlement) => Promise<void>;
+  selectStreet: (street: Street) => Promise<void>;
+  selectHouse: (house: House) => void;
+  updateFormData: (field: keyof FindLicData, value: string) => void;
+  submitForm: () => Promise<boolean>;
+  resetForm: () => void;
+  canSubmit: boolean;
 }
 
 // ========================
-// ТИПЫ ДЛЯ STORE
+// ТИПЫ ДЛЯ ПРОПСОВ КОМПОНЕНТОВ
 // ========================
 
+// Функции для управления состоянием
+export type SetPageFunction = (page: number) => void;
+export type SetItemFunction = (item: LicsItem) => void;
+
+// Store State
 export interface StoreState {
-  lics: LicsItem[];
   login: {
     token: string;
-    monthes?: any;
-    borders?: {
-      from: number;
-      to: number;
-    };
   };
-  profile: {
-    lics?: LicsItem[];
-  };
+  lics: LicsItem[];
 }
 
-// ========================
-// ПРОПСЫ ДЛЯ КОМПОНЕНТОВ - ОБНОВЛЕННЫЕ
-// ========================
-
+// Props для различных компонентов
 export interface ItemsProps {
   info: LicsItem[];
   setItem: SetItemFunction;
@@ -179,18 +208,22 @@ export interface AddLicProps {
 }
 
 export interface HistoryProps {
-  item: LicsItem | undefined;
+  item: LicsItem;
 }
 
 export interface PaymentsProps {
-  item: LicsItem | undefined;
+  item: LicsItem;
   setPage: SetPageFunction;
 }
 
 export interface IndicesProps {
-  item: LicsItem | undefined;
+  item: LicsItem;
   setPage: SetPageFunction;
 }
+
+// ========================
+// ТИПЫ ДЛЯ ADDLICS КОМПОНЕНТОВ
+// ========================
 
 export interface AddLicsProps {
   setPage: SetPageFunction;

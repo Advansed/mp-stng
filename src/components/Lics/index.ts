@@ -9,18 +9,12 @@ import { Lics } from './Lics';
 // Основной компонент
 export { Lics } from './Lics';
 
-// Новый объединенный компонент AddLics
-export { AddLics } from './components/AddLics';
-
 // ========================
 // ХУКИ
 // ========================
 
 // Основной хук
 export { useLics } from './useLics';
-
-// Новый хук для AddLics
-export { useAddLics } from './components/useAddLics';
 
 // ========================
 // ТИПЫ И ИНТЕРФЕЙСЫ
