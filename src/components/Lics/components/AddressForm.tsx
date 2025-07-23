@@ -1,4 +1,4 @@
-// src/components/Lics/components/AddLics/AddressForm.tsx
+// src/components/Lics/components/AddressForm.tsx
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { 
@@ -18,18 +18,22 @@ import {
   alertCircleOutline,
   locationOutline,
   homeOutline,
-  businessOutline
+  businessOutline,
+  mapOutline
 } from 'ionicons/icons';
-import { AddressFormProps, AddLicByAddressData, Settlement, Street, House } from './types';
+import { AddressFormProps, AddLicByAddressData, Ulus, Settlement, Street, House } from './types';
 import { ADD_LICS_CONSTANTS } from './constants';
 
 export function AddressForm({ 
   data, 
+  uluses,           // 🆕
+  selectedUlus,     // 🆕
   settlements, 
   selectedSettlement, 
   selectedStreet, 
   selectedHouse,
   onChange, 
+  onUlusChange,     // 🆕
   onSettlementChange, 
   onStreetChange, 
   onHouseChange, 
@@ -41,13 +45,17 @@ export function AddressForm({
   const [validationErrors, setValidationErrors] = useState<{ [K in keyof AddLicByAddressData]?: string | null }>({});
 
   // ========================
-  // ВАЛИДАЦИЯ
+  // ВАЛИДАЦИЯ - ОБНОВЛЕННАЯ
   // ========================
 
   const validateField = useCallback((field: keyof AddLicByAddressData, value: string): string | null => {
     const { VALIDATION, MESSAGES } = ADD_LICS_CONSTANTS;
 
     switch (field) {
+      // 🆕 Валидация улуса
+      case 'ulusId':
+        return !value ? MESSAGES.SELECT_ULUS : null;
+      
       case 'settlementId':
         return !value ? MESSAGES.SELECT_SETTLEMENT : null;
       
@@ -58,13 +66,12 @@ export function AddressForm({
         return !value ? MESSAGES.SELECT_HOUSE : null;
       
       case 'apartment':
-        if (value && value.length > 0) {
-          if (value.length > VALIDATION.MAX_APARTMENT_LENGTH) {
-            return `Номер квартиры не должен превышать ${VALIDATION.MAX_APARTMENT_LENGTH} символов`;
-          }
-          if (!VALIDATION.APARTMENT_PATTERN.test(value)) {
-            return MESSAGES.INVALID_APARTMENT;
-          }
+        if (!value || value.length === 0) return null; // Опционально
+        if (value.length > VALIDATION.MAX_APARTMENT_LENGTH) {
+          return `Максимум ${VALIDATION.MAX_APARTMENT_LENGTH} символов`;
+        }
+        if (!VALIDATION.APARTMENT_PATTERN.test(value)) {
+          return MESSAGES.INVALID_APARTMENT;
         }
         return null;
       
@@ -73,37 +80,35 @@ export function AddressForm({
           return MESSAGES.REQUIRED_FIELD;
         }
         if (value.length < VALIDATION.MIN_LC_LENGTH || value.length > VALIDATION.MAX_LC_LENGTH) {
-          return `Номер ЛС должен содержать от ${VALIDATION.MIN_LC_LENGTH} до ${VALIDATION.MAX_LC_LENGTH} символов`;
+          return `Длина от ${VALIDATION.MIN_LC_LENGTH} до ${VALIDATION.MAX_LC_LENGTH} символов`;
         }
         if (!VALIDATION.LC_PATTERN.test(value)) {
           return MESSAGES.INVALID_LC;
         }
         return null;
-
+      
       case 'fio':
         if (!value || value.trim().length === 0) {
           return MESSAGES.REQUIRED_FIELD;
         }
         if (value.length < VALIDATION.MIN_FIO_LENGTH || value.length > VALIDATION.MAX_FIO_LENGTH) {
-          return `ФИО должно содержать от ${VALIDATION.MIN_FIO_LENGTH} до ${VALIDATION.MAX_FIO_LENGTH} символов`;
+          return `Длина от ${VALIDATION.MIN_FIO_LENGTH} до ${VALIDATION.MAX_FIO_LENGTH} символов`;
         }
         if (!VALIDATION.FIO_PATTERN.test(value)) {
           return MESSAGES.INVALID_FIO;
         }
         return null;
-
+      
       default:
         return null;
     }
   }, []);
 
-  // ========================
-  // ОБРАБОТЧИКИ СОБЫТИЙ
-  // ========================
-
-  const handleInputChange = useCallback((field: keyof AddLicByAddressData, value: string) => {
+  // Обработчик изменения полей
+  const handleFieldChange = useCallback((field: keyof AddLicByAddressData, value: string) => {
     onChange(field, value);
-
+    
+    // Валидируем поле при изменении
     if (touched[field]) {
       const error = validateField(field, value);
       setValidationErrors(prev => ({
@@ -113,15 +118,55 @@ export function AddressForm({
     }
   }, [onChange, touched, validateField]);
 
+  // Обработчик потери фокуса
   const handleInputBlur = useCallback((field: keyof AddLicByAddressData) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-
-    const error = validateField(field, data[field] || '');
+    setTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+    
+    const value = data[field] || '';
+    const error = validateField(field, value);
     setValidationErrors(prev => ({
       ...prev,
       [field]: error
     }));
   }, [data, validateField]);
+
+  // Эффект для валидации всех полей при загрузке
+  useEffect(() => {
+    const errors: { [K in keyof AddLicByAddressData]?: string | null } = {};
+    Object.keys(data).forEach(key => {
+      const field = key as keyof AddLicByAddressData;
+      const value = data[field] || '';
+      errors[field] = validateField(field, value);
+    });
+    setValidationErrors(errors);
+  }, [data, validateField]);
+
+  // ========================
+  // ОБРАБОТЧИКИ ВЫБОРА - ОБНОВЛЕННЫЕ
+  // ========================
+
+  // 🆕 Обработчик выбора улуса
+  const handleUlusSelect = useCallback((ulusId: string) => {
+    const ulus = uluses.find(u => u.ulus_id === ulusId);
+    if (ulus) {
+      onUlusChange(ulus);
+      
+      // Сбрасываем последующие выборы
+      onChange('settlementId', '');
+      onChange('streetId', '');
+      onChange('houseId', '');
+      setValidationErrors(prev => ({
+        ...prev,
+        ulusId: undefined,
+        settlementId: undefined,
+        streetId: undefined,
+        houseId: undefined
+      }));
+    }
+  }, [uluses, onUlusChange, onChange]);
 
   const handleSettlementSelect = useCallback((settlementId: string) => {
     const settlement = settlements.find(s => s.s_id === settlementId);
@@ -195,39 +240,82 @@ export function AddressForm({
   };
 
   // ========================
-  // РЕНДЕРИНГ
+  // РЕНДЕР КОМПОНЕНТА
   // ========================
 
   return (
-    <div className="ml-1 mr-1">
-      {/* Описание формы */}
+    <div className="address-form">
+      
+      {/* 🆕 1. Выбор улуса (района) */}
       <div className="mb-1">
-        <p className="fs-08 color-medium text-center">
-          Выберите адрес и введите данные лицевого счета
-        </p>
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <IonText color="dark">
+              <p className="mb-05"><strong>Улус (район):</strong></p>
+            </IonText>
+            
+            <IonSelect
+              value={data.ulusId}
+              placeholder="Выберите улус"
+              onIonChange={(e) => handleUlusSelect(e.detail.value)}
+              disabled={loading || uluses.length === 0}
+              className="w-full"
+            >
+              {uluses.map((ulus) => (
+                <IonSelectOption key={ulus.ulus_id} value={ulus.ulus_id}>
+                  {ulus.name}
+                </IonSelectOption>
+              ))}
+            </IonSelect>
+          </div>
+          <div className="flex-shrink-0 mr-1">
+            <IonIcon 
+              icon={mapOutline} 
+              color={getFieldColor('ulusId')}
+              className="w-12 h-12"
+            />
+          </div>
+        </div>
+        
+        {validationErrors.ulusId && (
+          <div className="ml-1 mt-05">
+            <IonText color="danger">
+              <small>{validationErrors.ulusId}</small>
+            </IonText>
+          </div>
+        )}
       </div>
 
-      {/* Выбор населенного пункта */}
+      {/* 2. Выбор населенного пункта */}
       <div className="mb-1">
-        <IonItem className="t-underline">
-          <IonIcon icon={locationOutline} slot="start" color="tertiary" />
-          <IonLabel position="stacked">Населенный пункт *</IonLabel>
-          <IonSelect
-            placeholder="Выберите населенный пункт"
-            value={data.settlementId}
-            onIonChange={(e) => handleSettlementSelect(e.detail.value)}
-            disabled={loading || settlements.length === 0}
-          >
-            {settlements.map(settlement => (
-              <IonSelectOption key={settlement.s_id} value={settlement.s_id}>
-                {settlement.name}
-              </IonSelectOption>
-            ))}
-          </IonSelect>
-          {settlements.length === 0 && (
-            <IonSpinner slot="end" name="crescent" />
-          )}
-        </IonItem>
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <IonText color="dark">
+              <p className="mb-05"><strong>Населенный пункт:</strong></p>
+            </IonText>
+            
+            <IonSelect
+              value={data.settlementId}
+              placeholder="Выберите населенный пункт"
+              onIonChange={(e) => handleSettlementSelect(e.detail.value)}
+              disabled={loading || settlements.length === 0}
+              className="w-full"
+            >
+              {settlements.map((settlement) => (
+                <IonSelectOption key={settlement.s_id} value={settlement.s_id}>
+                  {settlement.name}
+                </IonSelectOption>
+              ))}
+            </IonSelect>
+          </div>
+          <div className="flex-shrink-0 mr-1">
+            <IonIcon 
+              icon={locationOutline} 
+              color={getFieldColor('settlementId')}
+              className="w-12 h-12"
+            />
+          </div>
+        </div>
         
         {validationErrors.settlementId && (
           <div className="ml-1 mt-05">
@@ -238,27 +326,36 @@ export function AddressForm({
         )}
       </div>
 
-      {/* Выбор улицы */}
+      {/* 3. Выбор улицы */}
       <div className="mb-1">
-        <IonItem className="t-underline">
-          <IonIcon icon={businessOutline} slot="start" color="tertiary" />
-          <IonLabel position="stacked">Улица *</IonLabel>
-          <IonSelect
-            placeholder="Выберите улицу"
-            value={data.streetId}
-            onIonChange={(e) => handleStreetSelect(e.detail.value)}
-            disabled={loading || !selectedSettlement || !selectedSettlement.streets}
-          >
-            {selectedSettlement?.streets?.map(street => (
-              <IonSelectOption key={street.ids} value={street.ids}>
-                {street.name}
-              </IonSelectOption>
-            ))}
-          </IonSelect>
-          {loading && selectedSettlement && !selectedSettlement.streets && (
-            <IonSpinner slot="end" name="crescent" />
-          )}
-        </IonItem>
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <IonText color="dark">
+              <p className="mb-05"><strong>Улица:</strong></p>
+            </IonText>
+            
+            <IonSelect
+              value={data.streetId}
+              placeholder="Выберите улицу"
+              onIonChange={(e) => handleStreetSelect(e.detail.value)}
+              disabled={loading || !selectedSettlement || !selectedSettlement.streets || selectedSettlement.streets.length === 0}
+              className="w-full"
+            >
+              {selectedSettlement?.streets?.map((street) => (
+                <IonSelectOption key={street.ids} value={street.ids}>
+                  {street.name}
+                </IonSelectOption>
+              ))}
+            </IonSelect>
+          </div>
+          <div className="flex-shrink-0 mr-1">
+            <IonIcon 
+              icon={businessOutline} 
+              color={getFieldColor('streetId')}
+              className="w-12 h-12"
+            />
+          </div>
+        </div>
         
         {validationErrors.streetId && (
           <div className="ml-1 mt-05">
@@ -269,27 +366,36 @@ export function AddressForm({
         )}
       </div>
 
-      {/* Выбор дома */}
+      {/* 4. Выбор дома */}
       <div className="mb-1">
-        <IonItem className="t-underline">
-          <IonIcon icon={homeOutline} slot="start" color="tertiary" />
-          <IonLabel position="stacked">Дом *</IonLabel>
-          <IonSelect
-            placeholder="Выберите дом"
-            value={data.houseId}
-            onIonChange={(e) => handleHouseSelect(e.detail.value)}
-            disabled={loading || !selectedStreet || !selectedStreet.houses}
-          >
-            {selectedStreet?.houses?.map(house => (
-              <IonSelectOption key={house.id} value={house.id}>
-                {house.number}
-              </IonSelectOption>
-            ))}
-          </IonSelect>
-          {loading && selectedStreet && !selectedStreet.houses && (
-            <IonSpinner slot="end" name="crescent" />
-          )}
-        </IonItem>
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <IonText color="dark">
+              <p className="mb-05"><strong>Дом:</strong></p>
+            </IonText>
+            
+            <IonSelect
+              value={data.houseId}
+              placeholder="Выберите дом"
+              onIonChange={(e) => handleHouseSelect(e.detail.value)}
+              disabled={loading || !selectedStreet || !selectedStreet.houses || selectedStreet.houses.length === 0}
+              className="w-full"
+            >
+              {selectedStreet?.houses?.map((house) => (
+                <IonSelectOption key={house.id} value={house.id}>
+                  {house.number}
+                </IonSelectOption>
+              ))}
+            </IonSelect>
+          </div>
+          <div className="flex-shrink-0 mr-1">
+            <IonIcon 
+              icon={homeOutline} 
+              color={getFieldColor('houseId')}
+              className="w-12 h-12"
+            />
+          </div>
+        </div>
         
         {validationErrors.houseId && (
           <div className="ml-1 mt-05">
@@ -300,19 +406,21 @@ export function AddressForm({
         )}
       </div>
 
-      {/* Поле квартиры (опционально) */}
+      {/* 5. Квартира (опционально) */}
       <div className="mb-1">
-        <div className="flex items-center t-underline s-input">
-          <div className="flex-1">
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <IonText color="dark">
+              <p className="mb-05"><strong>Квартира (необязательно):</strong></p>
+            </IonText>
             <IonInput
-              className="s-input-1 ml-1"
-              placeholder="Квартира (необязательно)"
-              value={data.apartment || ''}
-              maxlength={ADD_LICS_CONSTANTS.VALIDATION.MAX_APARTMENT_LENGTH}
-              onIonInput={(e) => handleInputChange('apartment', e.detail.value!)}
+              value={data.apartment}
+              placeholder="Введите номер квартиры"
+              onIonInput={(e) => handleFieldChange('apartment', e.detail.value!)}
               onIonBlur={() => handleInputBlur('apartment')}
               onKeyPress={handleKeyPress}
               disabled={loading}
+              className="s-input"
             />
           </div>
           <div className="flex-shrink-0 mr-1">
@@ -333,20 +441,21 @@ export function AddressForm({
         )}
       </div>
 
-      {/* Поле номера лицевого счета */}
+      {/* 6. Номер лицевого счета */}
       <div className="mb-1">
-        <div className="flex items-center t-underline s-input">
-          <div className="flex-1">
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <IonText color="dark">
+              <p className="mb-05"><strong>Номер лицевого счета:</strong></p>
+            </IonText>
             <IonInput
-              className="s-input-1 ml-1"
-              placeholder="Номер лицевого счета *"
               value={data.lc}
-              maxlength={ADD_LICS_CONSTANTS.VALIDATION.MAX_LC_LENGTH}
-              inputMode="numeric"
-              onIonInput={(e) => handleInputChange('lc', e.detail.value!)}
+              placeholder="Введите номер ЛС"
+              onIonInput={(e) => handleFieldChange('lc', e.detail.value!)}
               onIonBlur={() => handleInputBlur('lc')}
               onKeyPress={handleKeyPress}
               disabled={loading}
+              className="s-input"
             />
           </div>
           <div className="flex-shrink-0 mr-1">
@@ -367,19 +476,21 @@ export function AddressForm({
         )}
       </div>
 
-      {/* Поле ФИО */}
+      {/* 7. ФИО */}
       <div className="mb-1">
-        <div className="flex items-center t-underline s-input">
-          <div className="flex-1">
+        <div className="flex items-center">
+          <div className="flex-grow">
+            <IonText color="dark">
+              <p className="mb-05"><strong>ФИО:</strong></p>
+            </IonText>
             <IonInput
-              className="s-input-1 ml-1"
-              placeholder="ФИО владельца *"
               value={data.fio}
-              maxlength={ADD_LICS_CONSTANTS.VALIDATION.MAX_FIO_LENGTH}
-              onIonInput={(e) => handleInputChange('fio', e.detail.value!)}
+              placeholder="Введите ФИО"
+              onIonInput={(e) => handleFieldChange('fio', e.detail.value!)}
               onIonBlur={() => handleInputBlur('fio')}
               onKeyPress={handleKeyPress}
               disabled={loading}
+              className="s-input"
             />
           </div>
           <div className="flex-shrink-0 mr-1">
@@ -407,6 +518,7 @@ export function AddressForm({
             <b>Последовательность заполнения:</b>
           </p>
           <ol className="fs-07 color-medium ml-1">
+            <li>Выберите улус (район)</li>
             <li>Выберите населенный пункт</li>
             <li>Выберите улицу (загрузится автоматически)</li>
             <li>Выберите дом (загрузится автоматически)</li>
@@ -417,19 +529,27 @@ export function AddressForm({
       </div>
 
       {/* Текущий выбранный адрес */}
-      {(selectedSettlement || selectedStreet || selectedHouse) && (
+      {(selectedUlus || selectedSettlement || selectedStreet || selectedHouse) && (
         <div className="mb-1">
           <div className="bg-success-light p-1 rounded">
             <p className="fs-08 color-dark mb-05">
               <b>Выбранный адрес:</b>
             </p>
             <p className="fs-07 color-dark">
+              {selectedUlus?.name && `${selectedUlus.name}, `}
               {selectedSettlement?.name}
               {selectedStreet && `, ${selectedStreet.name}`}
               {selectedHouse && `, д. ${selectedHouse.number}`}
               {data.apartment && `, кв. ${data.apartment}`}
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Индикатор загрузки */}
+      {loading && (
+        <div className="flex justify-center mt-1">
+          <IonSpinner name="crescent" />
         </div>
       )}
     </div>

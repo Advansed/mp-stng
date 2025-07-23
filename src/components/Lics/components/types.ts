@@ -41,20 +41,21 @@ export interface LicsState {
 // ========================
 
 export enum LicsPage {
-  MAIN = 0,
-  ADD_LIC = 1,            // 🆕 Объединенная страница вместо ADD_LIC_1 и ADD_LIC_2
-  HISTORY = 3,
-  PAYMENTS = 4,
-  PAYMENTS_TO = 5,
-  INDICES = 6,
-  EQUARING = 7,
-  SBER_PAY = 8,
-  HISTORY_INDICES = 9,
-  ALFA_BANK = 10
+  MAIN              = 0,
+  ADD_LIC_1         = 1,            // 🆕 Объединенная страница вместо ADD_LIC_1 и ADD_LIC_2
+  ADD_LIC_2         = 2,            // 🆕 Объединенная страница вместо ADD_LIC_1 и ADD_LIC_2
+  HISTORY           = 3,
+  PAYMENTS          = 4,
+  PAYMENTS_TO       = 5,
+  INDICES           = 6,
+  EQUARING          = 7,
+  SBER_PAY          = 8,
+  HISTORY_INDICES   = 9,
+  ALFA_BANK         = 10
 }
 
 // ========================
-// ТИПЫ ADDLICS - НОВЫЕ
+// ТИПЫ ADDLICS - ОБНОВЛЕННЫЕ
 // ========================
 
 // Режимы добавления лицевого счета
@@ -70,8 +71,20 @@ export interface AddLicByCodeData {
   fio: string;         // ФИО
 }
 
-// Данные для добавления по адресу
+// 🆕 Шаг 1.1: Добавляем интерфейс для Улуса
+export interface Ulus {
+  ulus_id: string;
+  name: string;
+  settlements?: Settlement[];
+}
+
+// 🆕 Шаг 1.2: Обновляем данные для добавления по адресу - добавляем улус
 export interface AddLicByAddressData {
+  // 🆕 Новые поля для улуса
+  ulusId?: string;
+  ulusName?: string;
+  
+  // Существующие поля
   settlementId?: string;
   settlementName?: string;
   streetId?: string;
@@ -83,7 +96,7 @@ export interface AddLicByAddressData {
   fio: string;
 }
 
-// Справочные данные
+// Справочные данные (существующие)
 export interface Settlement {
   s_id: string;
   name: string;
@@ -101,7 +114,7 @@ export interface House {
   number: string;
 }
 
-// Состояние компонента AddLics
+// 🆕 Шаг 1.3: Обновляем состояние компонента AddLics - добавляем улусы
 export interface AddLicsState {
   mode: AddLicMode;
   loading: boolean;
@@ -111,11 +124,13 @@ export interface AddLicsState {
   codeData: AddLicByCodeData;
   addressData: AddLicByAddressData;
   
-  // Справочники
-  settlements: Settlement[];
-  selectedSettlement?: Settlement;
-  selectedStreet?: Street;
-  selectedHouse?: House;
+  // 🆕 Справочники с поддержкой улусов
+  uluses: Ulus[];                    // Список улусов
+  selectedUlus?: Ulus;               // Выбранный улус
+  settlements: Settlement[];          // Список населенных пунктов (может фильтроваться по улусу)
+  selectedSettlement?: Settlement;    // Выбранный населенный пункт
+  selectedStreet?: Street;           // Выбранная улица
+  selectedHouse?: House;             // Выбранный дом
 }
 
 // ========================
@@ -147,11 +162,10 @@ export interface StoreState {
   profile: {
     lics?: LicsItem[];
   };
-  [key: string]: any;
 }
 
 // ========================
-// ПРОПСЫ КОМПОНЕНТОВ - СУЩЕСТВУЮЩИЕ
+// ПРОПСЫ ДЛЯ КОМПОНЕНТОВ - ОБНОВЛЕННЫЕ
 // ========================
 
 export interface ItemsProps {
@@ -178,10 +192,6 @@ export interface IndicesProps {
   setPage: SetPageFunction;
 }
 
-// ========================
-// ПРОПСЫ ADDLICS КОМПОНЕНТОВ - НОВЫЕ
-// ========================
-
 export interface AddLicsProps {
   setPage: SetPageFunction;
   initialMode?: AddLicMode;
@@ -198,13 +208,21 @@ export interface CodeFormProps {
   loading: boolean;
 }
 
+// 🆕 Обновляем пропсы AddressForm - добавляем улусы
 export interface AddressFormProps {
   data: AddLicByAddressData;
+  
+  // 🆕 Справочники с поддержкой улусов
+  uluses: Ulus[];
+  selectedUlus?: Ulus;
   settlements: Settlement[];
   selectedSettlement?: Settlement;
   selectedStreet?: Street;
   selectedHouse?: House;
+  
+  // 🆕 Обработчики с поддержкой улусов
   onChange: (field: keyof AddLicByAddressData, value: string) => void;
+  onUlusChange: (ulus: Ulus) => void;        // Новый обработчик
   onSettlementChange: (settlement: Settlement) => void;
   onStreetChange: (street: Street) => void;
   onHouseChange: (house: House) => void;
@@ -222,7 +240,7 @@ export interface ActionButtonsProps {
 }
 
 // ========================
-// ТИПЫ ДЛЯ ХУКА USEADDLICS - НОВЫЕ
+// ТИПЫ ДЛЯ ХУКА USEADDLICS - ОБНОВЛЕННЫЕ
 // ========================
 
 export interface UseAddLicsReturn {
@@ -237,8 +255,10 @@ export interface UseAddLicsReturn {
   updateCodeData: (field: keyof AddLicByCodeData, value: string) => void;
   updateAddressData: (field: keyof AddLicByAddressData, value: string) => void;
   
-  // Address form specific
-  loadSettlements: () => Promise<void>;
+  // 🆕 Address form specific - с поддержкой улусов
+  loadUluses: () => Promise<void>;                    // Новый метод
+  selectUlus: (ulus: Ulus) => Promise<void>;          // Новый метод
+  loadSettlements: (ulusId?: string) => Promise<void>; // Обновленный метод
   selectSettlement: (settlement: Settlement) => Promise<void>;
   selectStreet: (street: Street) => Promise<void>;
   selectHouse: (house: House) => void;
@@ -256,7 +276,7 @@ export interface UseAddLicsReturn {
 }
 
 // ========================
-// ТИПЫ ДЛЯ API RESPONSES - НОВЫЕ
+// ТИПЫ ДЛЯ API RESPONSES - ОБНОВЛЕННЫЕ
 // ========================
 
 export interface ApiResponse<T = any> {
@@ -265,14 +285,22 @@ export interface ApiResponse<T = any> {
   data?: T;
 }
 
+// 🆕 Обновляем параметры AddAccount - используем правильные как в AddLic2
 export interface AddAccountParams {
   token: string;
-  LC?: string;
-  fio: string;
-  s_id?: string;        // Для добавления по адресу
-  ids?: string;         // Для добавления по адресу  
-  house_id?: string;    // Для добавления по адресу
-  apartment?: string;   // Для добавления по адресу
+  LC?: string;          // номер лицевого счета
+  fio: string;          // ФИО
+  
+  // Параметры для добавления по адресу (как в AddLic2)
+  s_id?: string;        // ID населенного пункта
+  ids?: string;         // ID улицы  
+  house_id?: string;    // ID дома
+  apartment?: string;   // номер квартиры (опционально)
+}
+
+// 🆕 Новый тип для ответа API улусов
+export interface GetUlusesResponse {
+  uluses: Ulus[];
 }
 
 export interface GetSettlementsResponse {

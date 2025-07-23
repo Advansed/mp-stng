@@ -6,7 +6,7 @@ import { useAddLics } from './useAddLics';
 import { AddLicMode, AddLicsProps, LicsPage } from './types';
 import { ADD_LICS_CONSTANTS, DEBUG_PREFIXES } from './constants';
 
-// Подкомпоненты (пока заглушки, создадим позже)
+// Подкомпоненты
 import { ModeSelection } from './ModeSelection';
 import { CodeForm } from './CodeForm';
 import { AddressForm } from './AddressForm';
@@ -14,7 +14,7 @@ import { ActionButtons } from './ActionButtons';
 
 export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
   // ========================
-  // ХУК И СОСТОЯНИЕ
+  // ХУК И СОСТОЯНИЕ - ОБНОВЛЕННЫЙ
   // ========================
   
   const {
@@ -23,10 +23,15 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
     resetToSelection,
     updateCodeData,
     updateAddressData,
+    
+    // 🆕 Новые методы для работы с улусами
+    loadUluses,
+    selectUlus,
     loadSettlements,
     selectSettlement,
     selectStreet,
     selectHouse,
+    
     submitByCode,
     submitByAddress,
     validateCodeForm,
@@ -36,7 +41,7 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
   } = useAddLics();
 
   // ========================
-  // ЭФФЕКТЫ
+  // ЭФФЕКТЫ - ОБНОВЛЕННЫЕ
   // ========================
 
   // Инициализация режима
@@ -47,16 +52,27 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
     }
   }, [initialMode, state.mode, setMode]);
 
-  // Загрузка справочников при переходе в режим по адресу
+  // ✅ Шаг 5: Обновленная загрузка справочников при переходе в режим по адресу
   useEffect(() => {
-    if (state.mode === AddLicMode.BY_ADDRESS && state.settlements.length === 0) {
-      console.log(`${DEBUG_PREFIXES.ADD_LICS} Loading settlements for address mode`);
-      loadSettlements();
+    if (state.mode === AddLicMode.BY_ADDRESS) {
+      console.log(`${DEBUG_PREFIXES.ADD_LICS} Entering address mode, loading directories`);
+      
+      // 🆕 Сначала загружаем улусы, если они еще не загружены
+      if (state.uluses.length === 0) {
+        console.log(`${DEBUG_PREFIXES.ADD_LICS} Loading uluses for address mode`);
+        loadUluses();
+      }
+      
+      // Загружаем населенные пункты, если они еще не загружены
+      if (state.settlements.length === 0) {
+        console.log(`${DEBUG_PREFIXES.ADD_LICS} Loading settlements for address mode`);
+        loadSettlements();
+      }
     }
-  }, [state.mode, state.settlements.length, loadSettlements]);
+  }, [state.mode, state.uluses.length, state.settlements.length, loadUluses, loadSettlements]);
 
   // ========================
-  // ОБРАБОТЧИКИ СОБЫТИЙ
+  // ОБРАБОТЧИКИ СОБЫТИЙ - ОБНОВЛЕННЫЕ
   // ========================
 
   const handleModeSelect = useCallback((mode: AddLicMode) => {
@@ -94,9 +110,8 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
     } else {
       // Возврат к выбору режима
       resetToSelection();
-      clearMessage();
     }
-  }, [state.mode, setPage, resetToSelection, clearMessage]);
+  }, [state.mode, setPage, resetToSelection]);
 
   const handleReset = useCallback(() => {
     console.log(`${DEBUG_PREFIXES.ADD_LICS} Reset button pressed`);
@@ -104,12 +119,10 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
   }, [resetForms]);
 
   // ========================
-  // ЛОГИКА ВАЛИДАЦИИ
+  // ПРОВЕРКА ВОЗМОЖНОСТИ ОТПРАВКИ - ОБНОВЛЕННАЯ
   // ========================
 
   const canSubmit = useCallback((): boolean => {
-    if (state.loading) return false;
-    
     switch (state.mode) {
       case AddLicMode.BY_CODE:
         return validateCodeForm();
@@ -118,16 +131,18 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
       default:
         return false;
     }
-  }, [state.mode, state.loading, validateCodeForm, validateAddressForm]);
+  }, [state.mode, validateCodeForm, validateAddressForm]);
 
   // ========================
-  // РЕНДЕРИНГ КОНТЕНТА
+  // РЕНДЕР КОНТЕНТА - ОБНОВЛЕННЫЙ
   // ========================
 
   const renderContent = (): JSX.Element => {
     switch (state.mode) {
       case AddLicMode.SELECTION:
-        return <ModeSelection onModeSelect={handleModeSelect} />;
+        return (
+          <ModeSelection onModeSelect={handleModeSelect} />
+        );
 
       case AddLicMode.BY_CODE:
         return (
@@ -143,11 +158,18 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
         return (
           <AddressForm
             data={state.addressData}
+            
+            // 🆕 Передаем улусы и связанные данные
+            uluses={state.uluses}
+            selectedUlus={state.selectedUlus}
             settlements={state.settlements}
             selectedSettlement={state.selectedSettlement}
             selectedStreet={state.selectedStreet}
             selectedHouse={state.selectedHouse}
+            
+            // 🆕 Передаем обработчики с поддержкой улусов
             onChange={updateAddressData}
+            onUlusChange={selectUlus}        // Новый обработчик
             onSettlementChange={selectSettlement}
             onStreetChange={selectStreet}
             onHouseChange={selectHouse}
@@ -209,6 +231,33 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
   };
 
   // ========================
+  // ОТЛАДОЧНАЯ ИНФОРМАЦИЯ
+  // ========================
+  
+  const renderDebugInfo = (): JSX.Element | null => {
+    if (process.env.NODE_ENV !== 'development') return null;
+
+    return (
+      <div className="ml-1 mr-1 mb-1">
+        <details>
+          <summary className="fs-06 color-medium">Debug Info</summary>
+          <div className="fs-06 color-medium mt-05">
+            <p>Mode: {state.mode}</p>
+            <p>Loading: {state.loading.toString()}</p>
+            <p>Can Submit: {canSubmit().toString()}</p>
+            <p>Uluses: {state.uluses.length}</p>
+            <p>Settlements: {state.settlements.length}</p>
+            <p>Selected Ulus: {state.selectedUlus?.name || 'none'}</p>
+            <p>Selected Settlement: {state.selectedSettlement?.name || 'none'}</p>
+            <p>Selected Street: {state.selectedStreet?.name || 'none'}</p>
+            <p>Selected House: {state.selectedHouse?.number || 'none'}</p>
+          </div>
+        </details>
+      </div>
+    );
+  };
+
+  // ========================
   // ОСНОВНОЙ РЕНДЕР
   // ========================
 
@@ -239,6 +288,9 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
             onReset={handleReset}
           />
         )}
+
+        {/* Отладочная информация */}
+        {renderDebugInfo()}
       </IonCard>
 
       {/* Индикатор загрузки */}
@@ -250,13 +302,3 @@ export function AddLics({ setPage, initialMode }: AddLicsProps): JSX.Element {
     </>
   );
 }
-
-// ========================
-// ВРЕМЕННЫЕ ЗАГЛУШКИ ДЛЯ ПОДКОМПОНЕНТОВ
-// Эти компоненты мы создадим на следующем шаге
-// ========================
-
-
-
-
-

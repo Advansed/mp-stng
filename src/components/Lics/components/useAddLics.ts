@@ -1,4 +1,23 @@
-// src/components/Lics/components/hooks/useAddLics.ts
+// src/components/Lics/components/useAddLics.ts
+
+/* ===============================================================================
+ * ПЛАН ПЕРЕДЕЛКИ AddLics.tsx для поиска по адресу
+ * ===============================================================================
+ * 
+ * ✅ ВЫПОЛНЕНО:
+ * - Шаг 1: Обновлены типы данных (Ulus, AddLicByAddressData, AddLicsState)
+ * - Шаг 2: Обновлены API методы (loadUluses, selectUlus, исправлены существующие)
+ * 
+ * 🔄 В ПРОЦЕССЕ:
+ * - Шаг 3: Исправление API вызовов (используем рабочие из AddLic2)
+ * - Шаг 4: Исправление отправки данных в AddAccount
+ * 
+ * ⏳ ПЛАНИРУЕТСЯ:
+ * - Шаг 5: Обновление UI компоненты
+ * - Шаг 6: Отладка и тестирование
+ * 
+ * ===============================================================================
+ */
 
 import { useState, useCallback } from 'react';
 import { Store, getData, getLics, getProfile } from '../../Store';
@@ -7,6 +26,7 @@ import {
   AddLicsState, 
   AddLicByCodeData, 
   AddLicByAddressData,
+  Ulus,           // 🆕
   Settlement,
   Street,
   House,
@@ -23,7 +43,7 @@ import {
 
 export const useAddLics = (): UseAddLicsReturn => {
   // ========================
-  // ОСНОВНОЕ СОСТОЯНИЕ
+  // ОСНОВНОЕ СОСТОЯНИЕ - ОБНОВЛЕННОЕ
   // ========================
   
   const [state, setState] = useState<AddLicsState>({
@@ -32,7 +52,14 @@ export const useAddLics = (): UseAddLicsReturn => {
     message: '',
     codeData: { ...ADD_LICS_CONSTANTS.INITIAL_CODE_DATA },
     addressData: { ...ADD_LICS_CONSTANTS.INITIAL_ADDRESS_DATA },
+    
+    // 🆕 Добавляем поддержку улусов в состояние
+    uluses: [],
+    selectedUlus: undefined,
     settlements: [],
+    selectedSettlement: undefined,
+    selectedStreet: undefined,
+    selectedHouse: undefined,
   });
 
   // ========================
@@ -107,26 +134,149 @@ export const useAddLics = (): UseAddLicsReturn => {
   }, [log]);
 
   // ========================
-  // РАБОТА СО СПРАВОЧНИКАМИ
+  // РАБОТА СО СПРАВОЧНИКАМИ - ОБНОВЛЕННАЯ
   // ========================
-
-  const loadSettlements = useCallback(async (): Promise<void> => {
+  
+  // 🆕 Шаг 2.1: Новый метод loadUluses для загрузки улусов
+  const loadUluses = useCallback(async (): Promise<void> => {
     try {
-      log('Loading settlements...');
+      log('Loading uluses...');
+      updateState({ 
+        loading: true, 
+        message: ADD_LICS_CONSTANTS.MESSAGES.LOADING_ULUSES 
+      });
+
+      // Попробуем загрузить улусы через API
+      // Если API для улусов нет, будем фильтровать населенные пункты
+      try {
+        const response: ApiResponse = await getData(ADD_LICS_API_ENDPOINTS.GET_ULUSES, {
+          token: getToken()
+        });
+
+        if (!response.error && response.data) {
+          const uluses: Ulus[] = response.data || [];
+          log(`Loaded ${uluses.length} uluses`);
+
+          updateState({
+            uluses,
+            loading: false,
+            message: ''
+          });
+          return;
+        }
+      } catch (error) {
+        log('No dedicated uluses API, will extract from settlements');
+      }
+
+      // Если API для улусов нет, извлекаем улусы из населенных пунктов
+      const settlementsResponse: ApiResponse = await getData(ADD_LICS_API_ENDPOINTS.GET_SETTLEMENTS, {
+        token: getToken()
+      });
+
+      if (settlementsResponse.error) {
+        throw new Error(settlementsResponse.message || ADD_LICS_CONSTANTS.MESSAGES.ULUSES_LOAD_ERROR);
+      }
+
+      const settlements: Settlement[] = settlementsResponse.data || [];
+      
+      // Извлекаем уникальные улусы из названий населенных пунктов
+      const ulusesMap = new Map<string, Ulus>();
+      settlements.forEach(settlement => {
+        // Предполагаем, что улус указан в начале названия населенного пункта
+        const parts = settlement.name.split(' ');
+        if (parts.length > 1) {
+          const ulusName = parts[0] + ' ' + (parts[1] || ''); // Берем первые 2 слова как улус
+          const ulusId = `ulus_${ulusName.toLowerCase().replace(/\s+/g, '_')}`;
+          
+          if (!ulusesMap.has(ulusId)) {
+            ulusesMap.set(ulusId, {
+              ulus_id: ulusId,
+              name: ulusName,
+              settlements: []
+            });
+          }
+          
+          ulusesMap.get(ulusId)!.settlements!.push(settlement);
+        }
+      });
+
+      const uluses = Array.from(ulusesMap.values());
+      log(`Extracted ${uluses.length} uluses from settlements`);
+
+      updateState({
+        uluses,
+        settlements,
+        loading: false,
+        message: ''
+      });
+
+    } catch (error) {
+      console.error(`${DEBUG_PREFIXES.ADD_LICS} Error loading uluses:`, error);
+      updateState({
+        loading: false,
+        message: error instanceof Error ? error.message : ADD_LICS_CONSTANTS.MESSAGES.ULUSES_LOAD_ERROR
+      });
+    }
+  }, [getToken, updateState, log]);
+
+  // 🆕 Шаг 2.1: Новый метод selectUlus для выбора улуса
+  const selectUlus = useCallback(async (ulus: Ulus): Promise<void> => {
+    try {
+      log(`Selecting ulus: ${ulus.name} (${ulus.ulus_id})`);
+      
+      updateState({ 
+        selectedUlus: ulus,
+        selectedSettlement: undefined,
+        selectedStreet: undefined,
+        selectedHouse: undefined,
+        settlements: ulus.settlements || []
+      });
+
+      updateAddressData('ulusId', ulus.ulus_id);
+      updateAddressData('ulusName', ulus.name);
+      
+      // Сбрасываем последующие выборы
+      updateAddressData('settlementId', '');
+      updateAddressData('streetId', '');
+      updateAddressData('houseId', '');
+
+    } catch (error) {
+      console.error(`${DEBUG_PREFIXES.ADD_LICS} Error selecting ulus:`, error);
+      updateState({
+        message: 'Ошибка при выборе улуса'
+      });
+    }
+  }, [updateState, updateAddressData, log]);
+
+  // ✅ Шаг 2.2: Исправляем loadSettlements - добавляем поддержку ulusId
+  const loadSettlements = useCallback(async (ulusId?: string): Promise<void> => {
+    try {
+      log('Loading settlements...', { ulusId });
       updateState({ 
         loading: true, 
         message: ADD_LICS_CONSTANTS.MESSAGES.LOADING_SETTLEMENTS 
       });
 
+      // ✅ Шаг 3.1: Используем рабочий API вызов как в AddLic2
       const response: ApiResponse = await getData(ADD_LICS_API_ENDPOINTS.GET_SETTLEMENTS, {
         token: getToken()
+        // Примечание: в AddLic2 этот вызов идет без дополнительных параметров
       });
 
       if (response.error) {
         throw new Error(response.message || ADD_LICS_CONSTANTS.MESSAGES.SETTLEMENTS_LOAD_ERROR);
       }
 
-      const settlements: Settlement[] = response.data || [];
+      let settlements: Settlement[] = response.data || [];
+      
+      // Если указан ulusId, фильтруем населенные пункты
+      if (ulusId && state.uluses.length > 0) {
+        const selectedUlus = state.uluses.find(u => u.ulus_id === ulusId);
+        if (selectedUlus && selectedUlus.settlements) {
+          settlements = selectedUlus.settlements;
+        }
+      }
+      
       log(`Loaded ${settlements.length} settlements`);
 
       updateState({
@@ -142,8 +292,9 @@ export const useAddLics = (): UseAddLicsReturn => {
         message: error instanceof Error ? error.message : ADD_LICS_CONSTANTS.MESSAGES.SETTLEMENTS_LOAD_ERROR
       });
     }
-  }, [getToken, updateState, log]);
+  }, [getToken, updateState, log, state.uluses]);
 
+  // ✅ Шаг 2.2: Исправляем selectSettlement - используем правильные параметры
   const selectSettlement = useCallback(async (settlement: Settlement): Promise<void> => {
     try {
       log(`Selecting settlement: ${settlement.name} (${settlement.s_id})`);
@@ -158,9 +309,10 @@ export const useAddLics = (): UseAddLicsReturn => {
       updateAddressData('settlementId', settlement.s_id);
       updateAddressData('settlementName', settlement.name);
 
+      // ✅ Шаг 3.1: Используем рабочий API вызов как в AddLic2
       const response: ApiResponse = await getData(ADD_LICS_API_ENDPOINTS.GET_STREETS, {
         token: getToken(),
-        s_id: settlement.s_id
+        s_id: settlement.s_id  // ✅ Правильный параметр как в AddLic2
       });
 
       if (response.error) {
@@ -188,6 +340,7 @@ export const useAddLics = (): UseAddLicsReturn => {
     }
   }, [getToken, updateState, updateAddressData, log]);
 
+  // ✅ Шаг 2.2: Исправляем selectStreet - используем правильные параметры
   const selectStreet = useCallback(async (street: Street): Promise<void> => {
     try {
       log(`Selecting street: ${street.name} (${street.ids})`);
@@ -201,9 +354,10 @@ export const useAddLics = (): UseAddLicsReturn => {
       updateAddressData('streetId', street.ids);
       updateAddressData('streetName', street.name);
 
+      // ✅ Шаг 3.1: Используем рабочий API вызов как в AddLic2
       const response: ApiResponse = await getData(ADD_LICS_API_ENDPOINTS.GET_HOUSES, {
         token: getToken(),
-        ids: street.ids
+        ids: street.ids  // ✅ Правильный параметр как в AddLic2
       });
 
       if (response.error) {
@@ -239,7 +393,7 @@ export const useAddLics = (): UseAddLicsReturn => {
   }, [updateState, updateAddressData, log]);
 
   // ========================
-  // ВАЛИДАЦИЯ
+  // ВАЛИДАЦИЯ - ОБНОВЛЕННАЯ
   // ========================
 
   const validateCodeForm = useCallback((): boolean => {
@@ -271,9 +425,13 @@ export const useAddLics = (): UseAddLicsReturn => {
     return true;
   }, [state.codeData]);
 
+  // ✅ Шаг 5.2: Обновляем валидацию - добавляем проверку ulusId
   const validateAddressForm = useCallback((): boolean => {
-    const { settlementId, streetId, houseId, apartment, lc, fio } = state.addressData;
+    const { ulusId, settlementId, streetId, houseId, apartment, lc, fio } = state.addressData;
     const { VALIDATION } = ADD_LICS_CONSTANTS;
+
+    // 🆕 Проверка улуса (пока делаем опциональной, так как может не быть API для улусов)
+    // if (!ulusId) return false;
 
     // Проверка обязательных справочников
     if (!settlementId || !streetId || !houseId) {
@@ -316,7 +474,7 @@ export const useAddLics = (): UseAddLicsReturn => {
   }, [state.addressData]);
 
   // ========================
-  // ОТПРАВКА ДАННЫХ
+  // ОТПРАВКА ДАННЫХ - ИСПРАВЛЕННАЯ
   // ========================
 
   const submitByCode = useCallback(async (): Promise<boolean> => {
@@ -369,6 +527,7 @@ export const useAddLics = (): UseAddLicsReturn => {
     }
   }, [state.codeData, validateCodeForm, getToken, updateState, log]);
 
+  // ✅ Шаг 4.2: Исправляем submitByAddress - используем правильные параметры как в AddLic2
   const submitByAddress = useCallback(async (): Promise<boolean> => {
     try {
       if (!validateAddressForm()) {
@@ -382,13 +541,14 @@ export const useAddLics = (): UseAddLicsReturn => {
         message: ADD_LICS_CONSTANTS.MESSAGES.ADDING_ACCOUNT 
       });
 
+      // ✅ Шаг 4.1: Используем правильные параметры как в AddLic2
       const params: AddAccountParams = {
         token: getToken(),
         fio: state.addressData.fio,
-        s_id: state.addressData.settlementId,
-        ids: state.addressData.streetId,
-        house_id: state.addressData.houseId,
-        LC: state.addressData.lc
+        s_id: state.addressData.settlementId,      // ✅ ID населенного пункта
+        ids: state.addressData.streetId,           // ✅ ID улицы
+        house_id: state.addressData.houseId,       // ✅ ID дома
+        LC: state.addressData.lc                   // ✅ номер лицевого счета
       };
 
       // Добавляем квартиру если указана
@@ -428,7 +588,7 @@ export const useAddLics = (): UseAddLicsReturn => {
   }, [state.addressData, validateAddressForm, getToken, updateState, log]);
 
   // ========================
-  // УТИЛИТЫ УПРАВЛЕНИЯ
+  // УТИЛИТЫ УПРАВЛЕНИЯ - ОБНОВЛЕННЫЕ
   // ========================
 
   const resetForms = useCallback(() => {
@@ -436,6 +596,7 @@ export const useAddLics = (): UseAddLicsReturn => {
     updateState({
       codeData: { ...ADD_LICS_CONSTANTS.INITIAL_CODE_DATA },
       addressData: { ...ADD_LICS_CONSTANTS.INITIAL_ADDRESS_DATA },
+      selectedUlus: undefined,           // 🆕
       selectedSettlement: undefined,
       selectedStreet: undefined,
       selectedHouse: undefined,
@@ -452,7 +613,7 @@ export const useAddLics = (): UseAddLicsReturn => {
   }, [updateState]);
 
   // ========================
-  // ВОЗВРАТ ИНТЕРФЕЙСА ХУКА
+  // ВОЗВРАТ ИНТЕРФЕЙСА ХУКА - ОБНОВЛЕННЫЙ
   // ========================
 
   return {
@@ -467,8 +628,10 @@ export const useAddLics = (): UseAddLicsReturn => {
     updateCodeData,
     updateAddressData,
     
-    // Address form specific
-    loadSettlements,
+    // 🆕 Address form specific - с поддержкой улусов
+    loadUluses,           // Новый метод
+    selectUlus,           // Новый метод
+    loadSettlements,      // Обновленный метод с поддержкой ulusId
     selectSettlement,
     selectStreet,
     selectHouse,

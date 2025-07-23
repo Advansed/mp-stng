@@ -1,122 +1,76 @@
-// src/components/Lics/components/AddLics/ActionButtons.tsx
+// src/components/Lics/components/ActionButtons.tsx
 
 import React from 'react';
-import { IonButton, IonIcon } from '@ionic/react';
+import { IonButton, IonIcon, IonText } from '@ionic/react';
 import { 
   arrowBackOutline, 
   refreshOutline, 
-  checkmarkOutline, 
-  hourglassOutline 
+  checkmarkOutline,
+  hourglassOutline
 } from 'ionicons/icons';
 import { ActionButtonsProps, AddLicMode } from './types';
-import { ADD_LICS_CONSTANTS } from './constants';
 
 export function ActionButtons({ 
-  mode, 
-  canSubmit, 
-  loading, 
-  onSubmit, 
-  onBack, 
-  onReset 
+  mode,
+  canSubmit,
+  loading,
+  onSubmit,
+  onBack,
+  onReset
 }: ActionButtonsProps): JSX.Element {
-
-  // ========================
-  // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-  // ========================
-
-  const getSubmitButtonText = (): string => {
-    if (loading) {
-      return 'Добавление...';
-    }
-    
-    switch (mode) {
-      case AddLicMode.BY_CODE:
-        return 'Добавить по номеру';
-      case AddLicMode.BY_ADDRESS:
-        return 'Добавить по адресу';
-      default:
-        return 'Добавить';
-    }
-  };
-
-  const getBackButtonText = (): string => {
-    switch (mode) {
-      case AddLicMode.BY_CODE:
-      case AddLicMode.BY_ADDRESS:
-        return 'К выбору способа';
-      default:
-        return 'Назад';
-    }
-  };
-
-  const getResetButtonText = (): string => {
-    switch (mode) {
-      case AddLicMode.BY_CODE:
-        return 'Очистить форму';
-      case AddLicMode.BY_ADDRESS:
-        return 'Сбросить адрес';
-      default:
-        return 'Сбросить';
-    }
-  };
-
-  // ========================
-  // РЕНДЕРИНГ
-  // ========================
 
   return (
     <div className="action-buttons">
-      {/* Основные кнопки */}
-      <div className="flex fl-space ml-1 mr-1 mb-1 mt-1">
+      
+      {/* Кнопки управления */}
+      <div className="flex gap-1 ml-1 mr-1 mb-1">
+        
         {/* Кнопка "Назад" */}
         <IonButton
           fill="outline"
           color="medium"
-          size="default"
-          disabled={loading}
           onClick={onBack}
-          className="flex-shrink-0"
+          disabled={loading}
+          className="flex-1"
         >
           <IonIcon icon={arrowBackOutline} slot="start" />
-          {getBackButtonText()}
+          Назад
         </IonButton>
 
-        {/* Spacer */}
-        <div className="flex-1"></div>
+        {/* Кнопка "Сбросить" */}
+        <IonButton
+          fill="clear"
+          color="medium"
+          onClick={onReset}
+          disabled={loading}
+          className="flex-shrink-0"
+        >
+          <IonIcon icon={refreshOutline} slot="icon-only" />
+        </IonButton>
 
         {/* Кнопка "Добавить" */}
         <IonButton
           fill="solid"
           color="primary"
-          size="default"
-          disabled={!canSubmit || loading}
           onClick={onSubmit}
-          className="flex-shrink-0"
+          disabled={!canSubmit || loading}
+          className="flex-1"
         >
-          <IonIcon 
-            icon={loading ? hourglassOutline : checkmarkOutline} 
-            slot="start" 
-          />
-          {getSubmitButtonText()}
+          {loading ? (
+            <>
+              <IonIcon icon={hourglassOutline} slot="start" />
+              Добавление...
+            </>
+          ) : (
+            <>
+              <IonIcon icon={checkmarkOutline} slot="start" />
+              Добавить
+            </>
+          )}
         </IonButton>
       </div>
 
-      {/* Дополнительные кнопки */}
-      <div className="flex justify-center ml-1 mr-1 mb-1">
-        {/* Кнопка "Сбросить" */}
-        <IonButton
-          fill="clear"
-          color="medium"
-          size="small"
-          disabled={loading}
-          onClick={onReset}
-        >
-          <IonIcon icon={refreshOutline} slot="start" />
-          {getResetButtonText()}
-        </IonButton>
-      </div>
-
-      {/* Подсказки для пользователя */}
+      {/* Статус формы */}
       <div className="ml-1 mr-1 mb-05">
         {loading ? (
           <p className="text-center fs-07 color-primary">
@@ -199,6 +153,7 @@ export function FormSteps({
         ];
       case AddLicMode.BY_ADDRESS:
         return [
+          'Улус',
           'Населенный пункт',
           'Улица',
           'Дом',

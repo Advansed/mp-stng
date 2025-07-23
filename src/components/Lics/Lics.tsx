@@ -62,8 +62,10 @@ export function     Lics(): JSX.Element {
                             <AddLic setPage={setPage} />
                         </>
                     );
-                case LicsPage.ADD_LIC:
-                    return <AddLics setPage={setPage} />;
+                case LicsPage.ADD_LIC_1:
+                    return <AddLic1 setPage={setPage} />;
+                case LicsPage.ADD_LIC_2:
+                    return <AddLic2 setPage={setPage} />;
                 case LicsPage.HISTORY:
                     return <History item={item} />;
                 case LicsPage.PAYMENTS:

@@ -1,95 +1,95 @@
 // src/components/Lics/components/constants.ts
 
-import { LicsItem, LicsPage, AddLicMode, AddLicByCodeData, AddLicByAddressData } from './types';
+import { AddLicMode, AddLicByCodeData, AddLicByAddressData, LicsItem , } from './types';
 
 // ========================
-// СУЩЕСТВУЮЩИЕ КОНСТАНТЫ LICS
+// СУЩЕСТВУЮЩИЕ КОНСТАНТЫ
 // ========================
 
-// ID подписок Store
 export const LICS_SUBSCRIPTION_IDS = {
-  LICS_UPDATE: 22,
-  BACK_NAVIGATION: 404
+  LICS_UPDATE: 1,
+  BACK_NAVIGATION: 2
 } as const;
 
-// Названия страниц для отладки и логирования
 export const LICS_PAGE_NAMES = {
-  [LicsPage.MAIN]: 'Основная',
-  [LicsPage.ADD_LIC]: 'Добавить ЛС',           // 🔄 Обновлено: объединенная страница
-  [LicsPage.HISTORY]: 'История',
-  [LicsPage.PAYMENTS]: 'Оплата за газ',
-  [LicsPage.PAYMENTS_TO]: 'Оплата за ТО',
-  [LicsPage.INDICES]: 'Показания',
-  [LicsPage.EQUARING]: 'Оплата через сайт',
-  [LicsPage.SBER_PAY]: 'СберПей',
-  [LicsPage.HISTORY_INDICES]: 'История показаний',
-  [LicsPage.ALFA_BANK]: 'АльфаБанк'
+  0: 'Главная',
+  1: 'Добавить ЛС',
+  3: 'История',
+  4: 'Платежи',
+  5: 'Платежи ТО',
+  6: 'Показания',
+  7: 'Сверка',
+  8: 'СберПэй',
+  9: 'История показаний',
+  10: 'АльфаБанк'
 } as const;
 
-// Маршруты возврата для каждой страницы
 export const LICS_BACK_ROUTES = {
-  [LicsPage.MAIN]: 'back' as const,
-  [LicsPage.ADD_LIC]: LicsPage.MAIN,            // 🔄 Обновлено: объединенный маршрут
-  [LicsPage.HISTORY]: LicsPage.MAIN,
-  [LicsPage.PAYMENTS]: LicsPage.MAIN,
-  [LicsPage.PAYMENTS_TO]: LicsPage.MAIN,
-  [LicsPage.INDICES]: LicsPage.MAIN,
-  [LicsPage.EQUARING]: LicsPage.MAIN,
-  [LicsPage.SBER_PAY]: LicsPage.MAIN,
-  [LicsPage.HISTORY_INDICES]: LicsPage.INDICES, // Особый случай - возврат к показаниям
-  [LicsPage.ALFA_BANK]: LicsPage.MAIN
+  1: 0,    // С добавления ЛС на главную
+  3: 0,    // С истории на главную
+  4: 0,    // С платежей на главную
+  5: 4,    // С платежей ТО на платежи
+  6: 0,    // С показаний на главную
+  7: 0,    // Со сверки на главную
+  8: 4,    // С СберПэй на платежи
+  9: 6,    // С истории показаний на показания
+  10: 4    // С АльфаБанк на платежи
 } as const;
 
-// Дефолтные значения
 export const LICS_DEFAULTS = {
-  INITIAL_PAGE: LicsPage.MAIN,
-  INITIAL_UPD_COUNTER: 0,
   INITIAL_INFO: [] as LicsItem[],
+  INITIAL_UPD_COUNTER: 0,
+  INITIAL_PAGE: 0,
   INITIAL_ITEM: undefined
 } as const;
 
-// Константы для валидации показаний
 export const INDICES_VALIDATION = {
-  MAX_DIFFERENCE: 3000,
-  MAX_VOLUME: 10000,
-  MAX_DIGITS: 5,
-  MIN_DAY: 20,
-  MAX_DAY: 25
+  MIN_VALUE: 0,
+  MAX_VALUE: 999999,
+  DECIMAL_PLACES: 2
 } as const;
 
-// Константы для отладки
 export const DEBUG_PREFIXES = {
-  LICS: '[Lics]',
-  STORE: '[Store]',
-  NAVIGATION: '[Navigation]',
-  ERROR: '[Error]',
-  ADD_LICS: '[AddLics]'                         // 🆕 Новый префикс для отладки AddLics
+  LICS: '[LICS]',
+  ADD_LICS: '[ADD_LICS]',
+  NAVIGATION: '[NAV]',
+  ERROR: '[ERROR]'
 } as const;
 
 // ========================
-// НОВЫЕ КОНСТАНТЫ ДЛЯ ADDLICS
+// КОНСТАНТЫ ДЛЯ ADDLICS - ОБНОВЛЕННЫЕ
 // ========================
 
-// Константы для AddLics
 export const ADD_LICS_CONSTANTS = {
-  // Режимы по умолчанию
+  // Режим по умолчанию
   DEFAULT_MODE: AddLicMode.SELECTION,
   
-  // Начальные данные форм
+  // 🆕 Обновленные начальные данные с поддержкой улусов
   INITIAL_CODE_DATA: {
     lc: '',
     fio: ''
   } as AddLicByCodeData,
   
   INITIAL_ADDRESS_DATA: {
+    // 🆕 Поля для улуса
+    ulusId: '',
+    ulusName: '',
+    
+    // Существующие поля
+    settlementId: '',
+    settlementName: '',
+    streetId: '',
+    streetName: '',
+    houseId: '',
+    houseNumber: '',
+    apartment: '',
     lc: '',
-    fio: '',
-    apartment: ''
+    fio: ''
   } as AddLicByAddressData,
   
-  // Правила валидации
+  // Валидация
   VALIDATION: {
-    // Лицевой счет
+    // Номер лицевого счета
     MIN_LC_LENGTH: 8,
     MAX_LC_LENGTH: 20,
     LC_PATTERN: /^[0-9]+$/, // Только цифры
@@ -101,10 +101,10 @@ export const ADD_LICS_CONSTANTS = {
     
     // Квартира
     MAX_APARTMENT_LENGTH: 10,
-    APARTMENT_PATTERN: /^[а-яёА-ЯЁ0-9\s-/]+$/, // Буквы, цифры, пробелы, дефисы, слеши
+    APARTMENT_PATTERN: /^[а-яёА-ЯЁ0-9\s-/]+$/, // Буквы, цифры, пробелы, дефисы, слеши    
   },
   
-  // Сообщения для пользователя
+  // 🆕 Обновленные сообщения с поддержкой улусов
   MESSAGES: {
     // Ошибки валидации
     REQUIRED_FIELD: 'Поле обязательно для заполнения',
@@ -112,12 +112,14 @@ export const ADD_LICS_CONSTANTS = {
     INVALID_FIO: 'ФИО должно содержать только русские буквы (2-100 символов)',
     INVALID_APARTMENT: 'Номер квартиры содержит недопустимые символы',
     
-    // Выбор справочников
+    // 🆕 Выбор справочников с улусами
+    SELECT_ULUS: 'Выберите улус (район)',
     SELECT_SETTLEMENT: 'Выберите населенный пункт',
     SELECT_STREET: 'Выберите улицу',
     SELECT_HOUSE: 'Выберите дом',
     
-    // Состояния загрузки
+    // 🆕 Состояния загрузки с улусами
+    LOADING_ULUSES: 'Загрузка улусов...',
     LOADING_SETTLEMENTS: 'Загрузка населенных пунктов...',
     LOADING_STREETS: 'Загрузка улиц...',
     LOADING_HOUSES: 'Загрузка домов...',
@@ -126,8 +128,9 @@ export const ADD_LICS_CONSTANTS = {
     // Успешные операции
     ACCOUNT_ADDED: 'Лицевой счет успешно добавлен',
     
-    // Ошибки API
+    // 🆕 Ошибки API с улусами
     NETWORK_ERROR: 'Ошибка сети. Проверьте подключение к интернету',
+    ULUSES_LOAD_ERROR: 'Не удалось загрузить список улусов',
     SETTLEMENTS_LOAD_ERROR: 'Не удалось загрузить список населенных пунктов',
     STREETS_LOAD_ERROR: 'Не удалось загрузить список улиц',
     HOUSES_LOAD_ERROR: 'Не удалось загрузить список домов',
@@ -154,9 +157,10 @@ export const ADD_LICS_CONSTANTS = {
   }
 } as const;
 
-// Константы для API эндпоинтов
+// 🆕 Обновленные константы для API эндпоинтов с поддержкой улусов
 export const ADD_LICS_API_ENDPOINTS = {
   ADD_ACCOUNT: 'AddAccount',
+  GET_ULUSES: 'getUluses',           // Новый эндпоинт для улусов
   GET_SETTLEMENTS: 'getSettlements',
   GET_STREETS: 'getStreets',
   GET_HOUSES: 'getHouses'
@@ -205,8 +209,16 @@ export const ADD_LICS_ICONS = {
   LOADING: 'hourglass'
 } as const;
 
-// Порядок полей в формах (для табуляции)
+// 🆕 Обновленный порядок полей в формах с поддержкой улусов
 export const ADD_LICS_FIELD_ORDER = {
   BY_CODE: ['lc', 'fio'] as Array<keyof AddLicByCodeData>,
-  BY_ADDRESS: ['settlementId', 'streetId', 'houseId', 'apartment', 'lc', 'fio'] as Array<keyof AddLicByAddressData>
+  BY_ADDRESS: [
+    'ulusId',         // 🆕 Сначала выбор улуса
+    'settlementId', 
+    'streetId', 
+    'houseId', 
+    'apartment', 
+    'lc', 
+    'fio'
+  ] as Array<keyof AddLicByAddressData>
 } as const;
