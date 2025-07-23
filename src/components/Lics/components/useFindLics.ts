@@ -360,6 +360,7 @@ export function useFindLics(): UseFindLicsReturn {
 
   // 🆕 Выбор улуса - просто устанавливает выбранный улус
   const selectUlus = useCallback((ulus: UlusWithSettlements): void => {
+    console.log( ulus )
     dispatch({ type: 'SELECT_ULUS', ulus });
   }, []);
 

@@ -1,6 +1,6 @@
 // src/components/Lics/components/FindLic.tsx
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   IonCard,
   IonButton,
@@ -59,9 +59,41 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
     house: false
   });
 
+  // Ref для контейнера dropdown'ов
+  const dropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+
+  // Закрытие dropdown'ов при клике вне их
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      let shouldClose = false;
+      
+      Object.keys(dropdownOpen).forEach(key => {
+        if (dropdownOpen[key as keyof typeof dropdownOpen] && dropdownRefs.current[key]) {
+          if (!dropdownRefs.current[key]?.contains(event.target as Node)) {
+            shouldClose = true;
+          }
+        }
+      });
+
+      if (shouldClose) {
+        setDropdownOpen({
+          ulus: false,
+          settlement: false,
+          street: false,
+          house: false
+        });
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
   // Функция для обновления текста поиска
   const updateSearchText = (field: keyof typeof searchTexts, value: string) => {
-    setSearchTexts(prev => ({ ...prev, [field]: value }));
+    setSearchTexts(prev => ({ ...prev, [field]: value || '' }));
     // Автоматически открываем dropdown при вводе текста
     setDropdownOpen(prev => ({ ...prev, [field]: true }));
   };
@@ -81,21 +113,29 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
 
   // Фильтрованные данные
   const filteredData = useMemo(() => {
-    const ulusFiltered = state.ulusesData.filter(ulus =>
-      ulus.ulus.toLowerCase().includes(searchTexts.ulus.toLowerCase())
-    );
+    // Безопасная фильтрация улусов
+    const ulusFiltered = (state.ulusesData || []).filter(ulus => {
+      if (!ulus || !ulus.ulus || !searchTexts.ulus) return true;
+      return ulus.ulus.toLowerCase().includes(searchTexts.ulus.toLowerCase());
+    });
 
-    const settlementsFiltered = state.settlements.filter(settlement =>
-      settlement.name.toLowerCase().includes(searchTexts.settlement.toLowerCase())
-    );
+    // Безопасная фильтрация населенных пунктов
+    const settlementsFiltered = (state.settlements || []).filter(settlement => {
+      if (!settlement || !settlement.name || !searchTexts.settlement) return true;
+      return settlement.name.toLowerCase().includes(searchTexts.settlement.toLowerCase());
+    });
 
-    const streetsFiltered = (state.selectedSettlement?.streets || []).filter(street =>
-      street.name.toLowerCase().includes(searchTexts.street.toLowerCase())
-    );
+    // Безопасная фильтрация улиц
+    const streetsFiltered = (state.selectedSettlement?.streets || []).filter(street => {
+      if (!street || !street.name || !searchTexts.street) return true;
+      return street.name.toLowerCase().includes(searchTexts.street.toLowerCase());
+    });
 
-    const housesFiltered = (state.selectedStreet?.houses || []).filter(house =>
-      house.number.toLowerCase().includes(searchTexts.house.toLowerCase())
-    );
+    // Безопасная фильтрация домов
+    const housesFiltered = (state.selectedStreet?.houses || []).filter(house => {
+      if (!house || !house.number || !searchTexts.house) return true;
+      return house.number.toLowerCase().includes(searchTexts.house.toLowerCase());
+    });
 
     return {
       uluses: ulusFiltered,
@@ -136,15 +176,25 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
     additionalInfo?: string;
   }) => {
     const handleSelect = (item: any) => {
-      onSelect(item);
-      setSearchTexts(prev => ({ ...prev, [field]: getDisplayText(item) }));
-      setDropdownOpen(prev => ({ ...prev, [field]: false }));
+      if (!item) return;
+      
+      try {
+        onSelect(item);
+        const displayText = getDisplayText(item);
+        setSearchTexts(prev => ({ ...prev, [field]: displayText || '' }));
+        setDropdownOpen(prev => ({ ...prev, [field]: false }));
+      } catch (error) {
+        console.error('Error selecting item:', error);
+      }
     };
 
     const clearSelection = () => {
       setSearchTexts(prev => ({ ...prev, [field]: '' }));
-      // Здесь нужно будет добавить логику сброса выбора в основном state
+      setDropdownOpen(prev => ({ ...prev, [field]: false }));
     };
+
+    const currentSearchText = searchTexts[field] || '';
+    const safeItems = items || [];
 
     return (
       <div className="find-lic-form-section">
@@ -157,21 +207,24 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
             )}
           </label>
           
-          <div className={`find-lic-dropdown ${dropdownOpen[field] ? 'open' : ''}`}>
+          <div 
+            className={`find-lic-dropdown ${dropdownOpen[field] ? 'open' : ''}`}
+            ref={(el) => { dropdownRefs.current[field] = el; }}
+          >
             {/* Поле ввода с кнопкой */}
             <div className="find-lic-dropdown-input-container">
               <input
                 type="text"
                 className="find-lic-dropdown-input"
                 placeholder={selectedItem ? getDisplayText(selectedItem) : placeholder}
-                value={searchTexts[field]}
+                value={currentSearchText}
                 onChange={(e) => updateSearchText(field, e.target.value)}
                 onFocus={() => setDropdownOpen(prev => ({ ...prev, [field]: true }))}
                 disabled={isDisabled}
               />
               
               <div className="find-lic-dropdown-buttons">
-                {searchTexts[field] && (
+                {currentSearchText && (
                   <button
                     type="button"
                     className="find-lic-dropdown-clear"
@@ -193,28 +246,37 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
             {/* Выпадающий список */}
             {dropdownOpen[field] && (
               <div className="find-lic-dropdown-list">
-                {items.length === 0 ? (
+                {safeItems.length === 0 ? (
                   <div className="find-lic-dropdown-no-results">
                     <IonIcon icon={alertCircleOutline} />
                     Ничего не найдено
                   </div>
                 ) : (
-                  items.map((item) => (
-                    <div
-                      key={getKey(item)}
-                      className={`find-lic-dropdown-item ${
-                        selectedItem && getKey(selectedItem) === getKey(item) ? 'selected' : ''
-                      }`}
-                      onClick={() => handleSelect(item)}
-                    >
-                      <span className="find-lic-dropdown-item-text">
-                        {getDisplayText(item)}
-                      </span>
-                      {selectedItem && getKey(selectedItem) === getKey(item) && (
-                        <IonIcon icon={checkmarkCircleOutline} className="find-lic-dropdown-item-icon" />
-                      )}
-                    </div>
-                  ))
+                  safeItems.map((item) => {
+                    try {
+                      const key = getKey(item);
+                      const displayText = getDisplayText(item);
+                      const isSelected = selectedItem && getKey(selectedItem) === key;
+                      
+                      return (
+                        <div
+                          key={key}
+                          className={`find-lic-dropdown-item ${isSelected ? 'selected' : ''}`}
+                          onClick={() => handleSelect(item)}
+                        >
+                          <span className="find-lic-dropdown-item-text">
+                            {displayText}
+                          </span>
+                          {isSelected && (
+                            <IonIcon icon={checkmarkCircleOutline} className="find-lic-dropdown-item-icon" />
+                          )}
+                        </div>
+                      );
+                    } catch (error) {
+                      console.error('Error rendering item:', error, item);
+                      return null;
+                    }
+                  })
                 )}
               </div>
             )}
@@ -295,8 +357,12 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
         selectedItem={state.selectedUlus}
         onSelect={selectUlus}
         placeholder="Начните вводить название улуса..."
-        getDisplayText={(ulus) => `${ulus.ulus}${ulus.settlements.length >= 3 ? ` (${ulus.settlements.length} нас. пунктов)` : ''}`}
-        getKey={(ulus) => ulus.ulus}
+        getDisplayText={(ulus) => {
+          if (!ulus || !ulus.ulus) return '';
+          const count = ulus.settlements?.length || 0;
+          return count >= 3 ? `${ulus.ulus} (${count} нас. пунктов)` : ulus.ulus;
+        }}
+        getKey={(ulus) => ulus?.ulus || ''}
       />
     );
   };
@@ -312,8 +378,8 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
         selectedItem={state.selectedSettlement}
         onSelect={selectSettlement}
         placeholder="Начните вводить название населенного пункта..."
-        getDisplayText={(settlement) => settlement.name}
-        getKey={(settlement) => settlement.s_id}
+        getDisplayText={(settlement) => settlement?.name || ''}
+        getKey={(settlement) => settlement?.s_id || ''}
         additionalInfo={state.selectedUlus ? `в улусе ${state.selectedUlus.ulus}` : ''}
       />
     );
@@ -339,8 +405,8 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
         selectedItem={state.selectedStreet}
         onSelect={selectStreet}
         placeholder="Начните вводить название улицы..."
-        getDisplayText={(street) => street.name}
-        getKey={(street) => street.ids}
+        getDisplayText={(street) => street?.name || ''}
+        getKey={(street) => street?.ids || ''}
         additionalInfo={state.selectedSettlement ? `в ${state.selectedSettlement.name}` : ''}
       />
     );
@@ -366,8 +432,8 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
         selectedItem={state.selectedHouse}
         onSelect={selectHouse}
         placeholder="Начните вводить номер дома..."
-        getDisplayText={(house) => house.number}
-        getKey={(house) => house.id}
+        getDisplayText={(house) => house?.number || ''}
+        getKey={(house) => house?.id || ''}
         additionalInfo={state.selectedStreet ? `на ${state.selectedStreet.name}` : ''}
       />
     );
