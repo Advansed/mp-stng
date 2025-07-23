@@ -1,0 +1,655 @@
+/* src/components/Lics/components/FindLic.css */
+
+/* ========================
+   FINDLIC CSS ОФОРМЛЕНИЕ
+   ======================== */
+
+/* Основные переменные цветов */
+:root {
+    --findlic-primary: #3f64a9;
+    --findlic-primary-dark: #2d4a8a;
+    --findlic-primary-light: #5a7bc8;
+    --findlic-secondary: #e5f1f8;
+    --findlic-accent: #1B80B9;
+    --findlic-success: #28a745;
+    --findlic-warning: #f5f1b6;
+    --findlic-error: #dc3545;
+    --findlic-white: #ffffff;
+    --findlic-light-gray: #f8f9fa;
+    --findlic-border: #e0e0e0;
+    --findlic-text: #333333;
+    --findlic-text-light: #666666;
+    --findlic-shadow: rgba(63, 100, 169, 0.15);
+    --findlic-shadow-hover: rgba(63, 100, 169, 0.25);
+}
+
+/* ========================
+   ОСНОВНОЙ КОНТЕЙНЕР
+   ======================== */
+
+.find-lic-container {
+    background: linear-gradient(156.39deg, #1B80B9 7.75%, #0E3977 100.99%);
+    min-height: 100vh;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Паттерн фона */
+.find-lic-container::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background-image: url('../../pattern.png');
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: cover;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ========================
+   ЗАГОЛОВОК
+   ======================== */
+
+.find-lic-header {
+    text-align: center;
+    padding: 20px 0 40px 0;
+    position: relative;
+    z-index: 10;
+}
+
+.find-lic-title {
+    color: var(--findlic-white);
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.find-lic-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-top: 8px;
+    font-weight: 400;
+}
+
+/* ========================
+   КАРТОЧКА ФОРМЫ
+   ======================== */
+
+.find-lic-card {
+    background: var(--findlic-white);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    margin: 0 auto;
+    max-width: 500px;
+    position: relative;
+    z-index: 5;
+}
+
+/* ========================
+   ИНДИКАТОР ПРОГРЕССА
+   ======================== */
+
+.find-lic-progress {
+    margin-bottom: 30px;
+}
+
+.find-lic-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 20px;
+}
+
+.find-lic-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.find-lic-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--findlic-border);
+    z-index: 1;
+}
+
+.find-lic-step.completed:not(:last-child)::after {
+    background: var(--findlic-success);
+}
+
+.find-lic-step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--findlic-white);
+    background: var(--findlic-border);
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.find-lic-step.active .find-lic-step-circle {
+    background: var(--findlic-primary);
+    transform: scale(1.1);
+}
+
+.find-lic-step.completed .find-lic-step-circle {
+    background: var(--findlic-success);
+}
+
+.find-lic-step-label {
+    font-size: 12px;
+    color: var(--findlic-text-light);
+    margin-top: 8px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.find-lic-step.active .find-lic-step-label {
+    color: var(--findlic-primary);
+    font-weight: 600;
+}
+
+/* ========================
+   СЕКЦИИ ФОРМЫ
+   ======================== */
+
+.find-lic-form-section {
+    margin-bottom: 25px;
+}
+
+.find-lic-section-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: var(--findlic-primary);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.find-lic-section-icon {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+/* ========================
+   ЭЛЕМЕНТЫ ФОРМЫ
+   ======================== */
+
+.find-lic-form-group {
+    margin-bottom: 20px;
+}
+
+.find-lic-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--findlic-text);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.find-lic-input,
+.find-lic-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--findlic-border);
+    border-radius: 12px;
+    font-size: 16px;
+    color: var(--findlic-text);
+    background: var(--findlic-white);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.find-lic-input:focus,
+.find-lic-select:focus {
+    outline: none;
+    border-color: var(--findlic-primary);
+    box-shadow: 0 0 0 3px rgba(63, 100, 169, 0.1);
+}
+
+.find-lic-input:hover,
+.find-lic-select:hover {
+    border-color: var(--findlic-primary-light);
+}
+
+.find-lic-input::placeholder {
+    color: var(--findlic-text-light);
+}
+
+/* Стили для select */
+.find-lic-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.find-lic-select:disabled {
+    background-color: var(--findlic-light-gray);
+    color: var(--findlic-text-light);
+    cursor: not-allowed;
+}
+
+/* ========================
+   СОСТОЯНИЯ ЗАГРУЗКИ
+   ======================== */
+
+.find-lic-loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--findlic-text-light);
+}
+
+.find-lic-loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--findlic-border);
+    border-radius: 50%;
+    border-top-color: var(--findlic-primary);
+    animation: find-lic-spin 1s ease-in-out infinite;
+}
+
+@keyframes find-lic-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================
+   СООБЩЕНИЯ
+   ======================== */
+
+.find-lic-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.find-lic-message-icon {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.find-lic-message.success {
+    background: rgba(40, 167, 69, 0.1);
+    color: var(--findlic-success);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.find-lic-message.error {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--findlic-error);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.find-lic-message.warning {
+    background: rgba(255, 193, 7, 0.1);
+    color: #856404;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+/* ========================
+   КНОПКИ
+   ======================== */
+
+.find-lic-button-section {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.find-lic-button {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+}
+
+.find-lic-button-primary {
+    background: var(--findlic-primary);
+    color: var(--findlic-white);
+}
+
+.find-lic-button-primary:hover:not(:disabled) {
+    background: var(--findlic-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--findlic-shadow-hover);
+}
+
+.find-lic-button-primary:active {
+    transform: translateY(0);
+}
+
+.find-lic-button-secondary {
+    background: transparent;
+    color: var(--findlic-primary);
+    border: 2px solid var(--findlic-primary);
+}
+
+.find-lic-button-secondary:hover:not(:disabled) {
+    background: var(--findlic-primary);
+    color: var(--findlic-white);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--findlic-shadow);
+}
+
+.find-lic-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.find-lic-button-icon {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* ========================
+   ВЫБОР ЭЛЕМЕНТОВ СПИСКА
+   ======================== */
+
+.find-lic-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--findlic-border);
+    border-radius: 12px;
+    background: var(--findlic-white);
+}
+
+.find-lic-list-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--findlic-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.find-lic-list-item:last-child {
+    border-bottom: none;
+}
+
+.find-lic-list-item:hover {
+    background: var(--findlic-secondary);
+}
+
+.find-lic-list-item.selected {
+    background: var(--findlic-primary);
+    color: var(--findlic-white);
+}
+
+.find-lic-list-item-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.find-lic-list-item-icon {
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+/* ========================
+   АДАПТИВНОСТЬ
+   ======================== */
+
+@media (max-width: 768px) {
+    .find-lic-container {
+        padding: 15px;
+    }
+    
+    .find-lic-card {
+        padding: 20px;
+    }
+    
+    .find-lic-title {
+        font-size: 24px;
+    }
+    
+    .find-lic-steps {
+        padding: 0 10px;
+    }
+    
+    .find-lic-step-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    
+    .find-lic-step-label {
+        font-size: 10px;
+    }
+    
+    .find-lic-button-section {
+        flex-direction: column;
+    }
+    
+    .find-lic-button {
+        flex: none;
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .find-lic-input,
+    .find-lic-select {
+        font-size: 16px; /* Предотвращает зум на iOS */
+    }
+}
+
+@media (max-width: 480px) {
+    .find-lic-section-title {
+        font-size: 16px;
+    }
+    
+    .find-lic-steps {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .find-lic-step {
+        flex: 1 1 calc(50% - 5px);
+        margin-bottom: 15px;
+    }
+    
+    .find-lic-step:not(:last-child)::after {
+        display: none;
+    }
+    
+    .find-lic-button-section {
+        gap: 8px;
+    }
+}
+
+/* ========================
+   АНИМАЦИИ
+   ======================== */
+
+.find-lic-fade-in {
+    animation: findLicFadeIn 0.5s ease-out;
+}
+
+@keyframes findLicFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.find-lic-slide-up {
+    animation: findLicSlideUp 0.3s ease-out;
+}
+
+@keyframes findLicSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================
+   ДОПОЛНИТЕЛЬНЫЕ УТИЛИТЫ
+   ======================== */
+
+.find-lic-spacer {
+    height: 20px;
+}
+
+.find-lic-divider {
+    border: none;
+    height: 1px;
+    background: var(--findlic-border);
+    margin: 20px 0;
+}
+
+.find-lic-text-center {
+    text-align: center;
+}
+
+.find-lic-text-muted {
+    color: var(--findlic-text-light);
+}
+
+.find-lic-hidden {
+    display: none;
+}
+
+.find-lic-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ========================
+   ИНТЕГРАЦИЯ С IONIC
+   ======================== */
+
+/* Переопределение стилей Ionic для лучшей интеграции */
+.find-lic-container.ion-content {
+    --background: transparent;
+}
+
+.find-lic-container ion-loading {
+    --backdrop-opacity: 0.5;
+    --spinner-color: var(--findlic-primary);
+}
+
+/* Стили для ion-icon внутри компонента */
+.find-lic-card ion-icon {
+    vertical-align: middle;
+}
+
+/* ========================
+   ТЕМНАЯ ТЕМА (ОПЦИОНАЛЬНО)
+   ======================== */
+
+@media (prefers-color-scheme: dark) {
+    .find-lic-container.dark-theme {
+        --findlic-white: #1a1a1a;
+        --findlic-light-gray: #2a2a2a;
+        --findlic-border: #404040;
+        --findlic-text: #ffffff;
+        --findlic-text-light: #cccccc;
+        --findlic-secondary: #2a4a6b;
+    }
+    
+    .find-lic-container.dark-theme .find-lic-card {
+        background: var(--findlic-white);
+        color: var(--findlic-text);
+    }
+    
+    .find-lic-container.dark-theme .find-lic-input,
+    .find-lic-container.dark-theme .find-lic-select {
+        background: var(--findlic-white);
+        color: var(--findlic-text);
+        border-color: var(--findlic-border);
+    }
+}
+
+/* ========================
+   ACCESSIBILITY
+   ======================== */
+
+/* Улучшенный фокус для доступности */
+.find-lic-input:focus,
+.find-lic-select:focus,
+.find-lic-button:focus {
+    outline: 2px solid var(--findlic-primary);
+    outline-offset: 2px;
+}
+
+/* Высокий контраст для пользователей с нарушениями зрения */
+@media (prefers-contrast: high) {
+    .find-lic-input,
+    .find-lic-select {
+        border-width: 3px;
+    }
+    
+    .find-lic-button {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Уменьшенная анимация для пользователей с чувствительностью к движению */
+@media (prefers-reduced-motion: reduce) {
+    .find-lic-fade-in,
+    .find-lic-slide-up {
+        animation: none;
+    }
+    
+    .find-lic-button,
+    .find-lic-input,
+    .find-lic-select,
+    .find-lic-step-circle {
+        transition: none;
+    }
+}
