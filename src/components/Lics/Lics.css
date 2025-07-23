@@ -3,7 +3,7 @@
 
 /* Базовые стили (для мобильного приложения) */
 .l-fon {
-    background-image: url('pattern.png');
+    background-image: url('../pattern.png');
 }
 
 .fone {
