@@ -2,13 +2,31 @@
 
 import { Lics } from './Lics';
 
+// ========================
+// ОСНОВНЫЕ КОМПОНЕНТЫ
+// ========================
+
 // Основной компонент
 export { Lics } from './Lics';
 
-// Кастомный хук
+// Новый объединенный компонент AddLics
+export { AddLics } from './components/AddLics';
+
+// ========================
+// ХУКИ
+// ========================
+
+// Основной хук
 export { useLics } from './useLics';
 
-// Типы и интерфейсы
+// Новый хук для AddLics
+export { useAddLics } from './components/useAddLics';
+
+// ========================
+// ТИПЫ И ИНТЕРФЕЙСЫ
+// ========================
+
+// Существующие типы
 export type {
   LicsItem,
   LicsCounter,
@@ -24,10 +42,42 @@ export type {
   IndicesProps
 } from './components/types';
 
-// Enum для страниц
+// Новые типы для AddLics
+export type {
+  AddLicByCodeData,
+  AddLicByAddressData,
+  Settlement,
+  Street,
+  House,
+  AddLicsState,
+  AddLicsProps,
+  ModeSelectionProps,
+  CodeFormProps,
+  AddressFormProps,
+  ActionButtonsProps,
+  UseAddLicsReturn,
+  ApiResponse,
+  AddAccountParams,
+  GetSettlementsResponse,
+  GetStreetsResponse,
+  GetHousesResponse
+} from './components/types';
+
+// ========================
+// ENUMS
+// ========================
+
+// Enum для страниц (обновленный)
 export { LicsPage } from './components/types';
 
-// Константы
+// Новый enum для режимов AddLics
+export { AddLicMode } from './components/types';
+
+// ========================
+// КОНСТАНТЫ
+// ========================
+
+// Существующие константы
 export {
   LICS_SUBSCRIPTION_IDS,
   LICS_PAGE_NAMES,
@@ -37,8 +87,40 @@ export {
   DEBUG_PREFIXES
 } from './components/constants';
 
-// Вспомогательные функции (если понадобятся в будущем)
-//export type { WidgetParams } from './Lics';
+// Новые константы для AddLics
+export {
+  ADD_LICS_CONSTANTS,
+  ADD_LICS_API_ENDPOINTS,
+  ADD_LICS_CSS_CLASSES,
+  ADD_LICS_ICONS,
+  ADD_LICS_FIELD_ORDER
+} from './components/constants';
+
+// ========================
+// ПОДКОМПОНЕНТЫ ADDLICS
+// (пока закомментированы, создадим на следующих шагах)
+// ========================
+
+// export { ModeSelection } from './components/AddLics/ModeSelection';
+// export { CodeForm } from './components/AddLics/CodeForm';
+// export { AddressForm } from './components/AddLics/AddressForm';
+// export { ActionButtons } from './components/AddLics/ActionButtons';
+
+// ========================
+// ДЕФОЛТНЫЙ ЭКСПОРТ
+// ========================
 
 // Дефолтный экспорт - основной компонент
 export default Lics;
+
+// ========================
+// КОММЕНТАРИИ ДЛЯ БУДУЩИХ ЭКСПОРТОВ
+// ========================
+
+// При создании подкомпонентов AddLics раскомментировать:
+// export type { ModeSelectionProps, CodeFormProps, AddressFormProps, ActionButtonsProps } from './components/types';
+// export { ModeSelection, CodeForm, AddressForm, ActionButtons } from './components/AddLics';
+
+// При создании утилит добавить:
+// export { validateLicNumber, validateFIO, formatLicNumber } from './components/utils/validation';
+// export { formatAddress, formatSettlementName } from './components/utils/formatting';
