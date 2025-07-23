@@ -6,6 +6,9 @@ import { alertCircleOutline, cardOutline, chevronForwardOutline, codeWorkingOutl
 import { PDFDoc } from '../Files'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
+import { useLics } from './useLics'
+import { LicsPage } from './components/types'
+import { DEBUG_PREFIXES } from './components/constants'
 
 type WidgetParams = {
     bankInvoiceId: string;
@@ -33,70 +36,68 @@ const               openUrl = async (url) =>{
     await Browser.open({ url: url })
 }
 
+export function     Lics(): JSX.Element {
+    // Используем кастомный хук вместо useState и useEffect
+    const {
+        info,
+        upd,
+        page,
+        item,
+        setPage,
+        setItem,
+        handleBackNavigation,
+        refreshLics,
+        getCurrentPageName
+    } = useLics();
 
-export function     Lics() {
-    const [ info,   setInfo ]   = useState<any>([])
-    const [ upd,    setUpd ]    = useState( 0 )
-    const [ page,   setPage ]   = useState( 0 )
-    const [ item,   setItem ]   = useState<any>()
-
-    Store.subscribe({num : 22, type: "lics", func: ()=>{
-        setInfo( Store.getState().lics )
-        setUpd( upd + 1)
-        console.log( "subscribe lics ")
-    } })
-
-    Store.subscribe({num : 404, type: "back", func: ()=>{
-
-        switch (page) {
-
-            case  0: Store.dispatch({type: "route", route: "back"}); break;
-            case  1: setPage(0); break;
-            case  2: setPage(0); break;
-            case  3: setPage(0); break;
-            case  4: setPage(0); break;
-            case  5: setPage(0); break;
-            case  6: setPage(0); break;
-            case  7: setPage(0); break;
-            case  8: setPage(0); break;
-            case  9: setPage(6); break;
-            case 10: setPage(0); break;
-            default: Store.dispatch({type: "route", route: "back"})
-
-        }    
-    } })
-
-    useEffect(()=>{
-
-        setInfo( Store.getState().lics )
-
-        return ()=>{ 
-            Store.unSubscribe( 404 ) 
-            Store.unSubscribe( 22 ) 
+    // Рендеринг компонентов на основе текущей страницы
+    const renderPageComponent = (): JSX.Element => {
+        try {
+            switch(page) {
+                case LicsPage.MAIN:
+                    return (
+                        <>
+                            <Items info={info} setItem={setItem} setPage={setPage} />
+                            <AddLic setPage={setPage} />
+                        </>
+                    );
+                case LicsPage.ADD_LIC_1:
+                    return <AddLic1 setPage={setPage} />;
+                case LicsPage.ADD_LIC_2:
+                    return <AddLic2 setPage={setPage} />;
+                case LicsPage.HISTORY:
+                    return <History item={item} />;
+                case LicsPage.PAYMENTS:
+                    return <Payments item={item} setPage={setPage} />;
+                case LicsPage.PAYMENTS_TO:
+                    return <PaymentsTO item={item} setPage={setPage} />;
+                case LicsPage.INDICES:
+                    return <Indices item={item} setPage={setPage} />;
+                case LicsPage.EQUARING:
+                    return <Equaring item={item} setPage={setPage} />;
+                case LicsPage.SBER_PAY:
+                    return <SberPay item={item} setPage={setPage} />;
+                case LicsPage.HISTORY_INDICES:
+                    return <HistoryIndices item={item} />;
+                case LicsPage.ALFA_BANK:
+                    return <AlfaBank item={item} setPage={setPage} />;
+                default:
+                    console.warn(`${DEBUG_PREFIXES.LICS} Unknown page: ${page}`);
+                    return <></>;
+            }
+        } catch (error) {
+            console.error(`${DEBUG_PREFIXES.ERROR} Error rendering page component:`, error);
+            return <></>;
         }
-    },[])
+    };
 
+    console.log(`${DEBUG_PREFIXES.LICS} Rendering page: ${getCurrentPageName()}`);
 
-    let elem = <></>
-
-    switch(page) {
-        case 0:     elem = <> <Items info = { info } setItem = { setItem } setPage = { setPage } /><AddLic setPage = { setPage } /> </>; break // main
-        case 1:     elem = <AddLic1 setPage={ setPage }/>; break // Добавить лицевой счет 1 способ
-        case 2:     elem = <AddLic2 setPage={ setPage }/>; break // Добавить лицевой счет 2 способ
-        case 3:     elem = <History item = { item }/>; break // История
-        case 4:     elem = <Payments item = { item } setPage = { setPage }/>; break // Оплата за газ
-        case 5:     elem = <PaymentsTO item = { item } setPage = { setPage }/>; break // Оплата за ТО
-        case 6:     elem = <Indices item = { item } setPage = { setPage }/>; break // Показания
-        case 7:     elem = <Equaring item = { item } setPage={ setPage }/>; break // Страница оплаты сайт
-        case 8:     elem = <SberPay  item =  { item } setPage = { setPage }/>; break // сберPay
-        case 9:     elem = <HistoryIndices item = { item } />; break // История показаний
-        case 10:    elem = <AlfaBank item={item} setPage={ setPage } />; break // НОВАЯ СТРАНИЦА        
-        default: <></>
-    }
-
-    return <>
-        { elem }
-    </>
+    return (
+        <>
+            {renderPageComponent()}
+        </>
+    );
 }
 
 async function      Add( params, setMessage, setPage ){
