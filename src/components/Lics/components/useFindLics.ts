@@ -5,6 +5,7 @@ import { Store, getData, getLics, getProfile } from '../../Store';
 import { 
   FindLicState, 
   FindLicData, 
+  UlusWithSettlements,
   Settlement, 
   Street, 
   House, 
@@ -21,6 +22,8 @@ import { FIND_LIC_CONSTANTS, DEBUG_PREFIXES } from './constants';
 type FindLicAction = 
   | { type: 'SET_LOADING'; loading: boolean; step?: string }
   | { type: 'SET_MESSAGE'; message: string }
+  | { type: 'SET_ULUSES_DATA'; ulusesData: UlusWithSettlements[] }    // 🆕
+  | { type: 'SELECT_ULUS'; ulus: UlusWithSettlements }                // 🆕
   | { type: 'SET_SETTLEMENTS'; settlements: Settlement[] }
   | { type: 'SELECT_SETTLEMENT'; settlement: Settlement }
   | { type: 'SET_STREETS'; streets: Street[] }
@@ -48,6 +51,38 @@ function findLicReducer(state: FindLicState, action: FindLicAction): FindLicStat
       return {
         ...state,
         message: action.message
+      };
+
+    // 🆕 Обработка загрузки улусов с поселениями
+    case 'SET_ULUSES_DATA':
+      return {
+        ...state,
+        ulusesData: action.ulusesData,
+        loading: false,
+        loadingStep: null,
+        currentStep: Math.max(state.currentStep, FIND_LIC_CONSTANTS.STEPS.ULUS)
+      };
+
+    // 🆕 Обработка выбора улуса
+    case 'SELECT_ULUS':
+      return {
+        ...state,
+        selectedUlus: action.ulus,
+        settlements: action.ulus.settlements,  // 🔑 Устанавливаем поселения из выбранного улуса
+        selectedSettlement: undefined,
+        selectedStreet: undefined,
+        selectedHouse: undefined,
+        formData: {
+          ...state.formData,
+          ulusName: action.ulus.ulus,
+          settlementId: '',
+          settlementName: '',
+          streetId: '',
+          streetName: '',
+          houseId: '',
+          houseNumber: ''
+        },
+        currentStep: Math.max(state.currentStep, FIND_LIC_CONSTANTS.STEPS.SETTLEMENT)
       };
 
     case 'SET_SETTLEMENTS':
@@ -144,7 +179,7 @@ function findLicReducer(state: FindLicState, action: FindLicAction): FindLicStat
     case 'RESET_FORM':
       return {
         ...initialState,
-        settlements: state.settlements // Сохраняем загруженные населенные пункты
+        ulusesData: state.ulusesData // Сохраняем загруженные данные улусов
       };
 
     default:
@@ -157,6 +192,8 @@ function findLicReducer(state: FindLicState, action: FindLicAction): FindLicStat
 // ========================
 
 const initialState: FindLicState = {
+  ulusesData: [],          // 🆕
+  selectedUlus: undefined, // 🆕
   settlements: [],
   selectedSettlement: undefined,
   selectedStreet: undefined,
@@ -172,14 +209,16 @@ const initialState: FindLicState = {
 // API FUNCTIONS
 // ========================
 
-async function getSettlementsApi(token: string): Promise<Settlement[]> {
+// 🔄 Обновленная функция getSettlementsApi - теперь возвращает улусы с поселениями
+async function getSettlementsApi(token: string): Promise<UlusWithSettlements[]> {
   try {
     const response: ApiResponse = await getData('getSettlements', { token });
     
     if (response.error) {
-      throw new Error(response.message || 'Ошибка загрузки населенных пунктов');
+      throw new Error(response.message || 'Ошибка загрузки данных');
     }
     
+    // 🔑 API возвращает массив объектов вида: [{ulus, settlements: [{s_id, settlement}...]}...]
     return response.data || [];
   } catch (error) {
     console.error(`${DEBUG_PREFIXES.ERROR} Error loading settlements:`, error);
@@ -269,6 +308,7 @@ function validateFIO(value: string): boolean {
 
 function validateFormData(formData: FindLicData): boolean {
   return (
+    !!formData.ulusName &&          // 🆕 Проверка улуса
     !!formData.settlementId &&
     !!formData.streetId &&
     !!formData.houseId &&
@@ -295,30 +335,35 @@ export function useFindLics(): UseFindLicsReturn {
     }
   }, []);
 
-  // Загрузка населенных пунктов
+  // 🔄 Обновленная загрузка - теперь загружает улусы с поселениями
   const loadSettlements = useCallback(async (): Promise<void> => {
     try {
       dispatch({ type: 'SET_LOADING', loading: true, step: FIND_LIC_CONSTANTS.MESSAGES.LOADING_SETTLEMENTS });
       dispatch({ type: 'SET_MESSAGE', message: '' });
 
-      const settlements = await getSettlementsApi(getToken());
+      const ulusesData = await getSettlementsApi(getToken());
       
-      dispatch({ type: 'SET_SETTLEMENTS', settlements });
+      dispatch({ type: 'SET_ULUSES_DATA', ulusesData });
       
-      if (settlements.length === 0) {
-        dispatch({ type: 'SET_MESSAGE', message: 'Населенные пункты не найдены' });
+      if (ulusesData.length === 0) {
+        dispatch({ type: 'SET_MESSAGE', message: 'Данные не найдены' });
       }
     } catch (error) {
       console.error(`${DEBUG_PREFIXES.ERROR} Error in loadSettlements:`, error);
       dispatch({ type: 'SET_LOADING', loading: false });
       dispatch({ 
         type: 'SET_MESSAGE', 
-        message: error instanceof Error ? error.message : 'Ошибка загрузки населенных пунктов' 
+        message: error instanceof Error ? error.message : 'Ошибка загрузки данных' 
       });
     }
   }, [getToken]);
 
-  // Выбор населенного пункта
+  // 🆕 Выбор улуса - просто устанавливает выбранный улус
+  const selectUlus = useCallback((ulus: UlusWithSettlements): void => {
+    dispatch({ type: 'SELECT_ULUS', ulus });
+  }, []);
+
+  // 🔄 selectSettlement остается без изменений - работает с settlements из state
   const selectSettlement = useCallback(async (settlement: Settlement): Promise<void> => {
     try {
       dispatch({ type: 'SELECT_SETTLEMENT', settlement });
@@ -337,7 +382,7 @@ export function useFindLics(): UseFindLicsReturn {
       dispatch({ type: 'SET_LOADING', loading: false });
       dispatch({ 
         type: 'SET_MESSAGE', 
-        message: error instanceof Error ? error.message : 'Ошибка загрузки улиц' 
+        message: error instanceof Error ? error.message : 'Ошибка выбора населенного пункта' 
       });
     }
   }, [getToken]);
@@ -361,7 +406,7 @@ export function useFindLics(): UseFindLicsReturn {
       dispatch({ type: 'SET_LOADING', loading: false });
       dispatch({ 
         type: 'SET_MESSAGE', 
-        message: error instanceof Error ? error.message : 'Ошибка загрузки домов' 
+        message: error instanceof Error ? error.message : 'Ошибка выбора улицы' 
       });
     }
   }, [getToken]);
@@ -369,7 +414,6 @@ export function useFindLics(): UseFindLicsReturn {
   // Выбор дома
   const selectHouse = useCallback((house: House): void => {
     dispatch({ type: 'SELECT_HOUSE', house });
-    dispatch({ type: 'SET_MESSAGE', message: FIND_LIC_CONSTANTS.MESSAGES.FILL_FORM });
   }, []);
 
   // Обновление данных формы
@@ -381,7 +425,7 @@ export function useFindLics(): UseFindLicsReturn {
   const submitForm = useCallback(async (): Promise<boolean> => {
     try {
       if (!validateFormData(state.formData)) {
-        dispatch({ type: 'SET_MESSAGE', message: 'Проверьте корректность заполнения всех полей' });
+        dispatch({ type: 'SET_MESSAGE', message: 'Заполните все обязательные поля' });
         return false;
       }
 
@@ -390,14 +434,12 @@ export function useFindLics(): UseFindLicsReturn {
 
       await addAccountApi(getToken(), state.formData);
 
-      // Обновляем данные в Store
-      await Promise.all([
-        getLics({ token: getToken() }),
-        getProfile({ token: getToken() })
-      ]);
-
       dispatch({ type: 'SET_LOADING', loading: false });
       dispatch({ type: 'SET_MESSAGE', message: FIND_LIC_CONSTANTS.MESSAGES.SUCCESS });
+
+      // Обновляем список лицевых счетов
+      const params = { token: getToken() };
+      getLics(params);
 
       return true;
     } catch (error) {
@@ -405,7 +447,7 @@ export function useFindLics(): UseFindLicsReturn {
       dispatch({ type: 'SET_LOADING', loading: false });
       dispatch({ 
         type: 'SET_MESSAGE', 
-        message: error instanceof Error ? error.message : 'Ошибка при добавлении лицевого счета' 
+        message: error instanceof Error ? error.message : 'Ошибка добавления лицевого счета' 
       });
       return false;
     }
@@ -416,23 +458,17 @@ export function useFindLics(): UseFindLicsReturn {
     dispatch({ type: 'RESET_FORM' });
   }, []);
 
-  // Инициализация - загрузка населенных пунктов при первом использовании
-  const initializeIfNeeded = useCallback((): void => {
-    if (state.settlements.length === 0 && !state.loading && state.currentStep === 0) {
-      loadSettlements();
-    }
-  }, [state.settlements.length, state.loading, state.currentStep, loadSettlements]);
-
-  // Автоинициализация
-  useEffect(() => {
-    initializeIfNeeded();
-  }, [initializeIfNeeded]);
-
-  // Вычисляемые значения
+  // Проверка возможности отправки
   const canSubmit = validateFormData(state.formData) && !state.loading;
+
+  // Загрузка данных при инициализации
+  useEffect(() => {
+    loadSettlements(); // 🔄 Теперь загружает улусы с поселениями
+  }, [loadSettlements]);
 
   return {
     state,
+    selectUlus,        // 🆕
     selectSettlement,
     selectStreet,
     selectHouse,

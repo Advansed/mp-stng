@@ -71,14 +71,21 @@ export interface AddLicByCodeData {
   fio: string;         // ФИО
 }
 
-// 🆕 Шаг 1.1: Добавляем интерфейс для Улуса
+// 🆕 Интерфейс для Улуса
 export interface Ulus {
   ulus_id: string;
   name: string;
   settlements?: Settlement[];
 }
 
-// 🆕 Шаг 1.2: Обновляем данные для добавления по адресу - добавляем улус
+// 🆕 Структура ответа getSettlements с улусами
+export interface UlusWithSettlements {
+  ulus: string;                    // Название улуса
+  ulus_id?: string;               // ID улуса (если есть)
+  settlements: Settlement[];       // Населенные пункты этого улуса
+}
+
+// Обновленные данные для добавления по адресу - добавляем улус
 export interface AddLicByAddressData {
   // 🆕 Новые поля для улуса
   ulusId?: string;
@@ -114,7 +121,7 @@ export interface House {
   number: string;
 }
 
-// 🆕 Шаг 1.3: Обновляем состояние компонента AddLics - добавляем улусы
+// Обновленное состояние компонента AddLics - добавляем улусы
 export interface AddLicsState {
   mode: AddLicMode;
   loading: boolean;
@@ -134,11 +141,12 @@ export interface AddLicsState {
 }
 
 // ========================
-// 🆕 ТИПЫ ДЛЯ FINDLIC
+// 🆕 ТИПЫ ДЛЯ FINDLIC - ОБНОВЛЕННЫЕ С УЛУСАМИ
 // ========================
 
-// Данные формы FindLic
+// 🆕 Данные формы FindLic - добавлен улус
 export interface FindLicData {
+  ulusName?: string;            // 🆕 Название улуса
   settlementId?: string;
   settlementName?: string;
   streetId?: string;
@@ -150,9 +158,11 @@ export interface FindLicData {
   fio: string;                  // ФИО
 }
 
-// Состояние компонента FindLic
+// 🆕 Состояние компонента FindLic - обновлено с улусами
 export interface FindLicState {
-  settlements: Settlement[];
+  ulusesData: UlusWithSettlements[];  // 🆕 Данные улусов с поселениями
+  selectedUlus?: UlusWithSettlements; // 🆕 Выбранный улус
+  settlements: Settlement[];           // Поселения выбранного улуса
   selectedSettlement?: Settlement;
   selectedStreet?: Street;
   selectedHouse?: House;
@@ -160,7 +170,7 @@ export interface FindLicState {
   loading: boolean;
   loadingStep: string | null;   // Какой именно шаг загружается
   message: string;              // Сообщение пользователю
-  currentStep: number;          // Текущий шаг (1-4)
+  currentStep: number;          // Текущий шаг (1-5)
 }
 
 // Props для компонента FindLic
@@ -168,9 +178,10 @@ export interface FindLicProps {
   setPage: SetPageFunction;
 }
 
-// Возвращаемые значения хука useFindLics
+// 🆕 Возвращаемые значения хука useFindLics - обновлено
 export interface UseFindLicsReturn {
   state: FindLicState;
+  selectUlus: (ulus: UlusWithSettlements) => void;        // 🆕 Выбор улуса
   selectSettlement: (settlement: Settlement) => Promise<void>;
   selectStreet: (street: Street) => Promise<void>;
   selectHouse: (house: House) => void;
@@ -241,7 +252,7 @@ export interface CodeFormProps {
   loading: boolean;
 }
 
-// 🆕 Обновляем пропсы AddressForm - добавляем улусы
+// Обновленные пропсы AddressForm - добавляем улусы
 export interface AddressFormProps {
   data: AddLicByAddressData;
   
@@ -318,7 +329,25 @@ export interface ApiResponse<T = any> {
   data?: T;
 }
 
-// 🆕 Обновляем параметры AddAccount - используем правильные как в AddLic2
+// 🆕 Обновленные ответы API
+export interface GetUlusesResponse {
+  uluses: Ulus[];
+}
+
+// 🆕 Обновленный ответ getSettlements с улусами
+export interface GetSettlementsResponse {
+  data: UlusWithSettlements[];    // Массив улусов с поселениями
+}
+
+export interface GetStreetsResponse {
+  streets: Street[];
+}
+
+export interface GetHousesResponse {
+  houses: House[];
+}
+
+// Обновленные параметры AddAccount - используем правильные как в AddLic2
 export interface AddAccountParams {
   token: string;
   LC?: string;          // номер лицевого счета
@@ -329,21 +358,4 @@ export interface AddAccountParams {
   ids?: string;         // ID улицы  
   house_id?: string;    // ID дома
   apartment?: string;   // номер квартиры (опционально)
-}
-
-// 🆕 Новый тип для ответа API улусов
-export interface GetUlusesResponse {
-  uluses: Ulus[];
-}
-
-export interface GetSettlementsResponse {
-  settlements: Settlement[];
-}
-
-export interface GetStreetsResponse {
-  streets: Street[];
-}
-
-export interface GetHousesResponse {
-  houses: House[];
 }

@@ -27,13 +27,14 @@ import {
   refreshOutline
 } from 'ionicons/icons';
 import { useFindLics } from './useFindLics';
-import { FindLicProps, Settlement, Street, House } from './types';
-import { FIND_LIC_CONSTANTS } from './constants';
+import { FindLicProps, Settlement, Street, House, UlusWithSettlements } from './types';
+import { FIND_LIC_CONSTANTS, FIND_LIC_LABELS, FIND_LIC_PLACEHOLDERS } from './constants';
 import './FindLic.css';
 
 export function FindLic({ setPage }: FindLicProps): JSX.Element {
   const {
     state,
+    selectUlus,        // 🆕
     selectSettlement,
     selectStreet,
     selectHouse,
@@ -47,13 +48,14 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
   // ВНУТРЕННИЕ КОМПОНЕНТЫ
   // ========================
 
-  // Индикатор прогресса
+  // 🔄 Обновленный индикатор прогресса с 5 шагами
   const ProgressBar = (): JSX.Element => {
     const steps = [
-      { step: 1, label: 'Населенный пункт', completed: !!state.selectedSettlement },
-      { step: 2, label: 'Улица', completed: !!state.selectedStreet },
-      { step: 3, label: 'Дом', completed: !!state.selectedHouse },
-      { step: 4, label: 'Данные', completed: canSubmit }
+      { step: 1, label: 'Улус', completed: !!state.selectedUlus },              // 🆕
+      { step: 2, label: 'Населенный пункт', completed: !!state.selectedSettlement },
+      { step: 3, label: 'Улица', completed: !!state.selectedStreet },
+      { step: 4, label: 'Дом', completed: !!state.selectedHouse },
+      { step: 5, label: 'Данные', completed: canSubmit }
     ];
 
     return (
@@ -74,6 +76,7 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
                 )}
               </div>
               <div className="find-lic-step-label">{stepInfo.label}</div>
+              {index < steps.length - 1 && <div className="find-lic-step-line"></div>}
             </div>
           ))}
         </div>
@@ -81,196 +84,309 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
     );
   };
 
-  // Сообщение о состоянии
-  const StatusMessage = (): JSX.Element | null => {
-    if (!state.message) return null;
+  // 🆕 Компонент для выбора улуса
+  const UlusSelection = (): JSX.Element => {
+    if (state.loading && state.loadingStep === FIND_LIC_CONSTANTS.MESSAGES.LOADING_SETTLEMENTS) {
+      return (
+        <div className="find-lic-loading">
+          <div className="find-lic-loading-spinner"></div>
+          <span>Загрузка данных...</span>
+        </div>
+      );
+    }
 
-    const getMessageType = () => {
-      if (state.message.includes('успешно') || state.message.includes('найден')) return 'success';
-      if (state.message.includes('ошибка') || state.message.includes('не удалось')) return 'error';
-      if (state.message.includes('загрузка') || state.loading) return 'warning';
-      return 'warning';
-    };
-
-    const getMessageIcon = () => {
-      const type = getMessageType();
-      switch (type) {
-        case 'success': return checkmarkCircleOutline;
-        case 'error': return alertCircleOutline;
-        default: return alertCircleOutline;
-      }
-    };
+    if (state.ulusesData.length === 0) {
+      return (
+        <div className="find-lic-message error">
+          <IonIcon icon={alertCircleOutline} className="find-lic-message-icon" />
+          Данные не найдены
+        </div>
+      );
+    }
 
     return (
-      <div className={`find-lic-message ${getMessageType()}`}>
-        <IonIcon icon={getMessageIcon()} className="find-lic-message-icon" />
+      <div className="find-lic-form-section">
+        <div className="find-lic-form-group">
+          <label className="find-lic-label">
+            <IonIcon icon={locationOutline} className="find-lic-label-icon" />
+            {FIND_LIC_LABELS.ULUS}
+          </label>
+          <div className="find-lic-list">
+            {state.ulusesData.map((ulusData, index) => (
+              <div
+                key={index}
+                className={`find-lic-list-item ${state.selectedUlus?.ulus === ulusData.ulus ? 'selected' : ''}`}
+                onClick={() => selectUlus(ulusData)}
+              >
+                <span className="find-lic-list-item-text">
+                  {ulusData.ulus}
+                  {ulusData.settlements.length >= 3 && (
+                    <small className="find-lic-list-item-count">
+                      ({ulusData.settlements.length} нас. пунктов)
+                    </small>
+                  )}
+                </span>
+                {state.selectedUlus?.ulus === ulusData.ulus && (
+                  <IonIcon icon={checkmarkCircleOutline} className="find-lic-list-item-icon" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // 🔄 Обновленный компонент выбора поселения
+  const SettlementSelection = (): JSX.Element => {
+    // Теперь settlements берутся из state.settlements (которые установлены при выборе улуса)
+    if (state.settlements.length === 0) {
+      return (
+        <div className="find-lic-message error">
+          <IonIcon icon={alertCircleOutline} className="find-lic-message-icon" />
+          Населенные пункты не найдены в выбранном улусе
+        </div>
+      );
+    }
+
+    return (
+      <div className="find-lic-form-section">
+        <div className="find-lic-form-group">
+          <label className="find-lic-label">
+            <IonIcon icon={homeOutline} className="find-lic-label-icon" />
+            {FIND_LIC_LABELS.SETTLEMENT}
+            {state.selectedUlus && (
+              <small className="find-lic-label-info">в улусе {state.selectedUlus.ulus}</small>
+            )}
+          </label>
+          <div className="find-lic-list">
+            {state.settlements.map((settlement) => (
+              <div
+                key={settlement.s_id}
+                className={`find-lic-list-item ${state.selectedSettlement?.s_id === settlement.s_id ? 'selected' : ''}`}
+                onClick={() => selectSettlement(settlement)}
+              >
+                <span className="find-lic-list-item-text">{settlement.name}</span>
+                {state.selectedSettlement?.s_id === settlement.s_id && (
+                  <IonIcon icon={checkmarkCircleOutline} className="find-lic-list-item-icon" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Компонент выбора улицы
+  const StreetSelection = (): JSX.Element => {
+    if (state.loading && state.loadingStep === FIND_LIC_CONSTANTS.MESSAGES.LOADING_STREETS) {
+      return (
+        <div className="find-lic-loading">
+          <div className="find-lic-loading-spinner"></div>
+          <span>Загрузка улиц...</span>
+        </div>
+      );
+    }
+
+    const streets = state.selectedSettlement?.streets || [];
+
+    if (streets.length === 0) {
+      return (
+        <div className="find-lic-message error">
+          <IonIcon icon={alertCircleOutline} className="find-lic-message-icon" />
+          Улицы не найдены для выбранного населенного пункта
+        </div>
+      );
+    }
+
+    return (
+      <div className="find-lic-form-section">
+        <div className="find-lic-form-group">
+          <label className="find-lic-label">
+            <IonIcon icon={businessOutline} className="find-lic-label-icon" />
+            {FIND_LIC_LABELS.STREET}
+            {state.selectedSettlement && (
+              <small className="find-lic-label-info">в {state.selectedSettlement.name}</small>
+            )}
+          </label>
+          <div className="find-lic-list">
+            {streets.map((street) => (
+              <div
+                key={street.ids}
+                className={`find-lic-list-item ${state.selectedStreet?.ids === street.ids ? 'selected' : ''}`}
+                onClick={() => selectStreet(street)}
+              >
+                <span className="find-lic-list-item-text">{street.name}</span>
+                {state.selectedStreet?.ids === street.ids && (
+                  <IonIcon icon={checkmarkCircleOutline} className="find-lic-list-item-icon" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Компонент выбора дома
+  const HouseSelection = (): JSX.Element => {
+    if (state.loading && state.loadingStep === FIND_LIC_CONSTANTS.MESSAGES.LOADING_HOUSES) {
+      return (
+        <div className="find-lic-loading">
+          <div className="find-lic-loading-spinner"></div>
+          <span>Загрузка домов...</span>
+        </div>
+      );
+    }
+
+    const houses = state.selectedStreet?.houses || [];
+
+    if (houses.length === 0) {
+      return (
+        <div className="find-lic-message error">
+          <IonIcon icon={alertCircleOutline} className="find-lic-message-icon" />
+          Дома не найдены для выбранной улицы
+        </div>
+      );
+    }
+
+    return (
+      <div className="find-lic-form-section">
+        <div className="find-lic-form-group">
+          <label className="find-lic-label">
+            <IonIcon icon={homeOutline} className="find-lic-label-icon" />
+            {FIND_LIC_LABELS.HOUSE}
+            {state.selectedStreet && (
+              <small className="find-lic-label-info">на {state.selectedStreet.name}</small>
+            )}
+          </label>
+          <div className="find-lic-list">
+            {houses.map((house) => (
+              <div
+                key={house.id}
+                className={`find-lic-list-item ${state.selectedHouse?.id === house.id ? 'selected' : ''}`}
+                onClick={() => selectHouse(house)}
+              >
+                <span className="find-lic-list-item-text">дом {house.number}</span>
+                {state.selectedHouse?.id === house.id && (
+                  <IonIcon icon={checkmarkCircleOutline} className="find-lic-list-item-icon" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Компонент формы данных
+  const FormSection = (): JSX.Element => {
+    return (
+      <div className="find-lic-form-section">
+        <div className="find-lic-form-group">
+          <label className="find-lic-label">
+            <IonIcon icon={homeOutline} className="find-lic-label-icon" />
+            {FIND_LIC_LABELS.APARTMENT}
+          </label>
+          <input
+            type="text"
+            className="find-lic-input"
+            placeholder={FIND_LIC_PLACEHOLDERS.APARTMENT}
+            value={state.formData.apartment || ''}
+            onChange={(e) => updateFormData('apartment', e.target.value)}
+          />
+        </div>
+
+        <div className="find-lic-form-group">
+          <label className="find-lic-label">
+            <IonIcon icon={cardOutline} className="find-lic-label-icon" />
+            {FIND_LIC_LABELS.LICENSE_NUMBER}
+          </label>
+          <input
+            type="text"
+            className="find-lic-input"
+            placeholder={FIND_LIC_PLACEHOLDERS.LICENSE_NUMBER}
+            value={state.formData.licenseNumber}
+            onChange={(e) => updateFormData('licenseNumber', e.target.value)}
+          />
+        </div>
+
+        <div className="find-lic-form-group">
+          <label className="find-lic-label">
+            <IonIcon icon={personOutline} className="find-lic-label-icon" />
+            {FIND_LIC_LABELS.FIO}
+          </label>
+          <input
+            type="text"
+            className="find-lic-input"
+            placeholder={FIND_LIC_PLACEHOLDERS.FIO}
+            value={state.formData.fio}
+            onChange={(e) => updateFormData('fio', e.target.value)}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // Компонент сообщений
+  const MessageSection = (): JSX.Element | null => {
+    if (!state.message) return null;
+
+    const isSuccess = state.message === FIND_LIC_CONSTANTS.MESSAGES.SUCCESS;
+    const messageClass = isSuccess ? 'success' : 'error';
+
+    return (
+      <div className={`find-lic-message ${messageClass}`}>
+        <IonIcon 
+          icon={isSuccess ? checkmarkCircleOutline : alertCircleOutline} 
+          className="find-lic-message-icon" 
+        />
         {state.message}
       </div>
     );
   };
 
-  // Форма выбора населенного пункта
-  const SettlementForm = (): JSX.Element => (
-    <div className="find-lic-form-section find-lic-slide-up">
-      <div className="find-lic-section-title">
-        <IonIcon icon={locationOutline} className="find-lic-section-icon" />
-        Выбор населенного пункта
-      </div>
-      
-      <div className="find-lic-form-group">
-        <label className="find-lic-label">Населенный пункт</label>
-        <select 
-          className="find-lic-select"
-          value={state.selectedSettlement?.s_id || ''}
-          onChange={(e) => {
-            const settlement = state.settlements.find(s => s.s_id === e.target.value);
-            if (settlement) selectSettlement(settlement);
-          }}
-          disabled={state.loading || state.settlements.length === 0}
-        >
-          <option value="">
-            {state.settlements.length === 0 ? 'Загрузка...' : 'Выберите населенный пункт'}
-          </option>
-          {state.settlements.map((settlement) => (
-            <option key={settlement.s_id} value={settlement.s_id}>
-              {settlement.name}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
+  // Компонент кнопок действий
+  const ActionButtons = (): JSX.Element => {
+    const handleSubmit = async () => {
+      const success = await submitForm();
+      if (success) {
+        // Переходим на главную страницу после успешного добавления
+        setTimeout(() => setPage(0), 2000);
+      }
+    };
 
-  // Форма выбора улицы
-  const StreetForm = (): JSX.Element => (
-    <div className="find-lic-form-section find-lic-slide-up">
-      <div className="find-lic-section-title">
-        <IonIcon icon={businessOutline} className="find-lic-section-icon" />
-        Выбор улицы
-      </div>
-      
-      <div className="find-lic-form-group">
-        <label className="find-lic-label">Улица</label>
-        <select 
-          className="find-lic-select"
-          value={state.selectedStreet?.ids || ''}
-          onChange={(e) => {
-            const street = state.selectedSettlement?.streets?.find(s => s.ids === e.target.value);
-            if (street) selectStreet(street);
-          }}
-          disabled={state.loading || !state.selectedSettlement}
-        >
-          <option value="">
-            {!state.selectedSettlement ? 'Сначала выберите населенный пункт' : 'Выберите улицу'}
-          </option>
-          {state.selectedSettlement?.streets?.map((street) => (
-            <option key={street.ids} value={street.ids}>
-              {street.name}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
-
-  // Форма выбора дома
-  const HouseForm = (): JSX.Element => (
-    <div className="find-lic-form-section find-lic-slide-up">
-      <div className="find-lic-section-title">
-        <IonIcon icon={homeOutline} className="find-lic-section-icon" />
-        Выбор дома
-      </div>
-      
-      <div className="find-lic-form-group">
-        <label className="find-lic-label">Дом</label>
-        <select 
-          className="find-lic-select"
-          value={state.selectedHouse?.id || ''}
-          onChange={(e) => {
-            const house = state.selectedStreet?.houses?.find(h => h.id === e.target.value);
-            if (house) selectHouse(house);
-          }}
-          disabled={state.loading || !state.selectedStreet}
-        >
-          <option value="">
-            {!state.selectedStreet ? 'Сначала выберите улицу' : 'Выберите дом'}
-          </option>
-          {state.selectedStreet?.houses?.map((house) => (
-            <option key={house.id} value={house.id}>
-              {house.number}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
-
-  // Форма данных
-  const DataForm = (): JSX.Element => (
-    <div className="find-lic-form-section">
-      <div className="find-lic-section-title">
-        <IonIcon icon={personOutline} className="find-lic-section-icon" />
-        Данные владельца
-      </div>
-      
-      <div className="find-lic-form-group">
-        <label className="find-lic-label">Номер квартиры (опционально)</label>
-        <input 
-          type="text" 
-          className="find-lic-input"
-          placeholder="Введите номер квартиры"
-          value={state.formData.apartment || ''}
-          onChange={(e) => updateFormData('apartment', e.target.value)}
+    return (
+      <div className="find-lic-button-section">
+        <button
+          className="find-lic-button find-lic-button-secondary"
+          onClick={() => setPage(0)}
           disabled={state.loading}
-        />
-      </div>
-      
-      <div className="find-lic-form-group">
-        <label className="find-lic-label">Номер лицевого счета</label>
-        <input 
-          type="text" 
-          className="find-lic-input"
-          placeholder="Введите номер лицевого счета"
-          value={state.formData.licenseNumber}
-          onChange={(e) => updateFormData('licenseNumber', e.target.value)}
+        >
+          <IonIcon icon={arrowBackOutline} className="find-lic-button-icon" />
+          Назад
+        </button>
+
+        <button
+          className="find-lic-button find-lic-button-secondary"
+          onClick={resetForm}
           disabled={state.loading}
-          required
-        />
+        >
+          <IonIcon icon={refreshOutline} className="find-lic-button-icon" />
+          Сбросить
+        </button>
+
+        <button
+          className="find-lic-button find-lic-button-primary"
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+        >
+          <IonIcon icon={checkmarkCircleOutline} className="find-lic-button-icon" />
+          {state.loading ? 'Добавление...' : 'Добавить'}
+        </button>
       </div>
-      
-      <div className="find-lic-form-group">
-        <label className="find-lic-label">ФИО владельца</label>
-        <input 
-          type="text" 
-          className="find-lic-input"
-          placeholder="Введите ФИО владельца"
-          value={state.formData.fio}
-          onChange={(e) => updateFormData('fio', e.target.value)}
-          disabled={state.loading}
-          required
-        />
-      </div>
-    </div>
-  );
-
-  // ========================
-  // ОБРАБОТЧИКИ СОБЫТИЙ
-  // ========================
-
-  const handleBack = () => {
-    setPage(0); // Вернуться на главную страницу
-  };
-
-  const handleReset = () => {
-    resetForm();
-  };
-
-  const handleSubmit = async () => {
-    const success = await submitForm();
-    if (success) {
-      // После успешного поиска можно перейти на другую страницу
-      // setPage(NEXT_PAGE);
-    }
+    );
   };
 
   // ========================
@@ -278,68 +394,46 @@ export function FindLic({ setPage }: FindLicProps): JSX.Element {
   // ========================
 
   return (
-    <IonContent className="find-lic-container">
+    <div className="find-lic-container">
       {/* Заголовок */}
       <div className="find-lic-header">
-        <h1 className="find-lic-title">Поиск лицевого счета</h1>
-        <p className="find-lic-subtitle">Найдите свой счет по адресу</p>
+        <h1 className="find-lic-title">Добавление лицевого счета</h1>
+        <p className="find-lic-subtitle">Выберите адрес и заполните данные</p>
       </div>
 
-      {/* Основная карточка */}
-      <div className="find-lic-card find-lic-fade-in">
+      {/* Карточка формы */}
+      <IonCard className="find-lic-card">
         {/* Индикатор прогресса */}
         <ProgressBar />
 
-        {/* Сообщения о состоянии */}
-        <StatusMessage />
+        {/* Сообщения */}
+        <MessageSection />
 
-        {/* Формы на основе текущего шага */}
-        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.SETTLEMENT && <SettlementForm />}
-        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.STREET && state.selectedSettlement && <StreetForm />}
-        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.HOUSE && state.selectedStreet && <HouseForm />}
-        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.FORM && state.selectedHouse && <DataForm />}
+        {/* 🆕 Выбор улуса */}
+        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.ULUS && <UlusSelection />}
+
+        {/* Выбор населенного пункта */}
+        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.SETTLEMENT && state.selectedUlus && <SettlementSelection />}
+
+        {/* Выбор улицы */}
+        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.STREET && state.selectedSettlement && <StreetSelection />}
+
+        {/* Выбор дома */}
+        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.HOUSE && state.selectedStreet && <HouseSelection />}
+
+        {/* Форма данных */}
+        {state.currentStep >= FIND_LIC_CONSTANTS.STEPS.FORM && state.selectedHouse && <FormSection />}
 
         {/* Кнопки действий */}
-        <div className="find-lic-button-section">
-          <button 
-            className="find-lic-button find-lic-button-secondary"
-            onClick={handleBack}
-            disabled={state.loading}
-          >
-            <IonIcon icon={arrowBackOutline} className="find-lic-button-icon" />
-            Назад
-          </button>
-
-          {/* Кнопка сброса (показывается только если есть данные для сброса) */}
-          {(state.selectedSettlement || state.formData.licenseNumber || state.formData.fio) && (
-            <button 
-              className="find-lic-button find-lic-button-secondary"
-              onClick={handleReset}
-              disabled={state.loading}
-            >
-              <IonIcon icon={refreshOutline} className="find-lic-button-icon" />
-              Сбросить
-            </button>
-          )}
-
-          {/* Кнопка поиска */}
-          <button 
-            className="find-lic-button find-lic-button-primary"
-            onClick={handleSubmit}
-            disabled={!canSubmit || state.loading}
-          >
-            <IonIcon icon={searchOutline} className="find-lic-button-icon" />
-            {state.loading ? 'Поиск...' : 'Найти счет'}
-          </button>
-        </div>
-      </div>
+        <ActionButtons />
+      </IonCard>
 
       {/* Индикатор загрузки */}
       <IonLoading
         isOpen={state.loading}
         message={state.loadingStep || 'Загрузка...'}
-        duration={0}
+        duration={FIND_LIC_CONSTANTS.TIMEOUTS.LOADING_TIMEOUT}
       />
-    </IonContent>
+    </div>
   );
 }
