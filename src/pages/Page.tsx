@@ -170,11 +170,11 @@ const Page: React.FC = () => {
               <div className='h-2'>Лицевые счета</div>
             </IonTabButton>
             
-            <IonTabButton tab="news" href="/page/news"
-              onClick={()=>{ hist.push('/page/news')}}
+            <IonTabButton tab="news" href="/page/push"
+              onClick={()=>{ hist.push('/page/push')}}
             >
               <IonIcon icon={ chatboxEllipsesOutline } className='w-1 h-1'/>
-              <div className='h-2'>Новости объявления</div>
+              <div className='h-2'>Уведомления</div>
             </IonTabButton>
             
           </IonTabBar>

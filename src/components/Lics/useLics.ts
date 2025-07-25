@@ -108,7 +108,7 @@ export const useLics = (): UseLicsReturn => {
   // Типизированный setPage с дополнительной валидацией
   const setPageSafe: SetPageFunction = useCallback((newPage: number) => {
     try {
-      if (newPage >= 0 && newPage <= 10) {
+      if (newPage >= 0 && newPage <= 11) {
         console.log(`${DEBUG_PREFIXES.NAVIGATION} Page change: ${getCurrentPageName()} -> ${LICS_PAGE_NAMES[newPage] || newPage}`);
         setPage(newPage as LicsPage);
       } else {

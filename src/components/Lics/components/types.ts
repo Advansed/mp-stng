@@ -51,7 +51,8 @@ export enum LicsPage {
   EQUARING          = 7,
   SBER_PAY          = 8,
   HISTORY_INDICES   = 9,
-  ALFA_BANK         = 10
+  ALFA_BANK         = 10,
+  SBP               = 11
 }
 
 // ========================

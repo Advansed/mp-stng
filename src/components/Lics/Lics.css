@@ -120,7 +120,7 @@
 
 .ls-button1 {
     background-color: #3f64a9;  
-    padding: 0.5em;
+    /* padding: 0.5em; */
     display: flex;
     color: white;
     font-size: 1em;

@@ -1,6 +1,7 @@
 
 import { combineReducers  } from 'redux'
 import axios from 'axios'
+import ky from 'ky';
 import { Reducer } from 'react';
 import localForage from "localforage";
 import { createBrowserHistory } from 'history';
@@ -8,6 +9,14 @@ const hist = createBrowserHistory();
 
 export function setItem(key, value){
     localForage.setItem(key, value)
+}
+
+interface respData {
+
+    error:      boolean,
+    data:       any,
+    message:    string
+
 }
 
 export async function getItem( key ){
@@ -71,6 +80,36 @@ for(const [key, value] of Object.entries(i_state)){
 
 
 export async function   getData(method : string, params){
+
+    // params.method = method;
+
+    // try {
+    //     const data: respData = await ky.post(URL + method, {
+            
+    //         json: params,
+
+    //         timeout: 10000 // например, таймаут 10 секунд, можно убрать или настроить
+
+    //     }).json();
+
+    //     if (data.error) {
+
+    //         Store.dispatch({ type: "error", error: data.message });
+
+    //     }
+
+    //     return data;
+
+    // } catch (error: any) {
+
+    //     console.log(error);
+
+    //     Store.dispatch({ type: "error", error: "Сервер не отвечает (" + error.message + ")" });
+
+    //     return { error: true, message: "Сервер не отвечает (" + error.message + ")" };
+
+    // }
+
     params.method = method
     const res = await axios.post(
             URL + method, params
@@ -84,6 +123,7 @@ export async function   getData(method : string, params){
           Store.dispatch({type: "error", error: "Cервер не отвечает (" + error.message + ")" })
           return {error: true, message: "Cервер не отвечает (" + error.message + ")" }
         })
+
     return res
 
 }
@@ -229,7 +269,7 @@ export async function   getProfile( params){
 }
 
 export async function   getLics( params){
-    const res = await getData("getAccount1", params)
+    const res = await getData("getAccount", params)
     console.log(res)
     if(res.error) console.log(res.message)
     else res.data.forEach(elem => {
@@ -237,10 +277,6 @@ export async function   getLics( params){
             return a + b.sum;
         }, 0);
         elem.sum = parseFloat( elem.sum.toFixed(2)) 
-        elem.sumto = elem.debtsto.reduce(function(a, b){
-            return a + b.sum;
-        }, 0);
-        elem.sumto = parseFloat( elem.sumto.toFixed(2)) 
     }); 
     if(res.error) console.log(res.message)
     else Store.dispatch({ type: "lics", lics: res.data})
