@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Store, getApps, getData, getLics, getProfile } from '../Store'
 import './Lics.css'
-import { IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRefresher, IonRefresherContent, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonText } from '@ionic/react'
-import { alertCircleOutline, cardOutline, chevronForwardOutline, closeCircleOutline, closeOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, ellipsisVerticalOutline, locationOutline, newspaperOutline, pencilOutline, personCircleOutline, personOutline, trashBinOutline } from 'ionicons/icons'
+import { IonAlert, IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRefresher, IonRefresherContent, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonText } from '@ionic/react'
+import { alertCircleOutline, cardOutline, chevronForwardOutline, closeCircleOutline, closeOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, ellipsisVerticalOutline, listOutline, locationOutline, newspaperOutline, pencilOutline, personCircleOutline, personOutline, trashBinOutline } from 'ionicons/icons'
 import { PDFDoc } from '../Files'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
@@ -704,7 +704,8 @@ function            AddLic2(props:{ setPage }){
 function            Lic(props: { info, ind, setItem, setPage } ){
     const [ load,   setLoad ]   = useState(false)
     const [ modal,  setModal ]  = useState<any>()
-    const [ pop,    setPop ]    = useState( false )
+    const [ showDeleteAlert, setShowDeleteAlert ] = useState(false) // 🆕 Состояние для диалога
+
 
     const info = props.info 
     
@@ -720,6 +721,24 @@ function            Lic(props: { info, ind, setItem, setPage } ){
             })
         }
         setLoad(false)
+    }
+
+ // 🆕 Функция для показа диалога подтверждения
+    function confirmDelete() {
+        setShowDeleteAlert(true)
+        console.log("alert")
+    }
+
+    // 🆕 Функция для обработки подтверждения удаления
+    function handleDeleteConfirm() {
+        setShowDeleteAlert(false)
+        delAccont()
+    }
+
+    // 🆕 Функция для отмены удаления
+    function handleDeleteCancel() {
+     
+        setShowDeleteAlert(false)
     }
 
     async function  Quits() {
@@ -742,10 +761,10 @@ function            Lic(props: { info, ind, setItem, setPage } ){
                 <div className='cl-black fs-12'> <b>{ "л/с № " + info.code }</b></div>
                 <IonButton
                     fill    = "clear"
-                    onClick={()=>{ 
-                        console.log("del account ")
-                        delAccont()
-                    }}
+                    onClick={()=> {
+                        console.log( " click" )
+                        confirmDelete()
+                    } }
                 >
                     <IonIcon icon = { closeCircleOutline }  color="danger" slot='icon-only'/> 
                 </IonButton>
@@ -828,6 +847,22 @@ function            Lic(props: { info, ind, setItem, setPage } ){
                             </IonButton>
           
                         </div>
+
+                        <IonButton
+                            mode = { 'ios' }
+                            color={ "tertiary" }
+                            className='fs-09 w-100'
+                            expand='block'
+                            onClick={()=>{
+                                props.setItem( info )
+                                props.setPage( LicsPage.HISTORY )                  
+                            }}
+                        >
+                            <IonIcon icon = { listOutline } />
+                            <IonLabel className='ml-1'> { "История оплат" } </IonLabel>
+                                
+                        </IonButton>
+
                         {
                             info.counters.length > 0
                                 ? <>
@@ -903,6 +938,25 @@ function            Lic(props: { info, ind, setItem, setPage } ){
                 }
             </div>
         </IonModal>
+ {/* 🆕 Диалог подтверждения удаления */}
+        <IonAlert
+            isOpen={showDeleteAlert}
+            onDidDismiss={handleDeleteCancel}
+            header={'Подтверждение'}
+            message={'Действительно удалить этот лицевой счет?'}
+            buttons={[
+                {
+                    text: 'Отмена',
+                    role: 'cancel',
+                    handler: handleDeleteCancel
+                },
+                {
+                    text: 'Удалить',
+                    role: 'destructive',
+                    handler: handleDeleteConfirm
+                }
+            ]}
+        />
     </>
 
     return elem 
