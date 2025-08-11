@@ -251,6 +251,8 @@ function Service(props: { info, page }){
         setLoad(true)
         if( info.Просмотр.Файл === ""){
             info.token = Store.getState().login.token
+            console.log("preview")
+            console.log(info)
             const res = await getData("Preview", info )
             console.log(res)
             if(res.data.Файлы.length > 0 ){
@@ -381,11 +383,11 @@ function Date( props: { info }) {
             <div className="flex fl-space mt-1">
                 <div className="w-40"> <b>{ props.info.title }</b> </div>
                 <div className=' ml-1 s-input a-right pr-1 w-60'>
-                    <MaskedInput
-                        className='m-input a-right'
-                        mask={[ /[0-9]/, /\d/, '.', /\d/, /\d/,'.', /\d/, /\d/, /\d/, /\d/]}
-                        value={ info[ props.info.name ][0] }
-                        placeholder="__.__.____"
+
+                    <IonInput 
+                        type = 'date'
+                        mode = 'ios'
+                        value={ info[ props.info.name ][0]  }
                         onInput={(e: any) => {
                             
                             info[ props.info.name ][0] = (e.target.value as string).substring(0, 10)

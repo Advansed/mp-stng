@@ -30,12 +30,12 @@ const appPages: AppPage[] = [
     iosIcon: personOutline,
     mdIcon: personSharp
   },
-  {
-    title: 'АГЗС бонусы',
-    url: '/page/bonuse',
-    iosIcon: ribbonOutline,
-    mdIcon: ribbonSharp
-  },
+  // {
+  //   title: 'АГЗС бонусы',
+  //   url: '/page/bonuse',
+  //   iosIcon: ribbonOutline,
+  //   mdIcon: ribbonSharp
+  // },
   {
     title: 'Услуги',
     url: '/page/services',
