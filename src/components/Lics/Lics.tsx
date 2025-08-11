@@ -964,10 +964,12 @@ function            Lic(props: { info, ind, setItem, setPage } ){
 
 function            History(props: { item }){
     const [ info, setInfo ] = useState<any>([])
+    const [ load, setLoad] = useState( false )
 
     const item = props.item
     
     async function Load(){
+        setLoad( true)
         console.log({
             token: Store.getState().login.token,
             LC: item.code 
@@ -982,7 +984,7 @@ function            History(props: { item }){
                 setInfo( res.data[0].payments )
             }
         }
-            
+        setLoad( false )            
     }
 
     useEffect(()=>{
@@ -1031,6 +1033,7 @@ function            History(props: { item }){
     }
 
     const elem = <>
+        <IonLoading isOpen = { load } message = {"Подождите"} />
       <IonCard className='pb-1'>
             <div className='flex fl-space mt-1 ml-1'>
                 <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
@@ -1060,6 +1063,36 @@ function            Payments(props:{ item, setPage }){
     const item  = props.item
     const [ upd, setUpd ] = useState( 0 )
 
+    function Lines() {
+
+        let elem = <>
+            <div className='mt-1 ml-1 cl-black fs-09'> <b>Начисления</b></div>
+        </>
+        console.log('lines')
+        console.log( item.debts)
+        for( let i = 0; i < item.debts.length; i++ ){
+            elem = <>
+                { elem }
+                <div className='flex fl-space ml-2 mt-1 mr-1 fs-09'>
+                    <div><b>{ item.debts[i].label }</b></div>
+                    <div className='cl-black'>
+                        <b>
+                            { new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts[i].sum ) }
+                        </b>
+                    </div>
+                </div>
+            </>
+        }        
+
+        elem = <>
+            <IonCard className='pb-1'>
+                { elem }
+            </IonCard>
+        </>
+
+        return elem
+    }
+
     let items = <>
         <div className='ml-1 mt-1 fs-09 cl-black'>
             <b>
@@ -1072,11 +1105,9 @@ function            Payments(props:{ item, setPage }){
         </div>
     </>
     
-    console.log(item.debts)
-
     for( let i = 0; i < item.debts.length; i++ ){
         if( item.debts[i].pay === undefined ) item.debts[i].pay = item.debts[i].sum > 0 ? item.debts[i].sum : 0
-        if( item.debts[i].sum >= 0) {
+        if( (item.debts[i].pay > 0) || ( item.debts[i].label === 'Газоснабжение природным газом') || ( item.debts[i].label === 'Техническое обслуживание')) {
             console.log( item.debts[i] )
             items = <>
                 { items }
@@ -1104,13 +1135,13 @@ function            Payments(props:{ item, setPage }){
                     </div>
                 </div>
             </>
-        }
+        } 
     }
 
     items = <>
         { items }
         <div className='ml-1 mr-1 t-upperline mt-05 pt-05 flex fl-space' >
-            <div className='fs-09 cl-black'><b>Итого</b></div>
+            <div className='fs-09 cl-black'><b>Итого к оплате</b></div>
             <div className='mr-1 cl-black'><b>{ 
                 new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts.reduce((total, item) => total + item.pay, 0) ) 
            }</b></div>
@@ -1119,6 +1150,9 @@ function            Payments(props:{ item, setPage }){
 
     
     const elem = <>
+
+        <Lines />
+        
         <IonCard className='pb-1'>
             
             { items }
@@ -1217,6 +1251,37 @@ function            PaymentsTO(props:{ item, setPage }){
     const item  = props.item
     const [ upd, setUpd ] = useState( 0 )
 
+
+    function Lines() {
+
+        let elem = <>
+            <div className='mt-1 ml-1 cl-black fs-09'> <b>Начисления</b></div>
+        </>
+        console.log('lines')
+        console.log( item.debts)
+        for( let i = 0; i < item.debts.length; i++ ){
+            elem = <>
+                { elem }
+                <div className='flex fl-space ml-2 mt-1 mr-1 fs-09'>
+                    <div><b>{ item.debts[i].label }</b></div>
+                    <div className='cl-black'>
+                        <b>
+                            { new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts[i].sum ) }
+                        </b>
+                    </div>
+                </div>
+            </>
+        }        
+
+        elem = <>
+            <IonCard className='pb-1'>
+                { elem }
+            </IonCard>
+        </>
+
+        return elem
+    }
+
     let items = <>
         <div className='ml-1 mt-1 fs-09 cl-black'>
             <b>
@@ -1246,11 +1311,12 @@ function            PaymentsTO(props:{ item, setPage }){
 
     
     const elem = <>
+        <Lines />
         <IonCard className='pb-1'>
             
             { items }
 
-            <div className='mt-2 ml-1 fs-09'>Способы оплаты</div>
+            <div className='mt-2 ml-1 fs-09'>Спос обы оплаты</div>
             <div className='flex fl-space ml-1 mr-1'>
                 <div className='ls-item3 w-50'>
                     <div className=''
