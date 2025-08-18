@@ -9,6 +9,7 @@ import { Browser } from '@capacitor/browser'
 import { useLics } from './useLics'
 import { LicsPage } from './components/types'
 import { DEBUG_PREFIXES } from './components/constants'
+import { PDFDocModal } from '../Files/PDFDocModal'
 
 
 type WidgetParams = {
@@ -925,19 +926,22 @@ function            Lic(props: { info, ind, setItem, setPage } ){
                 </IonSegmentView>            
             </div>
         </IonCard>
-        <IonModal
-            className="w-100 h-100"
-            isOpen = { modal !== undefined }
-            onDidDismiss={ () => setModal( undefined )}
-        >
-            <div className="w-100 h-100">
-                {  
-                    modal?.format === "pdf" 
-                        ? <PDFDoc url = { modal?.dataUrl } name  = { "Квитанция" } title = { "Квитанция" }/>
-                        : <img src={ modal?.dataUrl } alt = "" />
-                }
-            </div>
-        </IonModal>
+        {
+            modal !== undefined
+                ?<>
+                    <PDFDocModal
+                        isOpen={ modal !== undefined }
+                        onClose={() => setModal( undefined )}
+                        pdfUrl={ modal?.dataUrl }
+                        fileName="Квитанция.pdf"
+                        title="Квитанция"
+                        showActions={true}
+                        allowEmail={true}
+                    />
+
+                </>
+                :<></>
+        }
  {/* 🆕 Диалог подтверждения удаления */}
         <IonAlert
             isOpen={showDeleteAlert}
