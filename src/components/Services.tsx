@@ -387,6 +387,8 @@ function Date( props: { info }) {
                     <IonInput 
                         type = 'date'
                         mode = 'ios'
+                        className="w-100"
+                        placeholder="гггг-мм-дд"
                         value={ info[ props.info.name ][0]  }
                         onInput={(e: any) => {
                             
