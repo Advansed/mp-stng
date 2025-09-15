@@ -385,12 +385,12 @@ function Date( props: { info }) {
                 <div className=' ml-1 s-input a-right pr-1 w-60'>
 
                     <IonInput 
-                        type = 'date'
-                        mode = 'ios'
-                        className="w-100"
-                        placeholder="гггг-мм-дд"
-                        value={ info[ props.info.name ][0]  }
-                        onInput={(e: any) => {
+                        type            = 'date'
+                        mode            = 'ios'
+                        className       = "ser-input"
+                        placeholder     = "гггг-мм-дд"
+                        value           = { info[ props.info.name ][0]  }
+                        onInput         = {(e: any) => {
                             
                             info[ props.info.name ][0] = (e.target.value as string).substring(0, 10)
                             

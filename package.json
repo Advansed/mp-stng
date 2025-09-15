@@ -37,7 +37,7 @@
     "ionicons": "^7.0.0",
     "jetifier": "^2.0.0",
     "jspdf": "^2.5.1",
-    "ky": "^1.8.2",
+    "ky": "^1.9.0",
     "localforage": "^1.10.0",
     "onesignal-cordova-plugin": "^5.0.2",
     "pdfjs-dist": "^3.11.174",

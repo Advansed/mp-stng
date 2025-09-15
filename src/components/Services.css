@@ -114,3 +114,10 @@ ion-popover {
     overflow-x: scroll;
     height: 56vh ;
 }
+
+.ser-input {
+    margin-left: 1em;
+    width: 100%;
+    min-width: 9em;
+    text-align: right;
+}
