@@ -1,14 +1,13 @@
 
-import { combineReducers  } from 'redux'
-import axios from 'axios'
-import ky from 'ky';
-import { Reducer } from 'react';
-import localForage from "localforage";
-import { createBrowserHistory } from 'history';
+import { combineReducers  }         from 'redux'
+import axios                        from 'axios'
+import { Reducer, useEffect, useState }                  from 'react';
+import localForage                  from "localforage";
+import { createBrowserHistory }     from 'history';
 const hist = createBrowserHistory();
 
-export function setItem(key, value){
-    localForage.setItem(key, value)
+export function setItem( key, value ){
+    localForage.setItem( key, value )
 }
 
 interface respData {
@@ -33,9 +32,12 @@ export async function getItem( key ){
 
 const reducers: Array<Reducer<any, any>> = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
+
 export const listeners: Array<any>  = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
+
 export const version = '2.3.8'
+
 
 export const i_state = {
 
@@ -199,6 +201,7 @@ function                create_Store(reducer, initialState) {
     };
 }
 
+
 const reduct: any = {}
 
 
@@ -213,6 +216,7 @@ export const Store   =  create_Store(rootReducer, i_state)
 //export const URL = "https://fhd.aostng.ru/vesta_storage/hs/API_STNG/V2/"
 export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/"
 //export const URL = "https://fhd.aostng.ru/node/"
+
 
 
 export function Phone(phone): string {
@@ -383,7 +387,7 @@ function goProfile(){
     console.log("change")
 }
 
-Store.subscribe({ num: 1001, type: "login", func: ()=>{
+Store.subscribe({ num: 1002, type: "auth", func: ()=>{
     const login = Store.getState().login
     const params = { token: Store.getState().login.token }
 

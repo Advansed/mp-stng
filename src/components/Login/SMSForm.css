@@ -1,0 +1,46 @@
+.sms-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+.code-inputs {
+  margin: 2rem 0;
+}
+
+.code-input {
+  --padding-start: 0;
+  --padding-end: 0;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: 2px solid var(--ion-color-medium);
+  border-radius: 8px;
+  background: var(--ion-color-light);
+}
+
+.code-input.input-highlight {
+  border-color: var(--ion-color-primary);
+}
+
+.submit-button {
+  margin: 1rem 0;
+  min-height: 50px;
+}
+
+.resend-section {
+  margin-top: 2rem;
+}
+
+.resend-button {
+  margin-top: 0.5rem;
+}
+
+.error-message {
+  color: var(--ion-color-danger);
+  font-weight: bold;
+  margin: 1rem 0;
+}

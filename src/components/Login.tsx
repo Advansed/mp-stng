@@ -1,21 +1,21 @@
-import { IonButton, IonCheckbox, IonHeader, IonIcon, IonImg, IonInput, IonLoading, IonText, isPlatform } from "@ionic/react"
+import { IonButton, IonIcon, IonImg, IonInput, IonLoading, IonText, isPlatform } from "@ionic/react"
 import React, { useState, useEffect } from "react"
-import { Phone, Store, getData, version } from "./Store"
+import { Store, getData, version } from "./Store"
 import "./Login.css"
 import MaskedInput from "../mask/reactTextMask"
-import { arrowBackOutline, eyeOffOutline, eyeOutline } from "ionicons/icons"
+import { eyeOffOutline, eyeOutline } from "ionicons/icons"
 
 
 export function Login() {
     
-    const [ info,   setInfo]    = useState<any>({ phone: "", password: "", version: version, mode: "android"}) // eslint-disable-line @typescript-eslint/no-explicit-any
-    const [ error,  setError]   = useState("")
-    const [ upd,    setUpd]     = useState( 0 )
-    const [ message, setMessage ] = useState( "" )
-    const [ load,   setLoad ]   = useState( false)
-    const [ page,   setPage ]   = useState( 0 )
-    const [ order1, setOrder1 ] = useState({ call: "", id: "" })
-    const [ namer,  setNamer ]  = useState( "Проверить" )
+    const [ info,       setInfo]        = useState<any>({ phone: "", password: "", version: version, mode: "android"}) // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ error,      setError]       = useState("")
+    const [ upd,        setUpd]         = useState( 0 )
+    const [ message,    setMessage ]    = useState( "" )
+    const [ load,       setLoad ]       = useState( false)
+    const [ page,       setPage ]       = useState( 0 )
+    const [ order1,     setOrder1 ]     = useState({ call: "", id: "" })
+    const [ namer,      setNamer ]      = useState( "Проверить" )
 
     useEffect(()=>{
 
@@ -194,7 +194,7 @@ export function Login() {
  
                          setLoad( true )
                          console.log( info )
-                         const res = await getData("getPhone", {
+                         const res = await getData("restore", {
                              phone:     info.phone,
                              type:      "restore",
                          })
@@ -254,8 +254,8 @@ export function Login() {
                         console.log("Звонок")
                         console.log( order1 )
                         window.open('tel:' + order1.call )
-                         setMessage("")
-                         setPage( 3 )
+                            setMessage("")
+                            setPage( 3 )
                      }}
                  >
                      Звонок
@@ -263,10 +263,10 @@ export function Login() {
 
                  <IonButton className="login-text-url ion-text-wrap" fill="clear"
                      onClick={()=>{ setPage( page + 1 )}}                
-                 >Пользовательское соглашение</IonButton>
+                 > Пользовательское соглашение </IonButton>
  
                  <div className="a-center">
-                     <IonText className="login-text">Уже зарегистрированы? </IonText>        
+                     <IonText className="login-text"> Уже зарегистрированы? </IonText>        
                  </div>
                      
                  <IonButton fill="clear" className="login-text-url ion-text-wrap" 
@@ -440,6 +440,7 @@ export function Login() {
             }
 
         </>
+        
         return elem
     }
 
