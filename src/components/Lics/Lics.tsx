@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Store, getApps, getData, getLics, getProfile } from '../Store'
+import { Store, getData, getLics, getProfile } from '../Store'
 import './Lics.css'
-import { IonAlert, IonButton, IonCard, IonCol, IonContent, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonModal, IonPopover, IonRefresher, IonRefresherContent, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonText } from '@ionic/react'
-import { alertCircleOutline, cardOutline, chevronForwardOutline, closeCircleOutline, closeOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, ellipsisVerticalOutline, listOutline, locationOutline, newspaperOutline, pencilOutline, personCircleOutline, personOutline, trashBinOutline } from 'ionicons/icons'
-import { PDFDoc } from '../Files'
+import { IonAlert, IonButton, IonCard, IonCol, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView } from '@ionic/react'
+import { alertCircleOutline, cardOutline, closeCircleOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, listOutline, locationOutline, pencilOutline, personOutline } from 'ionicons/icons'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
 import { useLics } from './useLics'
@@ -856,11 +855,11 @@ function            Lic(props: { info, ind, setItem, setPage } ){
                             expand='block'
                             onClick={()=>{
                                 props.setItem( info )
-                                props.setPage( LicsPage.HISTORY )                  
+                                props.setPage( 6 )  
                             }}
                         >
-                            <IonIcon icon = { listOutline } />
-                            <IonLabel className='ml-1'> { "История оплат" } </IonLabel>
+                            <IonIcon icon = { codeWorkingOutline } />
+                            <IonLabel className='ml-1'> { "Передать показания" } </IonLabel>
                                 
                         </IonButton>
 
@@ -891,15 +890,15 @@ function            Lic(props: { info, ind, setItem, setPage } ){
                                         <div className='ls-item1'
                                             onClick={()=>{
                                                 props.setItem( info )
-                                                props.setPage( 6 )                                   
+                                                props.setPage( LicsPage.HISTORY )                                   
                                             }}
                                         >
                                             <div className='ml-05'>
-                                                <IonIcon icon = { codeWorkingOutline }  className='h-15 w-15' color="primary"/>
+                                                <IonIcon icon = { listOutline }  className='h-15 w-15' color="primary"/>
                                             </div>
                                             <div className='ml-1'>
-                                                <div className='fs-09'><b>Внести показания </b>  </div>
-                                                <div className='fs-08'>Передать текущие показания счетчика</div>
+                                                <div className='fs-09'><b>История оплат </b>  </div>
+                                                <div className='fs-08'>Посмотреть список предыдущих оплат</div>
                                             </div>
 
                                         </div> 
