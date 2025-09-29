@@ -1,4 +1,10 @@
 import { create } from 'zustand';
+import { fetchData } from './api';
+import { useToast } from '../components/Toast';
+
+const url = 'https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/'
+
+const toast = useToast()
 
 interface User {
   id:               string;
@@ -25,10 +31,10 @@ interface LoginStore {
     isLoading:      boolean;
     error:          string | null;
   
-    login:          (email: string, password: string) => Promise<void>;
-    logout:         () => void;
-    getProfile:     () => Promise<void>;
-    updateProfile:  (data: Partial<User>) => Promise<void>;
+    login:          ( phone: string, password: string ) => Promise<void>;
+    logout:         ( ) => void;
+    getProfile:     ( ) => Promise<void>;
+    updateProfile:  ( data: Partial<User> ) => Promise<void>;
 
 }
 
@@ -41,23 +47,24 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
     error:          null,
     isAuth:         !!localStorage.getItem('token'),
 
-    login: async (email, password) => {
+    login: async (login, password) => {
+        
         set({ isLoading: true, error: null });
-        try {
-        const         res = await fetch('https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/authorization', {
-            method:     'POST',
-            headers:    { 'Content-Type': 'application/json' },
-            body:       JSON.stringify({ email, password })
-        });
+
+        const res = await fetchData("authorization", {
+            phone:      login, 
+            password:   password, 
+            version :   "2.3.9", 
+            mode:       "android"
+        })
         
-        if (!res.ok) throw new Error('Login failed');
-        
-        const { user, token, phone } = await res.json();
-        localStorage.setItem('token', token);
-        set({ user, token, phone, auth: true, isLoading: false });
-        } catch (error) {
-        set({ error: (error as Error).message, isLoading: false });
+        if( res.error )
+            set({ user: res.data, token: res.data.token, phone: res.data.code, auth: true, isLoading: false });
+        else {
+            set({ isLoading: false });
+            toast.error( res.message )
         }
+            
     },
 
     logout: () => {
@@ -109,3 +116,7 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
     }
 
 }));
+
+export const useToken   = () => useLoginStore(state => state.token);
+
+export const useAuth    = () => useLoginStore(state => state.auth);
