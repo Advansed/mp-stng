@@ -9,6 +9,7 @@ import { useLics } from './useLics'
 import { LicsPage } from './components/types'
 import { DEBUG_PREFIXES } from './components/constants'
 import { PDFDocModal } from '../Files/PDFDocModal'
+import FindLics from './components/FindLic/FindLics'
 
 
 type WidgetParams = {
