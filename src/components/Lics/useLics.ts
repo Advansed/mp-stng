@@ -179,6 +179,8 @@ export const useLics = (): UseLicsReturn => {
     console.log(`${DEBUG_PREFIXES.NAVIGATION} Current page: ${getCurrentPageName()} (${page})`);
   }, [page, getCurrentPageName]);
 
+
+
   return {
     // State
     info,

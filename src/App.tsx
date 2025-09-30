@@ -77,6 +77,7 @@ const App: React.FC = () => {
   Store.subscribe({ num: 2, type: "reg", func: ()=>{
     setReg( Store.getState().reg ) 
   }})
+
   
   return (
     auth

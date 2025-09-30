@@ -9,7 +9,7 @@ import { useLics } from './useLics'
 import { LicsPage } from './components/types'
 import { DEBUG_PREFIXES } from './components/constants'
 import { PDFDocModal } from '../Files/PDFDocModal'
-import FindLics from './components/FindLic/FindLics'
+import { useLics_ } from './useLics_'
 
 
 type WidgetParams = {
@@ -51,6 +51,12 @@ export function     Lics(): JSX.Element {
         refreshLics,
         getCurrentPageName
     } = useLics();
+
+    const { lics } = useLics_()
+
+    // useEffect(()=>{
+    //     console.log( lcs )
+    // },[lcs])
 
     // Рендеринг компонентов на основе текущей страницы
     const renderPageComponent = (): JSX.Element => {
