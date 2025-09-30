@@ -12,6 +12,7 @@ import { useLics } from './useLics'
 import { useNavigation } from './useNavigation'
 import { AddLic } from './components/AddLic'
 import { FindLic } from './components/FindLic/FindLic'
+import { LicItem } from './components/LicItem'
 
 
 type WidgetParams = {
@@ -89,7 +90,7 @@ function            Items( props: { info, setItem, setPage, delAccount, addLic }
     for(let i= 0;i < info.length;i++){
         elem = <>
             { elem }
-            <Lic info = { info[i]} ind = { i } setItem = { props.setItem } setPage = { props.setPage } delAccount = { props.delAccount } />
+            <LicItem info = { info[i]} ind = { i } setItem = { props.setItem } setPage = { props.setPage } delAccount = { props.delAccount } />
         </>
     }
 
@@ -1509,6 +1510,7 @@ function            Indices(props: { item, setPage}){
             <Counter info  = { item.counters[i]} setPage = { props.setPage } />
         </>
     }
+
     const elem = <>
 
         <IonCard className='pb-1'>
