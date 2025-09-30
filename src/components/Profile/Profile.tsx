@@ -1,159 +1,71 @@
-import { IonButton, IonCard, IonCheckbox, IonIcon, IonInput, IonLabel, IonText, IonTextarea } from "@ionic/react"
-import React, { useEffect, useState } from "react"
+import {  IonCard, IonCheckbox, IonIcon, IonInput, IonLoading, IonText, IonTextarea } from "@ionic/react"
+import React, { useState } from "react"
 import { FioSuggestions } from "react-dadata"
-import '../../node_modules/react-dadata/dist/react-dadata.css'
-import { KemVydan, Store, getData } from "./Store"
-import MaskedInput from "../mask/reactTextMask"
-import { atOutline, barcodeOutline, businessOutline, calendarOutline, callOutline, codeWorkingOutline, ellipseOutline, ellipsisHorizontalOutline, eyeOffOutline, eyeOutline, saveOutline } from "ionicons/icons"
-import { Maskito } from "./Classes"
+import 'react-dadata/dist/react-dadata.css'
+import { atOutline, barcodeOutline, businessOutline, calendarOutline, callOutline, codeWorkingOutline, ellipsisHorizontalOutline, eyeOffOutline, eyeOutline, saveOutline } from "ionicons/icons"
+import { Maskito } from "../Classes"
+import { useProfile } from "./useProfile"
 
 
 export function Profile() {
-    const [ info, setInfo ] = useState<any>() 
+    const { profile, isLoading, save } = useProfile()
+    const [ info ] = useState<any>( profile )
 
-    Store.subscribe({num: 404, type: "back", func:()=>{
-        Store.dispatch({type:"route", route: "back"})
-    }})
-
-    Store.subscribe({num: 32, type: "profile", func:()=>{
-        setInfo( Store.getState().profile )
-    }})
-
-    useEffect(()=>{
-
-        setInfo( Store.getState().profile )        
-
-        return ()=>{
-            Store.unSubscribe(404);
-            Store.unSubscribe(32);
-        }
-
-    },[])
-
-    async function Save( params ){
-        const res = await getData("profile", params)
-        console.log( res )
-        if(res.error){ console.log(res.message)}
-        else Store.dispatch({ type: "profile", profile: res.data })
-    }
-
-    function FIO(props:{ info }){
-        const [ edit,   setEdit ] = useState( false)
-        const [ upd,    setUpd ]  = useState( 0 )
-        const [ mode,   setMode ] = useState<any>({ token: Store.getState().login.token })
-        const info = props.info
-
-        const elem = <>
-            <div className=" ml-1 mr-1 t-underline mt-1 cl-prim flex fl-space"> 
-                <b>ФИО</b> 
-                <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
-                    onClick={()=>{
-                        Save( mode )
-                        setMode( { token: Store.getState().login.token } );
-                    }}
-                />
-            </div>
-            <div className={ edit ? "ml-1 mr-1 mt-1 cl-prim fs-bold" : "hidden"}>
-                <FioSuggestions  token="50bfb3453a528d091723900fdae5ca5a30369832"
-                    value={{ 
-                        value: info?.surname + " " + info?.name + " " + info?.lastname, 
-                        unrestricted_value: info?.surname + " " + info?.name + " " + info?.lastname,
-                        data: {
-                            surname:            info?.surname,
-                            name:               info?.name,
-                            patronymic:         info?.lastname,
-                            gender:             "MALE",
-                            source:             null,
-                            qc:                 "0"
-                        }
-                    }}
-                    onChange={(e)=>{
-                        info.surname            = e?.data.surname;  
-                        info.name               = e?.data.name;  
-                        info.lastname           = e?.data.patronymic;  
-
-                        mode.surname            = e?.data.surname;  
-                        mode.name               = e?.data.name;  
-                        mode.lastname           = e?.data.patronymic;  
-
-                        setUpd( upd + 1)
-                        setEdit( edit )
-
-                        console.log( Object.keys(mode).length )
-
-                }}/>
-            </div>
-            <div className="cl-prim"  onClick={()=>{ setEdit(!edit); console.log( mode ) }} >
-                <div className='flex fl-space ml-2 mt-1 mr-1'>
-                    <div><b> ФИО</b> </div>
-                    <div> { info?.surname  + ' ' + info?.name + ' ' + info?.lastname }</div>
-                </div>
-            </div>
-        </>
-        return elem
-    }
 
     function Passport(props:{ info }) {
         const [ upd,    setUpd ]  = useState( 0 )
-        const [ mode,   setMode ] = useState<any>({ token: Store.getState().login.token })
+        const [ mode,   setMode ] = useState<any>({})
+            
+        const elem = <>
+        <div className=" ml-1 mr-1 t-underline mt-1 flex fl-space"> 
+            <b>Паспортные данные</b> 
+            <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 0 ? "medium" : "success" }
+                onClick={()=>{
+                    save({
+                        passport:   info?.passport,
+                        surname:    mode.surname,
+                        name:       mode.name,
+                        lastname:   mode.lastname
+                    })
+                    setMode({});
+                }}
+            />
+        </div>
 
+        <div className={ "ml-1 mr-1 mt-1 cl-prim fs-bold" }>
+            <FioSuggestions  token="50bfb3453a528d091723900fdae5ca5a30369832"
+                value={{ 
+                    value: info?.surname + " " + info?.name + " " + info?.lastname, 
+                    unrestricted_value: info?.surname + " " + info?.name + " " + info?.lastname,
+                    data: {
+                        surname:            info?.surname || '',
+                        name:               info?.name || '',
+                        patronymic:         info?.lastname || '',
+                        gender:             "MALE",
+                        source:             null,
+                        qc:                 "0"
+                    }
+                }}
+                onChange={(e)=>{
 
-        async function Save(){
-            const res = await getData("profile", {
-                token:      Store.getState().login.token,
-                passport:   info?.passport,
-                surname:    mode.surname,
-                name:       mode.name,
-                lastname:   mode.lastname,
-            })
-            console.log( {
-                token: Store.getState().login.token,
-                passport: info?.passport
-            })
-            console.log( res )
-            if(res.error){ console.log(res.message)}
-            else Store.dispatch({ type: "profile", profile: res.data })
-        }
-            const elem = <>
-            <div className=" ml-1 mr-1 t-underline mt-1 flex fl-space"> 
-                <b>Паспортные данные</b> 
-                <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
-                    onClick={()=>{
-                        Save()
-                        setMode( { token: Store.getState().login.token } );
-                    }}
-                />
-            </div>
+                    if(info) {
 
-            <div className={ "ml-1 mr-1 mt-1 cl-prim fs-bold" }>
-                <FioSuggestions  token="50bfb3453a528d091723900fdae5ca5a30369832"
-                    value={{ 
-                        value: info?.surname + " " + info?.name + " " + info?.lastname, 
-                        unrestricted_value: info?.surname + " " + info?.name + " " + info?.lastname,
-                        data: {
-                            surname:            info?.surname,
-                            name:               info?.name,
-                            patronymic:         info?.lastname,
-                            gender:             "MALE",
-                            source:             null,
-                            qc:                 "0"
-                        }
-                    }}
-                    onChange={(e)=>{
                         info.surname            = e?.data.surname;  
                         info.name               = e?.data.name;  
                         info.lastname           = e?.data.patronymic;  
 
-                        mode.surname            = e?.data.surname;  
-                        mode.name               = e?.data.name;  
-                        mode.lastname           = e?.data.patronymic;  
+                    }
 
-                        setUpd( upd + 1)
+                    mode.surname            = e?.data.surname;  
+                    mode.name               = e?.data.name;  
+                    mode.lastname           = e?.data.patronymic;  
 
-                        console.log( Object.keys(mode).length )
+                    setUpd( upd + 1)
 
-                }}/>
-            </div>  
+                    console.log( Object.keys(mode).length )
+
+            }}/>
+        </div>  
 
             <div className=" flex cl-black">
                 <IonIcon icon = { barcodeOutline } className="w-15 h-15 ml-1" color="primary"/>
@@ -240,7 +152,7 @@ export function Profile() {
 
     function Contacts(props: { info }) {
         const [ upd,    setUpd ]  = useState( 0 )
-        const [ mode,   setMode ] = useState<any>({ token: Store.getState().login.token })
+        const [ mode,   setMode ] = useState<any>({})
         const [ show,   setShow ] = useState( false)
 
         const togglePasswordVisibility = () => {
@@ -250,10 +162,10 @@ export function Profile() {
         const elem = <>
             <div className=" ml-1 mr-1 t-underline mt-1 flex fl-space"> 
                 <b>Настройки</b> 
-                <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 1 ? "medium" : "success" }
+                <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 0 ? "medium" : "success" }
                     onClick={()=>{
-                        Save( mode )
-                        setMode( { token: Store.getState().login.token } );
+                        save( mode )
+                        setMode({});
                     }}
                 />
             </div>
@@ -284,7 +196,7 @@ export function Profile() {
                 <IonIcon icon = { callOutline } className="w-15 h-15 ml-1" color="primary"/>
                 <div className="ml-1 w-80 mr-1 t-underline">
                     <div className="mt-05 pb-05 ml-1">
-                        { Store.getState().login.phone }     
+                        { profile?.phone }     
                     </div>
                 </div>                    
             </div>
@@ -358,6 +270,7 @@ export function Profile() {
 
 
     const elem = <>
+        <IonLoading isOpen = { isLoading } message = { "Идет обновление..." }/>
         <div>
             <div className='ml-1 h-3'>
                 <IonText>

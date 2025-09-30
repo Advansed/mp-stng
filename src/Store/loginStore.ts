@@ -3,10 +3,12 @@ import { api, version } from './api';
 
 const url = 'https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/'
 
-interface User {
+export interface User {
   id:               string;
   email:            string;
   name:             string;
+  surname:          string;
+  lastname:         string;
   phone:            string;
   token:            string;
   pincode?:         string;
@@ -171,21 +173,18 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
         
         set({ isLoading: true, error: null });
         try {
-        const res = await fetch('/api/profile', {
-            method: 'PUT',
-            headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (!res.ok) throw new Error('Update failed');
-        
-        const user = await res.json();
-        set({ user, isLoading: false });
+
+            const { user } = get()
+
+            const res =  await api('set_profile', { token: token, ...data });
+            
+            if(!res.error)
+                set({ user: {...user, ...data} as User, isLoading: false });
+
         } catch (error) {
-        set({ error: (error as Error).message, isLoading: false });
+
+            set({ error: (error as Error).message, isLoading: false });
+
         }
     }
 

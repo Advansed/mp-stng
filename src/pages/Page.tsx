@@ -5,7 +5,7 @@ import './Page.css';
 import { Lics }     from '../components/Lics';
 import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, createOutline, documentTextOutline } from 'ionicons/icons';
 import { Store, getApps, getData, getLics, getNotifications, getProfile, getServices, version }    from '../components/Store';
-import { Profile }  from '../components/Profile';
+import { Profile }  from '../components/Profile/Profile';
 import { Agzs }     from '../components/AGZS';
 import { Apps }     from '../components/Apps';
 import { Request }  from '../components/Request';
