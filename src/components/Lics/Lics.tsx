@@ -5,11 +5,11 @@ import { IonAlert, IonButton, IonCard, IonCol, IonIcon, IonImg, IonInput, IonIte
 import { alertCircleOutline, cardOutline, closeCircleOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, listOutline, locationOutline, pencilOutline, personOutline } from 'ionicons/icons'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
-import { useLics } from './useLics'
 import { LicsPage } from './components/types'
 import { DEBUG_PREFIXES } from './components/constants'
 import { PDFDocModal } from '../Files/PDFDocModal'
-import { useLics_ } from './useLics_'
+import { useLics } from './useLics'
+import { useNavigation } from './useNavigation'
 
 
 type WidgetParams = {
@@ -39,24 +39,13 @@ const               openUrl = async (url) =>{
 }
 
 export function     Lics(): JSX.Element {
-    // Используем кастомный хук вместо useState и useEffect
-    const {
-        info,
-        upd,
-        page,
-        item,
-        setPage,
-        setItem,
-        handleBackNavigation,
-        refreshLics,
-        getCurrentPageName
-    } = useLics();
 
-    const { lics } = useLics_()
+    const { info } = useLics()
+    const { page, setPage, item, setItem, getCurrentPageName } = useNavigation()
 
-    // useEffect(()=>{
-    //     console.log( lcs )
-    // },[lcs])
+    useEffect(()=>{
+        console.log( info )
+    },[ info ])
 
     // Рендеринг компонентов на основе текущей страницы
     const renderPageComponent = (): JSX.Element => {

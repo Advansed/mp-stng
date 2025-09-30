@@ -57,19 +57,17 @@ export const useLicsStore = create<LicsStore>()(
       selectedLic:      null,
 
       // Actions
-      getLiscs:         async (token: string) => {
-        console.log("getLics")
+      getLics:         async (token: string) => {
         set({ loading: true });
         try {
-          const response = await api('getAccount', { token });
-          console.log( response )
-          const result: ApiResponse = response.data;
+          const res = await api('getAccount', { token });
+          console.log( res )
           
-          if (result.error) {
+          if (res.error) {
             return;
           }
           
-          set({ lics: result.data || [], loading: false });
+          set({ lics: res.data || [], loading: false });
         } catch (error) {
           set({ loading: false });
         }
