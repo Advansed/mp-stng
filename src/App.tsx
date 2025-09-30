@@ -30,11 +30,12 @@ import OneSignal from 'onesignal-cordova-plugin'
 import './app.css'
 import { Registration } from './components/Registration';
 import { ToastProvider } from './components/Toast';
+import { useAuth } from './Store/loginStore';
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [ auth, setAuth ] = useState( Store.getState().auth )
+  const auth = useAuth()
   const [ reg,  setReg ]  = useState( Store.getState().reg )
   const [ alert, setAlert ] = useState( false )
   
@@ -72,25 +73,6 @@ const App: React.FC = () => {
       setAlert( true )
     }
   }
-
-
-  useEffect(()=>{
-    setAuth( Store.getState().auth ) 
-  }, [])
-
-  Store.subscribe({ num: 1, type: "auth", func: ()=>{
-    setAuth( Store.getState().auth ) 
-    if( Store.getState().auth)
-     if( isPlatform("mobile") )
-      try {
-        check()
-        OneSignalInit(); 
-      } catch (error) {
-        console.log( error )
-      }
-       
-    
-  }})
 
   Store.subscribe({ num: 2, type: "reg", func: ()=>{
     setReg( Store.getState().reg ) 

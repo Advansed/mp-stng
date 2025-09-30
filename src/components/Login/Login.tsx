@@ -15,41 +15,41 @@ export type LoginPage = 'login' | 'restore' | 'SMS' | 'Pass' | 'Reg';
 export function Login() {
     const [currentPage, setCurrentPage] = useState<LoginPage>('login');
 
-    const { isLoading, info,  login, compare, restore, create, password } = useLogin()
+    const { isLoading, user,  ulogin, ucompare, urestore, ucreate, upassword } = useLogin()
 
     const renderPage = () => {
         switch (currentPage) {
             case 'login':
                 return <LoginForm
                     onNavigate  = { setCurrentPage }
-                    onLogin     = { login }
+                    onLogin     = { ulogin }
                 />;
             case 'restore':
                 return <RestoreForm 
                     onNavigate  = { setCurrentPage }
-                    onRestore   = { restore }
+                    onRestore   = { urestore }
                 />;
             case 'SMS':
                 return <SMSForm 
-                    phone       = { info.code }
+                    phone       = { user.code }
                     onNavigate  = { setCurrentPage }
-                    onRestore   = { restore }
-                    onCompare   = { compare }
+                    onRestore   = { urestore }
+                    onCompare   = { ucompare }
                 />;
             case 'Pass':
                 return <PassForm 
                     onNavigate  = { setCurrentPage }
-                    onPassword  = { password }
+                    onPassword  = { upassword }
                 />;
             case 'Reg':
                 return <RegistrationForm 
                     onNavigate  = { setCurrentPage }
-                    onCreate    = { create }
+                    onCreate    = { ucreate }
                 />;
             default:
                 return <LoginForm 
                     onNavigate  = { setCurrentPage }
-                    onLogin     = { login }
+                    onLogin     = { ulogin }
                 />;
         }
     };
