@@ -53,13 +53,7 @@ export function     Lics(): JSX.Element {
     const renderPageComponent = (): JSX.Element => {
         try {
             switch(page) {
-                case LicsPage.MAIN:
-                    return (
-                        <>
-                            <Items info={info} setItem={setItem} setPage={setPage} delAccount = { delLic } />
-                            <AddLic_ setPage={setPage}  addLic = { addLic }/>
-                        </>
-                    );
+                case LicsPage.MAIN:             return <Items info={info} setItem={setItem} setPage={setPage} delAccount = { delLic }  addLic = { addLic }/>
                 case LicsPage.ADD_LIC_1:        return <AddLic setPage = {setPage}  addLic = { addLic } />;
                 case LicsPage.FIND_LIC:         return <FindLic setPage = { setPage } />; 
                 case LicsPage.HISTORY:          return <History item={item} />;
@@ -71,13 +65,10 @@ export function     Lics(): JSX.Element {
                 case LicsPage.HISTORY_INDICES:  return <HistoryIndices item={item} />;
                 case LicsPage.ALFA_BANK:        return <AlfaBank item={item} setPage={setPage} />;
                 case LicsPage.SBP:              return <SBP item={item} setPage={setPage} />;
-                default:
-                    console.warn(`${DEBUG_PREFIXES.LICS} Unknown page: ${page}`);
-                                                return <></>;
+                default:                        return <></>;
             }
         } catch (error) {
-            console.error(`${DEBUG_PREFIXES.ERROR} Error rendering page component:`, error);
-            return <></>;
+                return <></>;
         }
     };
 
@@ -90,7 +81,7 @@ export function     Lics(): JSX.Element {
     );
 }
 
-function Items( props: { info, setItem, setPage, delAccount }) {
+function            Items( props: { info, setItem, setPage, delAccount, addLic }) {
     const info = props.info
 
     let elem = <></>
@@ -103,13 +94,16 @@ function Items( props: { info, setItem, setPage, delAccount }) {
     }
 
     return (
-        <div className="cards-container">
-            { elem }
-        </div>
+        <>
+            <div className="cards-container">
+                { elem }
+            </div>                                    
+            <AddLics setPage={ props.setPage}  addLic = { props.addLic }/>
+        </>
     )
 }
 
-function            AddLic_(props:{ setPage, addLic }) {
+function            AddLics(props:{ setPage, addLic }) {
 
     return <>
         <IonCard>

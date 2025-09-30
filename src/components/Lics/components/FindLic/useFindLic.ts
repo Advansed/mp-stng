@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../../../../Store/api';
 import { useToken } from '../../../../Store/loginStore';
 import { useLicsStore } from '../../../../Store/licsStore';
+import { useToast } from '../../../Toast';
 
 // TODO: Миграция на zustand - заменить useState на store
 // TODO: Миграция на fetch - заменить getData на нативный fetch API
@@ -45,7 +46,7 @@ interface FindLicData {
   naspunkt?:        Settlement & { streets?: Street[] };
   street?:          Street & { houses?: House[] };
   house?:           House;
-  kv?:              string;
+  kv?:              Apartment;
   lc?:              string;
   fio:              string;
   message:          string;
@@ -86,6 +87,7 @@ export const useFindLic = (): UseFindLicReturn => {
   });
 
   const token = useToken()
+  const toast = useToast()
 
   const { addLic } = useLicsStore()
 
@@ -143,7 +145,7 @@ export const useFindLic = (): UseFindLicReturn => {
     
     updateState({ load: true });
 
-        await addLic( token || '',  params.LC || '', params.fio || '' )    
+    await addLic( token || '',  params.LC || '', params.fio || '' )    
 
     updateState({ load: false });
 
