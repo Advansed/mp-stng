@@ -8,6 +8,8 @@ export const useLics    = () => {
     loading,
     selectedLic,
     getLics,
+    addLic: add_Lic,
+    delLic: del_Lic,
     setSelectedLic
   } = useLicsStore();
 
@@ -40,6 +42,14 @@ export const useLics    = () => {
     setSelectedLic(lic || null);
   };
 
+  const addLic = async( lic: string, fio: string) => {
+      await add_Lic( token || '', lic, fio)
+  }
+
+  const delLic = async( lic: string ) => {
+      await del_Lic( token || '', lic )
+  }
+
   return {
     info:           lics,
     loading,
@@ -48,6 +58,8 @@ export const useLics    = () => {
     countersCount,
     refreshLics,
     selectLic,
+    addLic,
+    delLic,
     isLoading:      loading
   };
 };

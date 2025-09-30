@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { api } from './api';
 import { useToken } from './loginStore';
+import { loadavg } from 'os';
+import { getLics } from '../components/Store';
 
 interface   Counter {
   counterId:            string;
@@ -43,6 +45,8 @@ interface   LicsState {
 
 interface   LicsActions {
   getLics:              (token: string) => Promise<void>;
+  addLic:               (token: string, lic: string, fio: string) => Promise<void>;
+  delLic:                (token: string, lic: string ) => Promise<void>;
   setSelectedLic:       (lic: Lic | null) => void;
 }
 
@@ -61,16 +65,86 @@ export const useLicsStore = create<LicsStore>()(
         set({ loading: true });
         try {
           const res = await api('getAccount', { token });
-          console.log( res )
+          console.log('getAccount', res )
           
           if (res.error) {
             return;
           }
+
+          const licsWithSum = res.data?.map(lic => ({
+            ...lic,
+            sum: parseFloat(lic.debts.reduce((total, debt) => total + debt.sum, 0).toFixed(2))
+          })) || [];
           
-          set({ lics: res.data || [], loading: false });
+          set({ lics: licsWithSum || [], loading: false });
         } catch (error) {
           set({ loading: false });
         }
+      },
+
+      addLic:         async ( token: string, lic: string, fio: string ) => {
+        set({ loading: true })
+        
+        const res = await api('addAccount', { token: token, LC: lic, fio: fio });
+        console.log( res )
+          
+        if (res.error) {
+          return;
+        }
+
+         try {
+          const res = await api('getAccount', { token });
+          console.log('getAccount', res )
+          
+          if (res.error) {
+            return;
+          }
+
+          const licsWithSum = res.data?.map(lic => ({
+            ...lic,
+            sum: parseFloat(lic.debts.reduce((total, debt) => total + debt.sum, 0).toFixed(2))
+          })) || [];
+          
+          set({ lics: licsWithSum || [], loading: false });
+        } catch (error) {
+          set({ loading: false });
+        }
+
+        set({ loading: false })
+      },
+
+      delLic:         async ( token: string, lic: string ) => {
+        set({ loading: true })
+
+        console.log("LC", lic)
+        
+        const res = await api('delAccount', { token: token, LC: lic });
+
+        console.log( res )
+          
+        if (res.error) {
+          return;
+        }
+
+         try {
+          const res = await api('getAccount', { token });
+          console.log('getAccount', res )
+          
+          if (res.error) {
+            return;
+          }
+
+          const licsWithSum = res.data?.map(lic => ({
+            ...lic,
+            sum: parseFloat(lic.debts.reduce((total, debt) => total + debt.sum, 0).toFixed(2))
+          })) || [];
+          
+          set({ lics: licsWithSum || [], loading: false });
+        } catch (error) {
+          set({ loading: false });
+        }
+        
+        set({ loading: false })
       },
 
       setSelectedLic:   (lic) => set({ selectedLic: lic }),

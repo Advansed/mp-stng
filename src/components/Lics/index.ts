@@ -14,7 +14,7 @@ export { Lics } from './Lics';
 // ========================
 
 // Основной хук
-export { useLics } from './useLics_old';
+export { useLics } from './useLics';
 
 // ========================
 // ТИПЫ И ИНТЕРФЕЙСЫ

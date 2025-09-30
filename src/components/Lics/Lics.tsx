@@ -10,6 +10,8 @@ import { DEBUG_PREFIXES } from './components/constants'
 import { PDFDocModal } from '../Files/PDFDocModal'
 import { useLics } from './useLics'
 import { useNavigation } from './useNavigation'
+import { AddLic } from './components/AddLic'
+import { FindLic } from './components/FindLic/FindLic'
 
 
 type WidgetParams = {
@@ -40,7 +42,7 @@ const               openUrl = async (url) =>{
 
 export function     Lics(): JSX.Element {
 
-    const { info } = useLics()
+    const { info, addLic, delLic } = useLics()
     const { page, setPage, item, setItem, getCurrentPageName } = useNavigation()
 
     useEffect(()=>{
@@ -54,35 +56,24 @@ export function     Lics(): JSX.Element {
                 case LicsPage.MAIN:
                     return (
                         <>
-                            <Items info={info} setItem={setItem} setPage={setPage} />
-                            <AddLic setPage={setPage} />
+                            <Items info={info} setItem={setItem} setPage={setPage} delAccount = { delLic } />
+                            <AddLic_ setPage={setPage}  addLic = { addLic }/>
                         </>
                     );
-                case LicsPage.ADD_LIC_1:
-                    return <AddLic1 setPage={setPage} />;
-                case LicsPage.FIND_LIC:
-                    return <AddLic2 setPage={setPage} />;
-                case LicsPage.HISTORY:
-                    return <History item={item} />;
-                case LicsPage.PAYMENTS:
-                    return <Payments item={item} setPage={setPage} />;
-                case LicsPage.PAYMENTS_TO:
-                    return <PaymentsTO item={item} setPage={setPage} />;
-                case LicsPage.INDICES:
-                    return <Indices item={item} setPage={setPage} />;
-                case LicsPage.EQUARING:
-                    return <Equaring item={item} setPage={setPage} />;
-                case LicsPage.SBER_PAY:
-                    return <SberPay item={item} setPage={setPage} />;
-                case LicsPage.HISTORY_INDICES:
-                    return <HistoryIndices item={item} />;
-                case LicsPage.ALFA_BANK:
-                    return <AlfaBank item={item} setPage={setPage} />;
-                case LicsPage.SBP:
-                    return <SBP item={item} setPage={setPage} />;
+                case LicsPage.ADD_LIC_1:        return <AddLic setPage = {setPage}  addLic = { addLic } />;
+                case LicsPage.FIND_LIC:         return <FindLic setPage = { setPage } />; 
+                case LicsPage.HISTORY:          return <History item={item} />;
+                case LicsPage.PAYMENTS:         return <Payments item={item} setPage={setPage} />;
+                case LicsPage.PAYMENTS_TO:      return <PaymentsTO item={item} setPage={setPage} />;
+                case LicsPage.INDICES:          return <Indices item={item} setPage={setPage} />;
+                case LicsPage.EQUARING:         return <Equaring item={item} setPage={setPage} />;
+                case LicsPage.SBER_PAY:         return <SberPay item={item} setPage={setPage} />;
+                case LicsPage.HISTORY_INDICES:  return <HistoryIndices item={item} />;
+                case LicsPage.ALFA_BANK:        return <AlfaBank item={item} setPage={setPage} />;
+                case LicsPage.SBP:              return <SBP item={item} setPage={setPage} />;
                 default:
                     console.warn(`${DEBUG_PREFIXES.LICS} Unknown page: ${page}`);
-                    return <></>;
+                                                return <></>;
             }
         } catch (error) {
             console.error(`${DEBUG_PREFIXES.ERROR} Error rendering page component:`, error);
@@ -99,7 +90,7 @@ export function     Lics(): JSX.Element {
     );
 }
 
-function Items(props: { info, setItem, setPage }) {
+function Items( props: { info, setItem, setPage, delAccount }) {
     const info = props.info
 
     let elem = <></>
@@ -107,7 +98,7 @@ function Items(props: { info, setItem, setPage }) {
     for(let i= 0;i < info.length;i++){
         elem = <>
             { elem }
-            <Lic info = { info[i]} ind = { i } setItem = { props.setItem } setPage = { props.setPage } />
+            <Lic info = { info[i]} ind = { i } setItem = { props.setItem } setPage = { props.setPage } delAccount = { props.delAccount } />
         </>
     }
 
@@ -118,13 +109,13 @@ function Items(props: { info, setItem, setPage }) {
     )
 }
 
-function            AddLic(props:{ setPage}) {
+function            AddLic_(props:{ setPage, addLic }) {
 
     return <>
         <IonCard>
         <div className='ml-05 mr-05'>
                 <div className='ls-item1'
-                   onClick={()=>{  props.setPage( 1 )  }} 
+                   onClick={()=>{  props.setPage( LicsPage.ADD_LIC_1 )  }} 
                 >
                     <div> <IonIcon icon = { pencilOutline }  className='w-15 h-15 ml-05' color='tertiary' mode = "ios" /></div>
                     <div> 
@@ -134,7 +125,7 @@ function            AddLic(props:{ setPage}) {
                 </div>
             </div>
             <div className='ml-05 mr-05'
-                onClick={()=>{  props.setPage( 2 )  }}                
+                onClick={()=>{ props.setPage( LicsPage.FIND_LIC) }}                
             >
                 <div className='ls-item1'>
                     <div> <IonIcon icon = { documentTextOutline }  className='w-15 h-15 ml-05' color='tertiary' mode = "ios" /></div>
@@ -146,96 +137,6 @@ function            AddLic(props:{ setPage}) {
             </div>
         </IonCard>
     </>
-}
-
-function            AddLic1(props:{ setPage }){
-    const [ info ] = useState({
-        token:      Store.getState().login.token,
-        LC :        "",
-        fio:        "",
-    })
-    const [ upd, setUpd] = useState( 0 )
-    const [ message, setMessage ] = useState("")
-    const [ load, setLoad ] = useState( false )
-
-    async function      Add( params, setMessage, setPage ){
-
-        setLoad( true )
-        const res = await getData("AddAccount", params )
-        console.log( res )
-        if(res.error){
-            setMessage(res.message);
-        } else {
-            getLics({ token: Store.getState().login.token })
-            getProfile({ token: Store.getState().login.token })
-            setPage( 0 )
-        }
-        setLoad( false )
-    }   
-
-    const elem = <>
-        <IonLoading isOpen = { load} message={ "Подождите..." }/>
-            <IonCard className='pb-1'>
-                <div className='flex fl-space mt-1 ml-1'>
-                    <div className='cl-black'> <h4><b>{ "Новый лицевой счет" }</b></h4></div>
-                </div>
-                <div className='ml-1 mr-1 t-underline s-input'>
-                    <IonInput
-                        className='s-input-1 ml-1'
-                        placeholder='Номер л/с'
-                        value={ info.LC }
-                        mode = "ios"
-                        onIonInput={(e)=>{
-                            info.LC = e.detail.value as string;
-                            setUpd(upd + 1)
-                            setMessage("")
-                        }}
-                    >
-                    </IonInput>   
-                </div>    
-                <div className='ml-1 mr-1 mt-1 t-underline s-input'>
-                    <IonInput
-                        className='s-input-1 ml-1'
-                        placeholder='Первые три буквы фамилии'
-                        value={ info.fio }
-                        maxlength={ 3 }
-                        onIonInput={(e)=>{
-                            info.fio = e.detail.value as string;
-                            setUpd(upd + 1)
-                            setMessage("")
-                        }}
-                    >
-                    </IonInput>   
-                </div>    
-                <div className='ml-1 mr-1'>
-                    <p>
-                        { message }
-                    </p>
-                </div>
-                <div className='ml-1 mr-1'>
-                    <IonButton
-                        color = "tertiary"
-                        expand='block'
-                        mode = "ios"
-                        onClick={()=>{
-                            setMessage("")
-                            if( info.LC !== "" && info.fio !== "")
-                                Add( info, setMessage, props.setPage )
-                            else props.setPage( 0 )
-                        }}
-                    >
-                        {
-                            info.LC !== "" && info.fio !== ""
-                                ? "Добавить"
-                                : "Закрыть"  
-                        }
-                    </IonButton>
-                </div>
-
-
-            </IonCard>
-    </>
-    return elem
 }
 
 function            AddLic2(props:{ setPage }){
@@ -697,7 +598,7 @@ function            AddLic2(props:{ setPage }){
     return elem
 }
 
-function            Lic(props: { info, ind, setItem, setPage } ){
+function            Lic(props: { info, ind, setItem, setPage, delAccount } ){
     const [ load,   setLoad ]   = useState(false)
     const [ modal,  setModal ]  = useState<any>()
     const [ showDeleteAlert, setShowDeleteAlert ] = useState(false) // 🆕 Состояние для диалога
@@ -705,20 +606,6 @@ function            Lic(props: { info, ind, setItem, setPage } ){
 
     const info = props.info 
     
-    async function delAccont() {
-        setLoad( true)
-        const res = await  getData("DelAccount", {
-            token: Store.getState().login.token,
-            LC: info.code
-        })
-        if(!res.error){
-            getLics({
-                token: Store.getState().login.token,
-            })
-        }
-        setLoad(false)
-    }
-
  // 🆕 Функция для показа диалога подтверждения
     function confirmDelete() {
         setShowDeleteAlert(true)
@@ -728,7 +615,8 @@ function            Lic(props: { info, ind, setItem, setPage } ){
     // 🆕 Функция для обработки подтверждения удаления
     function handleDeleteConfirm() {
         setShowDeleteAlert(false)
-        delAccont()
+        props.delAccount( info.code )
+        props.setPage( LicsPage.MAIN )
     }
 
     // 🆕 Функция для отмены удаления
