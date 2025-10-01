@@ -14,7 +14,9 @@ import {
 } from '@ionic/react';
 import { 
   alertCircleOutline, 
+  cardOutline, 
   closeCircleOutline, 
+  codeWorkingOutline, 
   documentAttachOutline, 
   listOutline, 
   locationOutline, 
@@ -118,35 +120,90 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
           
           <IonSegmentView>
             <IonSegmentContent id={"first" + info.id}>
-              <div className="flex fl-space mt-05">
-                <div className="ml-2">
-                  {info.sum < 0 ? "Аванс" : "К оплате"}
-                </div>
-                <div className="cl-prim fs-11 mt-05 mb-05 mr-2">
-                  <b>
-                    {info.sum < 0 
-                      ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(Math.abs(info.sum))
-                      : new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(info.sum)
-                    }
-                  </b>
-                </div>
-              </div>
-              
-              {info.sum > 0 && (
-                <div className="ls-item2" onClick={() => {
-                  setItem(info);
-                  setPage(LicsPage.PAYMENTS);
-                }}>
-                  <div className="ml-05">
-                    <IonIcon icon={alertCircleOutline} className="h-15 w-15" color="primary" />
-                  </div>
-                  <div className="ml-1">
-                    <div className="fs-09">
-                      <b>Напоминание: </b> Пожалуйста, вносите показания счетчика ежемесячно
+                <div className='flex fl-space mt-05'>
+                    <div className='ml-2'>
+                        {
+                            info.sum < 0 ? "Аванс" : "К оплате" 
+                        }
                     </div>
-                  </div>
+                    <div className='cl-prim fs-11 mt-05 mb-05 mr-2'>
+                        <b>
+                            { 
+                                info.sum < 0 
+                                    ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( -info.sum ) ) 
+                                    : new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( ( info.sum ) ) 
+                            }
+                        </b>
+                    </div>
                 </div>
-              )}
+                <div className='flex fl-space'>
+                            
+                    <IonButton
+                        mode = { 'ios' }
+                        color={ "tertiary" }
+                        className='fs-09 w-50'
+                        disabled = { info.sum <= 0 }
+                        onClick={()=>{
+                            setItem( info )
+                            setPage( 5 )                  
+                        }}
+                    >
+                        <IonIcon icon = { cardOutline } />
+                        <IonLabel className='ml-1'> { "Оплатить" } </IonLabel>
+                                
+                    </IonButton>
+
+                    <IonButton
+                        mode = { 'ios' }
+                        color={ "tertiary" }
+                        className='fs-09 w-50'
+                        onClick={()=>{
+                            setItem( info )
+                            setPage( 4 )                  
+                        }}
+                    >
+                        <IonIcon icon = { cardOutline } />
+                        <IonLabel className='ml-1'>Подробнее</IonLabel>
+                                
+                    </IonButton>
+          
+                </div>
+
+                <IonButton
+                    mode = { 'ios' }
+                    color={ "tertiary" }
+                    className='fs-09 w-100'
+                    expand='block'
+                    onClick={()=>{
+                        setItem( info )
+                        setPage( 6 )  
+                    }}
+                >
+                    <IonIcon icon = { codeWorkingOutline } />
+                    <IonLabel className='ml-1'> { "Передать показания" } </IonLabel>
+                                
+                </IonButton>
+
+                {
+                    info.counters.length > 0
+                        ? <>
+                              <div className='ls-item2'
+                                  onClick={()=>{
+                                      console.log("quits")
+                                      // Quits()
+                                  }}
+                              >
+                                  <div className='ml-05'>
+                                      <IonIcon icon = { alertCircleOutline }  className='h-15 w-15' color="primary"/>
+                                  </div>
+                                  <div className='ml-1'>
+                                      <div className='fs-09'><b>Напоминание: </b> Пожалуйста, вносите показания счетчика ежемесячно  </div>
+                                  </div>
+                              </div> 
+                          </>
+                        : <></>
+                }            
+                
             </IonSegmentContent>
             
             <IonSegmentContent id={"second" + info.id}>

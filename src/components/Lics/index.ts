@@ -23,7 +23,6 @@ export { useLics } from './useLics';
 // Существующие типы
 export type {
   LicsItem,
-  LicsCounter,
   LicsIndication,
   LicsState,
   SetPageFunction,

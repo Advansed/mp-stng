@@ -1,12 +1,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { api } from './api';
-import { useToken } from './loginStore';
-import { loadavg } from 'os';
-import { getLics } from '../components/Store';
-import { useToast } from '../components/Toast';
 
-interface   Counter {
+
+export interface   LicCounter {
   counterId:            string;
   code:                 string;
   name:                 string;
@@ -14,6 +11,8 @@ interface   Counter {
   tip:                  string;
   predIndice:           number;
   predPeriod:           string;
+  indice:               number;
+  period:               string;
 }
 
 interface   Debt {
@@ -28,7 +27,7 @@ interface   Lic {
   name:                 string;
   address:              string;
   client:               'ВДГО' | 'Газоснабжение';
-  counters:             Counter[];
+  counters:             LicCounter[];
   debts:                Debt[];
 }
 
@@ -45,10 +44,11 @@ interface   LicsState {
 }
 
 interface   LicsActions {
-  getLics:              (token: string) => Promise<void>;
-  addLic:               (token: string, lic: string, fio: string) => Promise<void>;
-  delLic:                (token: string, lic: string ) => Promise<void>;
-  setSelectedLic:       (lic: Lic | null) => void;
+  getLics:              ( token: string) => Promise<void>;
+  addLic:               ( token: string, lic: string, fio: string) => Promise<void>;
+  delLic:               ( token: string, lic: string ) => Promise<void>;
+  setIndice:            ( token: string, counters: LicCounter[] ) => Promise<boolean>;
+  setSelectedLic:       ( lic: Lic | null) => void;
 }
 
 type        LicsStore = LicsState & LicsActions;
@@ -147,6 +147,36 @@ export const useLicsStore = create<LicsStore>()(
         }
         
         set({ loading: false })
+      },
+
+      setIndice:      async ( token: string, counters: LicCounter[] ) => { 
+        set({ loading: true })
+         const res = await api('setIndications', { token: token, counters: counters });
+
+         if(!res.error){
+            try {
+              const res = await api('getAccount', { token });
+              console.log('getAccount', res )
+              
+              if (res.error) {
+                return;
+              }
+
+              const licsWithSum = res.data?.map(lic => ({
+                ...lic,
+                sum: parseFloat(lic.debts.reduce((total, debt) => total + debt.sum, 0).toFixed(2))
+              })) || [];
+              
+              set({ lics: licsWithSum || [], loading: false });
+              return true
+            } catch (error) {
+              set({ loading: false });
+              return false
+            }
+        } else {
+          set({ loading: false })
+          return false
+        } 
       },
 
       setSelectedLic:   (lic) => set({ selectedLic: lic }),

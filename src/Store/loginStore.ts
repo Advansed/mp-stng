@@ -14,7 +14,7 @@ export interface User {
   pincode?:         string;
   monthes:          number;
   borders:          {
-     form:          number;
+     from:          number;
      to:            number;
   }
   passport?: {

@@ -1,39 +1,34 @@
 // src/components/Lics/components/types.ts
 
+import { LicCounter } from "../../../Store/licsStore";
+
 // ========================
 // ОСНОВНЫЕ ИНТЕРФЕЙСЫ LICS
 // ========================
 
-export interface LicsCounter {
-  counterId: string;
-  name: string;
-  indice?: number;
-  period?: string;
-  predIndice?: number;
-  predPeriod?: string;
-}
 
 export interface LicsItem {
-  id: string;
-  code: string;
-  name: string;
-  address: string;
-  sum: number;
-  counters?: LicsCounter[];
-  selected?: LicsCounter;
-  order?: any; // для заказов оплаты
+  id:         string;
+  code:       string;
+  name:       string;
+  address:    string;
+  sum:        number;
+  counters?:  LicCounter[];
+  selected?:  LicCounter;
+  order?:     any; // для заказов оплаты
+  current?:   string
 }
 
 export interface LicsIndication {
-  date: string;
-  value: number;
+  date:       string;
+  value:      number;
 }
 
 export interface LicsState {
-  info: LicsItem[];
-  upd: number;
-  page: LicsPage;
-  item: LicsItem | undefined;
+  info:       LicsItem[];
+  upd:        number;
+  page:       LicsPage;
+  item:       LicsItem | undefined;
 }
 
 // ========================
@@ -61,9 +56,9 @@ export enum LicsPage {
 
 // Режимы добавления лицевого счета
 export enum AddLicMode {
-  SELECTION = 'selection',     // Выбор способа
-  BY_CODE = 'by_code',        // По номеру ЛС
-  BY_ADDRESS = 'by_address'   // По адресу
+  SELECTION         = 'selection',     // Выбор способа
+  BY_CODE           = 'by_code',        // По номеру ЛС
+  BY_ADDRESS        = 'by_address'   // По адресу
 }
 
 // Данные для добавления по коду
@@ -360,3 +355,4 @@ export interface AddAccountParams {
   house_id?: string;    // ID дома
   apartment?: string;   // номер квартиры (опционально)
 }
+

@@ -16,6 +16,8 @@ import { Bonuses }  from '../components/Bonuse';
 import { Contacts } from '../components/Contacts';
 import { Notifications } from '../components/Notifications';
 import { Appeals } from '../components/Appeals';
+import { useLicsStore } from '../Store/licsStore';
+import { useToken } from '../Store/loginStore';
 
 const Page: React.FC = () => {
   const [ error, setError ] = useState("")
@@ -23,6 +25,9 @@ const Page: React.FC = () => {
   const { name } = useParams<{ name: string; }>();
 
   const ionRouter = useIonRouter();
+
+  const { getLics } = useLicsStore()
+  const token       = useToken()
 
   console.log("page " + name)
 
@@ -96,7 +101,7 @@ const Page: React.FC = () => {
         // Здесь ваша логика обновления, например, запрос к API
         setTimeout(() => {
           console.log("refresh")
-            getLics( { token: Store.getState().login.token } )
+          getLics( token || '' )
           event.detail.complete();
         }, 1500);
     };

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { selectCountersCount, selectTotalDebts, useLicsStore } from '../../Store/licsStore';
+import { LicCounter, selectCountersCount, selectTotalDebts, useLicsStore } from '../../Store/licsStore';
 import { useToken } from '../../Store/loginStore';
 
 export const useLics    = () => {
@@ -10,6 +10,7 @@ export const useLics    = () => {
     getLics,
     addLic: add_Lic,
     delLic: del_Lic,
+    setIndice : set_indice,
     setSelectedLic
   } = useLicsStore();
 
@@ -50,6 +51,10 @@ export const useLics    = () => {
       await del_Lic( token || '', lic )
   }
 
+  const setIndice = async( counters: LicCounter[] ) => {
+      return await set_indice( token || '', counters )
+  }
+
   return {
     info:           lics,
     loading,
@@ -58,6 +63,7 @@ export const useLics    = () => {
     countersCount,
     refreshLics,
     selectLic,
+    setIndice,
     addLic,
     delLic,
     isLoading:      loading
