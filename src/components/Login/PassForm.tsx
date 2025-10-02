@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { IonImg, IonText, IonButton, IonInput } from "@ionic/react";
 import { LoginPage } from "./Login";
-import MaskedInput from "../../mask/reactTextMask";
 import { useToast } from "../Toast";
 
 interface PassFormProps {

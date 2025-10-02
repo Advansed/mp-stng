@@ -19,9 +19,10 @@ interface   Debt {
   id:                   string;
   label:                string;
   sum:                  number;
+  pay:                  number;
 }
 
-interface   Lic {
+export interface   Lic {
   id:                   string;
   code:                 string;
   name:                 string;
@@ -29,6 +30,8 @@ interface   Lic {
   client:               'ВДГО' | 'Газоснабжение';
   counters:             LicCounter[];
   debts:                Debt[];
+  sum:                  number;
+  order:                any;
 }
 
 interface   ApiResponse {
@@ -178,6 +181,8 @@ export const useLicsStore = create<LicsStore>()(
           return false
         } 
       },
+
+       
 
       setSelectedLic:   (lic) => set({ selectedLic: lic }),
 

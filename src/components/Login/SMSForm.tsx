@@ -1,18 +1,11 @@
 import React, { useState, useRef } from 'react';
 import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
   IonInput,
   IonButton,
   IonGrid,
   IonRow,
   IonCol,
   IonText,
-  IonBackButton,
-  IonButtons,
   IonImg
 } from '@ionic/react';
 import './SMSForm.css';

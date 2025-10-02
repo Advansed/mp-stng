@@ -40,3 +40,25 @@ export async function fetchData1C(
     return { Код: 200 };
   }
 }
+
+
+export async function getCameras() {
+    try {
+        const response = await fetch('https://aostng.ru/api/v2/camera/get');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            console.log(data);
+        }
+        
+        return data;
+    } catch (error) {
+        console.log(error);
+        return { error: true, message: error };
+    }
+}

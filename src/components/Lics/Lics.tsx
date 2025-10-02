@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Store, getData, getLics, getProfile } from '../Store'
 import './Lics.css'
-import { IonAlert, IonButton, IonCard, IonCol, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView } from '@ionic/react'
-import { alertCircleOutline, cardOutline, closeCircleOutline, codeWorkingOutline, documentAttachOutline, documentTextOutline, listOutline, locationOutline, pencilOutline, personOutline } from 'ionicons/icons'
+import { IonCard, IonCol, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonRow } from '@ionic/react'
+import { documentTextOutline, pencilOutline } from 'ionicons/icons'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
 import { LicsItem, LicsPage } from './components/types'
 import { DEBUG_PREFIXES } from './components/constants'
-import { PDFDocModal } from '../Files/PDFDocModal'
 import { useLics } from './useLics'
 import { useNavigation } from './useNavigation'
 import { AddLic } from './components/AddLic'
@@ -44,7 +42,7 @@ const               openUrl = async (url) =>{
 
 export function     Lics(): JSX.Element {
 
-    const { info, addLic, delLic, setIndice } = useLics()
+    const { info, addLic, delLic, setIndice, sberPAY, equaring, getpayments, getIndices } = useLics()
     const { page, setPage, item, setItem, getCurrentPageName } = useNavigation()
 
     useEffect(()=>{
@@ -58,15 +56,15 @@ export function     Lics(): JSX.Element {
                 case LicsPage.MAIN:             return <Items info={info} setItem={setItem} setPage={setPage} delAccount = { delLic }  addLic = { addLic }/>
                 case LicsPage.ADD_LIC_1:        return <AddLic setPage = {setPage}  addLic = { addLic } />;
                 case LicsPage.FIND_LIC:         return <FindLic setPage = { setPage } />; 
-                case LicsPage.HISTORY:          return <History item={item} />;
+                case LicsPage.HISTORY:          return <History item={item} getpayments = { getpayments }/>;
                 case LicsPage.PAYMENTS:         return <Payments item={item} setPage={setPage} />;
                 case LicsPage.PAYMENTS_TO:      return <PaymentsTO item={item} setPage={setPage} />;
                 case LicsPage.INDICES:          return <Indices item = { item as LicsItem} setPage ={ setPage } setIndice = { setIndice }/>
-                case LicsPage.EQUARING:         return <Equaring item={item} setPage={setPage} />;
-                case LicsPage.SBER_PAY:         return <SberPay item={item} setPage={setPage} />;
-                case LicsPage.HISTORY_INDICES:  return <HistoryIndices item={item} />;
-                case LicsPage.ALFA_BANK:        return <AlfaBank item={item} setPage={setPage} />;
-                case LicsPage.SBP:              return <SBP item={item} setPage={setPage} />;
+                case LicsPage.EQUARING:         return <Equaring item={item} setPage={setPage} equairing={ equaring }/>;
+                case LicsPage.SBER_PAY:         return <SberPay item={item} setPage={setPage} SBOL = { sberPAY } />;
+                case LicsPage.HISTORY_INDICES:  return <HistoryIndices item={item}  getIndices={ getIndices }/>;
+                // case LicsPage.ALFA_BANK:        return <AlfaBank item={item} setPage={setPage} />;
+                // case LicsPage.SBP:              return <SBP item={item} setPage={setPage} />;
                 default:                        return <></>;
             }
         } catch (error) {
@@ -135,7 +133,7 @@ function            AddLics(props:{ setPage, addLic }) {
     </>
 }
 
-function            History(props: { item }){
+function            History(props: { item, getpayments }){
     const [ info, setInfo ] = useState<any>([])
     const [ load, setLoad] = useState( false )
 
@@ -143,14 +141,8 @@ function            History(props: { item }){
     
     async function Load(){
         setLoad( true)
-        console.log({
-            token: Store.getState().login.token,
-            LC: item.code 
-        })
-        const res = await getData("GetPayments1", { 
-            token: Store.getState().login.token,
-            LC: item.code 
-        })  
+        console.log('getPayments', item.code )
+        const res = await props.getpayments( item.code )  
         console.log(res)
         if(!res.error){
             if(res.data.length > 0 ){
@@ -358,12 +350,9 @@ function            Payments(props:{ item, setPage }){
                         className=''
                         onClick={()=>{
                             item.order = new Object()
-                            item.order.token    = Store.getState().login.token
                             item.order.LC       = item.code,
                             item.order.sum      = item.debts,
                             item.order.sumto    = [],
-                            item.order.phone    = Store.getState().login.phone,
-                            item.order.email    = Store.getState().login.email,
                             item.order.ios      = false
                             props.setPage( 7 )
                     }}
@@ -378,12 +367,9 @@ function            Payments(props:{ item, setPage }){
                         className=''
                         onClick={()=>{
                             item.order = new Object()
-                            item.order.token    = Store.getState().login.token
                             item.order.LC       = item.code,
                             item.order.sum      = item.debts,
                             item.order.sumto    = [],
-                            item.order.phone    = Store.getState().login.phone,
-                            item.order.email    = Store.getState().login.email,
                             item.order.ios      = false
                             props.setPage( 8 )
                     }}
@@ -495,11 +481,8 @@ function            PaymentsTO(props:{ item, setPage }){
                     <div className=''
                         onClick={()=>{
                             item.order = new Object()
-                            item.order.token    = Store.getState().login.token
                             item.order.LC       = item.code,
                             item.order.sum      = item.debts,
-                            item.order.phone    = Store.getState().login.phone,
-                            item.order.email    = Store.getState().login.email,
                             item.order.ios      = false
                             props.setPage( 7 )
                            
@@ -514,11 +497,8 @@ function            PaymentsTO(props:{ item, setPage }){
                         className=''
                         onClick={()=>{
                             item.order = new Object()
-                            item.order.token    = Store.getState().login.token
                             item.order.LC       = item.code,
                             item.order.sum    = item.debts,
-                            item.order.phone    = Store.getState().login.phone,
-                            item.order.email    = Store.getState().login.email,
                             item.order.ios      = false
                             props.setPage( 8 )
                     }}
@@ -535,18 +515,18 @@ function            PaymentsTO(props:{ item, setPage }){
     return elem
 }
 
-function            SberPay(props: { item, setPage }){
+function            SberPay({ item, setPage, SBOL }:{ item: any, setPage: any, SBOL: any }){
     const [ load, setLoad ] = useState( false)
 
-    const item = props.item
 
     useEffect(()=>{
         async function load(){
             setLoad( true)
-            console.log(item.order)
-            const res = await getData("SBOL", item.order )
+            console.log('sberPay', item.order)
+            const res = await SBOL( item.order )
+            console.log('sberPay', res )
             if(res.error){ 
-                props.setPage( 4 )
+                setPage( 4 )
             } else {
                //window.open( res.data.externalParams.sbolDeepLink,  "_system" )
                 openWidget( res.data )
@@ -564,21 +544,20 @@ function            SberPay(props: { item, setPage }){
     return elem
 }
 
-function            Equaring(props: { item, setPage }){
+function            Equaring({ item, setPage, equairing }:{ item: any, setPage: any, equairing: any }){
     const [ load, setLoad ] = useState( false)
     const [ info, setInfo ] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const item = props.item
 
     useEffect(()=>{
         async function load(){
             setLoad( true )
             console.log(item.order)
-            const res = await getData("SBOL1", item.order )
+            const res = await equairing( item.order )
             console.log( res )
             if(res.error){ 
 
-                props.setPage( 4 )
+                setPage( 4 )
 
             } else {
                 console.log( res.data )
@@ -617,20 +596,14 @@ function            Equaring(props: { item, setPage }){
     return elem
 }
 
-function            HistoryIndices(props: { item }){
+function            HistoryIndices(props: { item, getIndices }){
     const [ info, setInfo ] = useState<any>([])
 
     const item = props.item
     
     async function Load(){
-        console.log({
-            token: Store.getState().login.token,
-            counterId: item.selected.counterId 
-        } )
-        const res = await getData("GetIndices", { 
-            token: Store.getState().login.token,
-            counterId: item.selected.counterId 
-        })  
+
+        const res = await props.getIndices( item.selected.counterId )  
         console.log(res )
         if(!res.error){
             if(res.data.length > 0 ){
@@ -682,76 +655,76 @@ function            HistoryIndices(props: { item }){
 
 }
 
-function            AlfaBank(props: { item, setPage }) {
-    const [load, setLoad] = useState(false)
-    const item = props.item
+// function            AlfaBank(props: { item, setPage }) {
+//     const [load, setLoad] = useState(false)
+//     const item = props.item
 
-    useEffect(() => {
-        async function load() {
-            setLoad(true)
-            console.log('GPB order:', item.order)
+//     useEffect(() => {
+//         async function load() {
+//             setLoad(true)
+//             console.log('GPB order:', item.order)
             
-            try {
-                const res = await getData("GAZPROM", item.order)
-                console.log('GPB response:', res)
+//             try {
+//                 const res = await getData("GAZPROM", item.order)
+//                 console.log('GPB response:', res)
                 
-                if (res.error) { 
-                    props.setPage(4) // Возвращаемся к странице оплаты
-                } else {
-                    // Открываем форму оплаты Альфа-банка
-                    console.log( res.data )
-                    openUrl(res.data.formUrl)
-                }
-            } catch (error) {
-                console.error('GPB payment error:', error)
-                props.setPage(4)
-            }
+//                 if (res.error) { 
+//                     props.setPage(4) // Возвращаемся к странице оплаты
+//                 } else {
+//                     // Открываем форму оплаты Альфа-банка
+//                     console.log( res.data )
+//                     openUrl(res.data.formUrl)
+//                 }
+//             } catch (error) {
+//                 console.error('GPB payment error:', error)
+//                 props.setPage(4)
+//             }
             
-            setLoad(false)
-        }
-        load()
-    }, [])
+//             setLoad(false)
+//         }
+//         load()
+//     }, [])
 
-    const elem = <>
-        <IonLoading isOpen={load} message={"Переход к оплате через Альфа-Банк..."}/>
-    </>
+//     const elem = <>
+//         <IonLoading isOpen={load} message={"Переход к оплате через Альфа-Банк..."}/>
+//     </>
     
-    return elem
-}
+//     return elem
+// }
 
-function            SBP(props: { item, setPage }) {
-    const [load, setLoad] = useState(false)
-    const item = props.item
+// function            SBP(props: { item, setPage }) {
+//     const [load, setLoad] = useState(false)
+//     const item = props.item
 
-    useEffect(() => {
-        async function load() {
-            setLoad(true)
-            console.log('SBP order:', item.order)
+//     useEffect(() => {
+//         async function load() {
+//             setLoad(true)
+//             console.log('SBP order:', item.order)
             
-            try {
-                const res = await getData("GAZPROMSBP", item.order)
-                console.log('SBP response:', res)
+//             try {
+//                 const res = await api("GAZPROMSBP", item.order)
+//                 console.log('SBP response:', res)
                 
-                if (res.error) { 
-                    props.setPage(4) // Возвращаемся к странице оплаты
-                } else {
-                    // Открываем форму оплаты Альфа-банка
-                    console.log( res.data )
-                    openUrl(res.data.formUrl)
-                }
-            } catch (error) {
-                console.error('SBP payment error:', error)
-                props.setPage(4)
-            }
+//                 if (res.error) { 
+//                     props.setPage(4) // Возвращаемся к странице оплаты
+//                 } else {
+//                     // Открываем форму оплаты Альфа-банка
+//                     console.log( res.data )
+//                     openUrl(res.data.formUrl)
+//                 }
+//             } catch (error) {
+//                 console.error('SBP payment error:', error)
+//                 props.setPage(4)
+//             }
             
-            setLoad(false)
-        }
-        load()
-    }, [])
+//             setLoad(false)
+//         }
+//         load()
+//     }, [])
 
-    const elem = <>
-        <IonLoading isOpen={load} message={"Переход к оплате через Альфа-Банк..."}/>
-    </>
+//     const elem = <>
+//         <IonLoading isOpen={load} message={"Переход к оплате через Альфа-Банк..."}/>
+//     </>
     
-    return elem
-}
+//     return elem
+// }

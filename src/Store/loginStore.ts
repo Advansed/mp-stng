@@ -196,6 +196,8 @@ export const loginGetters = {
 
 }
 
-export const useToken   = () => useLoginStore(state => state.token);
+export const useToken   = () => useLoginStore(state => state.token );
 
-export const useAuth    = () => useLoginStore(state => state.auth);
+export const useUser    = () => useLoginStore(state => state.user );
+
+export const useAuth    = () => useLoginStore(state => state.auth );

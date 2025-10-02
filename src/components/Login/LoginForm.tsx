@@ -4,8 +4,8 @@ import { IonImg, IonText, IonButton, IonInput, IonIcon } from "@ionic/react";
 import { LoginPage } from "./Login";
 import { version } from "../Store";
 import MaskedInput from "../../mask/reactTextMask";
-import { AuthCredentials } from "./useLogin_";
 import { eyeOffOutline, eyeOutline } from "ionicons/icons";
+import { AuthCredentials } from "./useLogin";
 
 interface LoginFormProps {
     onNavigate:     (page: LoginPage) => void;

@@ -208,7 +208,6 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
             
             <IonSegmentContent id={"second" + info.id}>
               <div>
-                {info.counters.length > 0 && (
                   <div className="ls-item1" onClick={() => {
                     setItem(info);
                     setPage(LicsPage.HISTORY);
@@ -221,7 +220,6 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
                       <div className="fs-08">Посмотреть список предыдущих оплат</div>
                     </div>
                   </div>
-                )}
                 
                 <div className="ls-item1" onClick={quits}>
                   <div className="ml-05">
