@@ -2,22 +2,22 @@ import React, { useEffect, useState }        from 'react';
 import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonRefresher, IonRefresherContent, IonTabBar, IonTabButton, isPlatform, useIonRouter } from '@ionic/react';
 import { useHistory, useParams, useLocation } from 'react-router';
 import './Page.css';
-import { Lics }     from '../components/Lics';
-import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, createOutline, documentTextOutline } from 'ionicons/icons';
-import { Store, getApps, getData, getLics, getNotifications, getProfile, getServices, version }    from '../components/Store';
-import { Profile }  from '../components/Profile/Profile';
-import { Agzs }     from '../components/AGZS';
-import { Apps }     from '../components/Apps';
-import { Request }  from '../components/Request';
-import { Services } from '../components/Services';
-import { News }     from '../components/News';
-import { Queye }    from '../components/Queye';
-import { Bonuses }  from '../components/Bonuse';
-import { Contacts } from '../components/Contacts';
-import { Notifications } from '../components/Notifications';
-import { Appeals } from '../components/Appeals';
-import { useLicsStore } from '../Store/licsStore';
-import { useToken } from '../Store/loginStore';
+import { Lics }           from '../components/Lics';
+import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, documentTextOutline } 
+                          from 'ionicons/icons';
+import { Store }          from '../components/Store';
+import { Profile }        from '../components/Profile/Profile';
+import { Request }        from '../components/Request';
+import { Services }       from '../components/Services';
+import { Queye }          from '../components/Queye';
+import { Contacts }       from '../components/Contacts';
+import { Appeals }        from '../components/Appeals';
+import { useLicsStore }   from '../Store/licsStore';
+import { useToken }       from '../Store/loginStore';
+import { Apps }           from '../components/Apps';
+import { Notifications }  from '../components/Notificications';
+import { News }           from '../components/News';
+import { Agzs }           from '../components/AGZS/AGZS';
 
 const Page: React.FC = () => {
   const [ error, setError ] = useState("")
@@ -81,7 +81,7 @@ const Page: React.FC = () => {
         case "reqs":              elem = <Request />; break;
         case "apps":              elem = <Apps />; break;
         case "queye":             elem = <Queye />; break;
-        case "bonuse":            elem = <Bonuses name = { name }/>; break;
+        case "bonuse":            elem = <></>; break; //<Bonuses name = { name }/>; break;
         case "services":          elem = <Services />; break;
         case "appeals":           elem = <Appeals />; break;
         case "contacts":          elem = <Contacts />; break;

@@ -1,7 +1,7 @@
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonImg, IonLoading, IonText } from "@ionic/react"
 import React, { useEffect, useState } from "react"
 import './AGZS.css'
-import { getCameras } from "../Store/api"
+import { getCameras } from "../../Store/api"
 
 export function Agzs(){
     const [ load ] = useState( false)

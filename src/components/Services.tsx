@@ -22,12 +22,12 @@ const icons = {
 }
 
 export function Services(){
-    const [ info, setInfo ]             = useState<any>( Store.getState().services )
-    const [ order, setOrder ]           = useState<any>()
-    const [ page, setPage ]             = useState(0)
-    const [ load, setLoad ]             = useState( false )
-    const [ messages, setMessages ]     = useState<any>([])
-    const [ upd, setUpd]                = useState( 0 )
+    const [ info,       setInfo ]         = useState<any>( Store.getState().services )
+    const [ order,      setOrder ]        = useState<any>()
+    const [ page,       setPage ]         = useState(0)
+    const [ load,       setLoad ]         = useState( false )
+    const [ messages,   setMessages ]     = useState<any>([])
+    const [ upd,        setUpd]           = useState( 0 )
 
     let elem = <></>
 

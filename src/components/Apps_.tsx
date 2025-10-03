@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react"
-import { IonButton, IonCard, IonIcon, IonLabel, IonLoading, IonText } from "@ionic/react"
+import { IonButton, IonCard, IonIcon, IonLabel, IonLoading } from "@ionic/react"
 import { Store, getApps, getData } from "./Store"
-import { Agrees, Filess, Filesss, toPDF } from "./Files";
-import { chevronDownCircleOutline, chevronUpCircleOutline } from "ionicons/icons";
+import { Agrees, Filesss } from "./Files";
 
 
 export function Apps():JSX.Element {
