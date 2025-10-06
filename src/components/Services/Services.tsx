@@ -1,12 +1,14 @@
-import React, { useEffect } from 'react';
-import { useToast } from '../Toast';
-import { useServices } from './useService';
-import { IonCard, IonIcon, IonLoading, IonText } from '@ionic/react';
-import { buildOutline, callOutline, documentTextOutline, gitBranchOutline, gitMergeOutline } from 'ionicons/icons';
-import { useNavigateStore } from '../../Store/navigateStore';
-import { useNavigation } from '../../pages/useNavigation';
-import { Order } from './Order';
-import { TService } from '../../Store/serviceStore';
+import React, { useEffect }     from 'react';
+import { useToast }             from '../Toast';
+import { useServices }          from './useService';
+import { IonCard, IonIcon, IonLoading, IonText } 
+                                from '@ionic/react';
+import { buildOutline, callOutline, documentTextOutline, gitBranchOutline, gitMergeOutline } 
+                                from 'ionicons/icons';
+import { useNavigateStore }     from '../../Store/navigateStore';
+import { useNavigation }        from '../../pages/useNavigation';
+import { Order }                from './Order';
+import { TService }             from '../../Store/serviceStore';
 
 
 const icons = {
@@ -23,7 +25,7 @@ export const Services: React.FC = () => {
   
   const toast = useToast();
 
-  const { services, loadServices, loading,saveService } = useServices()
+  const { services, loadServices, loading, saveService, preview } = useServices()
   const { page, setPage, item, setItem } = useNavigation()
 
   const currentPage = useNavigateStore(state => state.currentPage)
@@ -63,9 +65,13 @@ export const Services: React.FC = () => {
         page === 0 
           ? elem
           : <Order 
-              service = { item as TService }
-              onSave  = { (orderData: any)=>{ saveService(orderData) } }
-              onBack  = { ()=>{ setPage( 0 )} }
+              service   = { item as TService }
+              onSave    = { (orderData: any)=>{ 
+                console.log( orderData )
+                //saveService(orderData) } 
+              }}
+              onBack    = { ()=>{ setPage( 0 )} }
+              onPreview = { preview }
           />
     }
   </> 

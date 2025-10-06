@@ -41,6 +41,7 @@ interface LoginStore {
     create:         ( phone: string, name: string, terms: boolean ) => Promise<boolean>;
     restore:        ( phone: string ) => Promise<boolean>;
     compare:        ( sms: string ) => boolean;
+    setAuth:        ( auth: boolean ) => void;
     setReg:         ( reg: boolean ) => void;
     setUser:        ( user: User ) => void;
     password:       ( password: string ) => Promise<boolean>;
@@ -60,7 +61,7 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
     error:          null,
     isAuth:         !!localStorage.getItem('token'),
 
-    login: async (login, password) => {
+    login:          async (login, password) => {
         
         set({ isLoading: true, error: null });
 
@@ -82,13 +83,15 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
             
     },
 
-    setUser: async ( login: User) => {
+    setUser:        async ( login: User) => {
          set({ user: login, token: login.token, phone: login.phone, auth: true, isLoading: false });
     },
 
-    setReg:   async( reg: boolean ) => { set({ reg: reg })},
+    setAuth:        async( auth: boolean ) => { set({ auth: auth })},
 
-    create: async (phone, name, terms) => {
+    setReg:         async( reg: boolean ) => { set({ reg: reg })},
+
+    create:         async (phone, name, terms) => {
         if (!phone || !terms) return false;
         
         set({ isLoading: true });
@@ -107,7 +110,7 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
         }
     },
 
-    restore: async (phone) => {
+    restore:        async (phone) => {
         set({ isLoading: true });
         try {
             const res = await api('restore', { phone });
@@ -128,13 +131,13 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
         }
     },
 
-    compare: (sms) => {
+    compare:        (sms) => {
         const { user } = get();
         console.log("restore", sms, user)
         return sms === user?.pincode;
     },
 
-    password: async (password) => {
+    password:       async (password) => {
         set({ isLoading: true });
         try {
             const { token } = get();
@@ -152,13 +155,13 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
         }
     },
 
-    logout: () => {
+    logout:         () => {
         localStorage.removeItem('stngul.phone');
         localStorage.removeItem('stngul.pass');
         set({ user: null, auth: false });
     },
 
-    getProfile: async () => {
+    getProfile:     async () => {
         const { token } = get();
         if (!token) return;
         
@@ -177,7 +180,7 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
         }
     },
 
-    updateProfile: async (data) => {
+    updateProfile:  async (data) => {
         const { token } = get();
         if (!token) return;
         

@@ -1,26 +1,29 @@
 // Order.tsx
-import React                                from 'react';
+import React, { useEffect, useState }                                from 'react';
 import { useToast }                         from '../Toast';
 import { TService, useServiceStore }        from '../../Store/serviceStore';
 import { FieldData, PageData }              from '../DataEditor/types';
 import DataEditor                           from '../DataEditor';
+import { IonLoading } from '@ionic/react';
 
 interface OrderProps {
-  service:   TService;
-  onSave: (orderData: any) => void;
-  onBack: () => void;
+  service:      TService;
+  onSave:       (orderData: any) => void;
+  onBack:       () => void;
+  onPreview:    (order: any) => Promise<any>
 }
 
-export const Order: React.FC<OrderProps> = ({ service, onBack, onSave }) => {
+export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview }) => {
   const toast = useToast();
+
   const getFormData = (): PageData => {
     if (!service || service.chapters.length === 0 ) {
       return [];
     }
 
-    const data = service.chapters.map((chapter, chapterIndex) => ({
+    const data = service.chapters.map(( chapter ) => ({
       title: chapter.label,
-      data: chapter.data?.map((field, fieldIndex) => {
+      data: chapter.data?.map(( field ) => {
         return {
           label:    field.label,
           type:     field.type,
@@ -28,17 +31,25 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave }) => {
           values:   field.values,    
           validate: field.validate
         } as FieldData;
+      }) || chapter.files?.map(( field ) =>{
+        return {
+          label:    field.label,
+          type:     'images',
+          data:     field.data || [],
+          values:   [],    
+          validate: field.validate
+        } as FieldData
       }) || []
     }));
     console.log("formdata", data)
     return data
   };
 
-  const handleSave = async (data: PageData) => {
-    try {
-      // Собираем все данные из формы
+  const getOrderData = (data: PageData):any =>{
       const orderData: { [key: string]: any } = {};
       
+      orderData.Заявка  = service.text
+
       data.forEach((chapter, chapterIndex) => {
         chapter.data.forEach((field, fieldIndex) => {
           const originalField = service.chapters[chapterIndex]?.data?.[fieldIndex];
@@ -49,18 +60,51 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave }) => {
         });
       });
 
+      return orderData
+  }
+
+  const handleSave = async (data: PageData) => {
+    try {
+      // Собираем все данные из формы
+      
+      const orderData = getOrderData( data );
 
       await onSave( orderData );
       
       onBack()
-
-      toast.success('Заявка успешно отправлена');
 
     } catch (error) {
       console.error('Error saving order:', error);
       toast.error('Ошибка при отправке заявки');
     }
   };
+
+  const preview  = ( data: PageData) => {
+    const [ info, setInfo ] = useState()
+    const [ load, setLoad ] = useState(false)
+
+    const Load = async() => {
+      
+      setLoad( false )
+      
+      const res = await onPreview( getOrderData(data) )
+      
+      setInfo( res )
+
+      setLoad( true )
+
+    }
+
+    useEffect(()=>{
+      Load()   
+    }, [])
+
+    const elem = <>
+      <IonLoading isOpen = { load } message = { "Подождите" }/>
+        <div>Просмотр</div> 
+    </>
+    return elem
+  }
 
   if (!service || service.chapters.length === 0 ) {
     return <></>
@@ -71,6 +115,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave }) => {
       data      = { getFormData() }
       onSave    = { handleSave }
       onBack    = { onBack }
+      onPreview = { preview }
       title     = { service.text }
     />
   );

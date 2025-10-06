@@ -12,7 +12,7 @@ export interface AddressData {
 
 export interface FieldData {
   label:      string;
-  type:       'text' | 'number' | 'select' | 'date' | 'boolean' | 'city' | 'address' | 'view' | 'party' | 'images' | 'image' | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' ;
+  type:       'text' | 'number' | 'select' | 'date' | 'boolean' | 'city' | 'address' | 'view' | 'party' | 'images' | 'image' | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' ;
   values?:    string[] | null;
   validate:   boolean;
   data:       any; 
@@ -31,6 +31,7 @@ export interface DataEditorProps {
   onSave?:    (data: PageData) => void;
   onChange?:  (data: Section) => void;
   onBack:     () => void;
+  onPreview:  (data: PageData) => JSX.Element;
   title?:     string;
 }
 

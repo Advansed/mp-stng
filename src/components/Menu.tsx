@@ -14,7 +14,8 @@ import { callOutline, callSharp, contractOutline, contractSharp, documentSharp, 
     ribbonSharp, videocamOutline, videocamSharp } from 'ionicons/icons';
     
 import './Menu.css';
-import { version, Store } from './Store_1';
+import { useLoginStore } from '../Store/loginStore';
+import { version } from '../Store/api';
 
 interface AppPage {
   url: string;
@@ -89,6 +90,7 @@ const appPages: AppPage[] = [
 
 const Menu: React.FC = () => {
   const hist      = useHistory();
+  const { setAuth} = useLoginStore()
 
   return (
     <IonMenu contentId="main" type="overlay">
@@ -110,7 +112,7 @@ const Menu: React.FC = () => {
                         localStorage.removeItem( "stngul.phone" )
                         localStorage.removeItem( "stngul.pass" )
         
-                        Store.dispatch({type: "auth", auth: false }); 
+                        setAuth( false )
                       } 
                         
                       else hist.push( appPage.url )

@@ -5,13 +5,12 @@ import { documentTextOutline, pencilOutline } from 'ionicons/icons'
 import { createWidget } from '@sber-ecom-core/sberpay-widget';
 import { Browser } from '@capacitor/browser'
 import { LicsItem, LicsPage } from './components/types'
-import { DEBUG_PREFIXES } from './components/constants'
 import { useLics } from './useLics'
 import { AddLic } from './components/AddLic'
 import { FindLic } from './components/FindLic/FindLic'
-import { LicItem } from './components/LicItem'
 import { Indices } from './components/Indices/Indices'
 import { useNavigation } from '../../pages/useNavigation';
+import { LicItem } from './components/LicItem/LicItem';
 
 
 type WidgetParams = {

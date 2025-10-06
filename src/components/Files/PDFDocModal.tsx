@@ -20,7 +20,6 @@ import {
     RenderZoomOutProps, 
     zoomPlugin 
 } from '@react-pdf-viewer/zoom';
-import { Store, getData } from '../Store_1';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/zoom/lib/styles/index.css';
@@ -86,8 +85,7 @@ export function PDFDocModal({
      */
     React.useEffect(() => {
         if (isOpen && !emailAddress) {
-            const userEmail = Store.getState().profile?.email || '';
-            setEmailAddress(userEmail);
+            setEmailAddress(emailAddress);
         }
     }, [isOpen]);
 
@@ -145,15 +143,9 @@ export function PDFDocModal({
         setMessage('');
         
         try {
-            const res = await getData('SendMail', {
-                token: Store.getState().login.token,
-                type: title,
-                name: fileName,
-                email: emailAddress, // Используем введенный email
-                image: pdfUrl,
-            });
-            
-            setMessage(res.message || `Документ отправлен на ${emailAddress}`);
+           
+            console.log("sendemail") 
+           
         } catch (error) {
             setMessage('Ошибка отправки документа');
             console.error('Email send error:', error);

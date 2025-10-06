@@ -5,10 +5,7 @@ import './Page.css';
 import { Lics }           from '../components/Lics';
 import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, documentTextOutline } 
                           from 'ionicons/icons';
-import { Store }          from '../components/Store_1';
 import { Profile }        from '../components/Profile/Profile';
-import { Request }        from '../components/Request';
-import { Queye }          from '../components/Queye';
 import { Contacts }       from '../components/Contacts';
 import { Appeals }        from '../components/Appeals';
 import { useLicsStore }   from '../Store/licsStore';
@@ -33,21 +30,6 @@ const Page: React.FC = () => {
 
   const lct = useLocation()
 
-
-  useEffect(()=>{
-    if( !lct.pathname.includes("page")){
-      Store.dispatch({ type: "auth", auth: false})
-    } 
-
-    
-  },[name])
-
-  useEffect(()=>{
-
-    return ()=>{ Store.unSubscribe( 3 )}
-
-  },[])
-
   function Main():JSX.Element {
     let elem = <></>
       switch ( name ) {
@@ -57,9 +39,8 @@ const Page: React.FC = () => {
         case "news":              elem = <News />; break;
         case "profile":           elem = <Profile />; break;
         case "agzs":              elem = <Agzs />; break;
-        case "reqs":              elem = <Request />; break;
         case "apps":              elem = <Apps />; break;
-        case "queye":             elem = <Queye />; break;
+        // case "queye":             elem = <Queye />; break;
         case "bonuse":            elem = <></>; break; //<Bonuses name = { name }/>; break;
         case "services":          elem = <Services />; break;
         case "appeals":           elem = <Appeals />; break;

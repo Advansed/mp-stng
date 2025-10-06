@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { IonImg, IonText, IonButton, IonInput, IonIcon } from "@ionic/react";
 import { LoginPage } from "./Login";
-import { version } from "../Store_1";
 import MaskedInput from "../../mask/reactTextMask";
 import { eyeOffOutline, eyeOutline } from "ionicons/icons";
 import { AuthCredentials } from "./useLogin";
+import { version } from "../../Store/api";
 
 interface LoginFormProps {
     onNavigate:     (page: LoginPage) => void;

@@ -20,6 +20,10 @@ export const useValidation = () => {
         if (!value?.trim()) return 'Обязательное поле';
         break;
       
+      case 'fio':
+        if (!value?.trim()) return 'Обязательное поле';
+        break;
+      
       case 'number':
         if (!value || isNaN(value)) return 'Введите число';
         if (value <= 0) return 'Значение должно быть больше 0';
@@ -53,9 +57,14 @@ export const useValidation = () => {
         if (value === 0) return 'Поставьте оценку работы';
         break;
       
-      case 'select':
+      case 'box':
         if (!value) return 'Выберите значение';
         break;
+
+      case 'lics':
+        if (!value) return 'Выберите значение';
+        break;
+
     }
 
     return null;

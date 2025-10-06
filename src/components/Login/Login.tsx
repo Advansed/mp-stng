@@ -1,5 +1,5 @@
 // Login.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IonLoading } from "@ionic/react";
 import { isPlatform } from "@ionic/core";
 import "./Login.css";
@@ -12,9 +12,8 @@ import { PassForm } from "./PassForm";
 
 export type LoginPage = 'login' | 'restore' | 'SMS' | 'Pass' | 'Reg';
 
-export function Login() {
-    const [currentPage, setCurrentPage] = useState<LoginPage>('login');
-
+export function Login(props:{ reg: boolean}) {
+    const [currentPage, setCurrentPage] = useState<LoginPage>( props.reg ? 'Reg' : 'login');
     const { isLoading, user,  ulogin, ucompare, urestore, ucreate, upassword } = useLogin()
 
     const renderPage = () => {

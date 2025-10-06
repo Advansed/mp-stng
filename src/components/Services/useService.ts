@@ -9,7 +9,8 @@ export const useServices = () => {
     loading,
     saveService: save,
     loadServices: load,
-    resetState
+    resetState,
+    preview
   } = useServiceStore()
 
   const token = useToken()
@@ -32,7 +33,7 @@ export const useServices = () => {
     order.token = token
     const res = await save( order )
     if(res.error) toast.error( res.message )
-    else res.success( res.message )
+    else toast.success( res.message )
   }
 
 
@@ -40,6 +41,7 @@ export const useServices = () => {
     services,
     loading,
     loadServices,
+    preview,
     saveService
   }
 }

@@ -27,10 +27,10 @@ import './theme/variables.css';
 import { Login } from './components/Login/Login';
 import OneSignal from 'onesignal-cordova-plugin'
 import './app.css'
-import { Registration } from './components/Registration';
 import { ToastProvider } from './components/Toast';
 import { useAuth, useReg, useSetReg, useSetUser, useUser } from './Store/loginStore';
 import { version, getVersion } from './Store/api';
+import { RegistrationForm } from './components/Login/RegistrationForm';
 
 setupIonicReact();
 
@@ -82,8 +82,14 @@ const App: React.FC = () => {
    
     if( auth ) check
     
-    if( !user ) OneSignalInit()
- 
+    if( !user ) 
+      if( isPlatform("mobile") )
+      try {
+        OneSignalInit(); 
+      } catch (error) {
+        console.log( JSON.stringify( error ) );
+      }
+       
   },[auth, user])
   
   return (
@@ -148,7 +154,7 @@ const App: React.FC = () => {
 
       </>
       : reg 
-        ? <Registration />
+        ? <Login reg = { reg } />
         : <>
           <IonApp>
             <ToastProvider>
@@ -157,11 +163,11 @@ const App: React.FC = () => {
                     <Route path="/" 
                       render={(props: { location: { hash: string } }) => { 
                         if(props.location.hash === ''){
-                          return <Login />
+                          return <Login reg = { false } />
                         }
                         if(props.location.hash === '#/registr'){
                           setReg( true )
-                          return <Login />
+                          return <Login  reg = { false}/>
                         } else {
                           let jarr  = props.location.hash.split("?");
                           
@@ -193,13 +199,13 @@ const App: React.FC = () => {
                               setUser( login )
 
                               return <></>    
-                            } else return <Login />
-                          } else return <Login />
+                            } else return <Login reg = { false}/>
+                          } else return <Login reg = { false } />
                         } 
                       }}
                     /> 
                     <Route path="/login" exact={true}>
-                      <Login />
+                      <Login reg = { false }/>
                     </Route>
                   </IonRouterOutlet>
               </IonReactRouter>

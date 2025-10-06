@@ -43,6 +43,7 @@ interface ServiceState {
   setLoading:   ( loading: boolean ) => void
   
   saveService:  ( order:any ) => Promise<any>
+  preview:      ( order:any ) => Promise<any>
   loadServices: ( token: string ) => Promise<any>
   resetState:   () => void
 }
@@ -65,15 +66,30 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
         
         try {
             // TODO: Заменить на fetch вместо getData
-            const res = await api('Services', orderData )
+            console.log(orderData)
+            const res = await api('services', orderData )
             console.log("saveService", res)
+            setLoading(false)
             return res
         } catch (error:any) {
+            setLoading(false)
             console.log(error)
             return { error: true, message: error.message }
         }
         
-        setLoading(false)
+    },
+    
+    preview:        async ( orderData: any) => {
+        try {
+            // TODO: Заменить на fetch вместо getData
+            console.log(orderData)
+            const res = await api('preview', orderData )
+            console.log("preview", res)
+            return res
+        } catch (error:any) {
+            console.log(error)
+            return { error: true, message: error.message }
+        }        
     },
 
     loadServices:   async( token: string) => {
@@ -101,6 +117,7 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
     resetState:     () => set({
 
         services:   [],
+        
         loading:    false,
 
     })

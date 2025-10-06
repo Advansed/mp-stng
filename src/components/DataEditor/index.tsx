@@ -18,18 +18,21 @@ import { ImageField } from './fields/ImageField';
 import { CheckField } from './fields/CheckField';
 import { RateField } from './fields/RateField';
 import { useLicsStore } from '../../Store/licsStore';
-import { useLoginStore } from '../../Store/loginStore';
+import { FioField } from './fields/FIOField';
 
 const DataEditor: React.FC<DataEditorProps> = ({ 
     data, 
     onSave, 
-    onBack
+    onBack, 
+    onPreview
 }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const navigation = useNavigation(data.length);
-  const formState = useFormState(data);
+  const scrollRef   = useRef<HTMLDivElement>(null);
+  const navigation  = useNavigation(data.length);
+  const formState   = useFormState(data);
+  
   const { errors, validateField, setError, clearAll } = useValidation();
-  const lics = useLicsStore(state => state.lics )
+
+  const lics        = useLicsStore(state => state.lics )
  
 
   const [fias, setFias ] = useState('')
@@ -90,20 +93,42 @@ const DataEditor: React.FC<DataEditorProps> = ({
       // Переход только если нет ошибок
       if (!hasErrors) {
         clearAll();
-        onSave?.(formState.data)
+        onSave?.( formState.data )
       }
   }
 
-  const handleClose = () => {
+  const handlePreview             = () => {
+      const currentSection = data[navigation.currentPage];
+      let hasErrors = false;
+      
+      currentSection.data.forEach((field, fIdx) => {
+        if (field.validate) {
+          const error = validateField(field, navigation.currentPage, fIdx);
+          console.log('validate',error)
+          if (error) {
+            setError(navigation.currentPage, fIdx, error);
+            hasErrors = true;
+          }
+        }
+      });
+      
+      // Переход только если нет ошибок
+      if (!hasErrors) {
+        clearAll();
+        return onPreview( formState.data )
+      } else return <></>
+  }
+
+  const handleClose               = () => {
     // Закрытие с отменой - просто возвращаемся назад
     onBack();
   }
 
-  const getPageTitle = () => {
+  const getPageTitle              = () => {
     return (navigation.currentPage + 1) + ' страница из ' +  data.length
   }
 
-  const getLics = () => {
+  const getLics                   = () => {
     return lics.map((e)=> {return e.code})
   }
   useEffect(()=>{
@@ -138,6 +163,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
         case 'images':      return <ImagesField     { ...props } />;
         case 'check':       return <CheckField      { ...props } />;
         case 'rate':        return <RateField       { ...props } />;
+        case 'fio':         return <FioField        { ...props } />;
 
         default:            return null;
     }
@@ -164,11 +190,15 @@ const DataEditor: React.FC<DataEditorProps> = ({
         
         <div className="step-container">
           <div className="page-content">
-            {currentSection.data.map((field, idx) => (
-              <div key={idx}>
-                {renderField(field, navigation.currentPage, idx)}
-              </div>
-            ))}
+            {
+              currentSection.title === "Просмотр"
+                ? handlePreview()
+                : currentSection.data.map((field, idx) => (
+                    <div key={idx}>
+                      {renderField(field, navigation.currentPage, idx)}
+                    </div>
+                  ))
+            }
             
             {/* Большая кнопка Сохранить на последней странице */}
             {isLastPage && (

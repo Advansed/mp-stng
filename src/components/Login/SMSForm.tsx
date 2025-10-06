@@ -10,7 +10,7 @@ import {
 } from '@ionic/react';
 import './SMSForm.css';
 import { LoginPage } from './Login';
-import { version } from '../Store_1';
+import { version } from '../../Store/api';
 
 interface SMSFormProps {
     phone:          string,

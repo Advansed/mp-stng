@@ -1,14 +1,14 @@
 import { IonCard, IonIcon, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { getData } from "./Store_1";
 import { callSharp, chevronDownOutline, chevronUpOutline, homeSharp, mailOpenSharp } from "ionicons/icons";
+import { api } from "../Store/api";
 
 export function Contacts(){
     const [ info, setInfo ] = useState<any>()
 
     useEffect(()=>{
         async function load() {
-            const res = await getData("Contacts",{})
+            const res = await api("Contacts",{})
             console.log( res )
             if(!res.error)
             setInfo( res.data )
