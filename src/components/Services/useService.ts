@@ -1,15 +1,13 @@
-import { useEffect } from 'react'
-import { useServiceStore } from '../../Store/serviceStore'
-import { useToast } from '../Toast'
-import { useToken } from '../../Store/loginStore'
+import { useEffect }        from 'react'
+import { useServiceStore }  from '../../Store/serviceStore'
+import { useToast }         from '../Toast'
+import { useToken }         from '../../Store/loginStore'
 
 export const useServices = () => {
   const {
-    info,
-    order,
+    services,
     loading,
-    setOrder,
-    saveService,
+    saveService: save,
     loadServices: load,
     resetState
   } = useServiceStore()
@@ -30,21 +28,18 @@ export const useServices = () => {
     }
   }
 
-  const handleSave          = async () => {
-    await saveService()
+  const saveService         = async (order: any) => {
+    order.token = token
+    const res = await save( order )
+    if(res.error) toast.error( res.message )
+    else res.success( res.message )
   }
 
 
-  useEffect(() => {
-    loadServices()
-    return () => resetState()
-  }, [])
-
   return {
-    info,
-    order,
+    services,
     loading,
-    setOrder,
-    handleSave
+    loadServices,
+    saveService
   }
 }

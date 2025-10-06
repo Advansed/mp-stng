@@ -1,16 +1,24 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { IonCard, IonText, IonLoading } from "@ionic/react"
 import { useNotifications } from "./useNotifications"
+import { useNavigateStore } from "../../Store/navigateStore"
 
 export function Notifications() {
-    const { notifications, loading } = useNotifications()
+    const { pages, notifications, loading, refreshNotifications } = useNotifications()
 
+    const currentPage = useNavigateStore(state => state.currentPage)
+    
+    useEffect(() => {
+        if(currentPage === '/page/push')
+            if( pages === -1)
+                refreshNotifications()
+    }, [currentPage])
     // TODO: Добавить обработку кнопки назад через Store.subscribe
     // Store.subscribe({num : 404, type: "back", func: handleBack})
 
     return (
         <>
-            <IonLoading isOpen={loading} message="Загрузка..." />
+            <IonLoading isOpen={loading} message="Загрузка уведомлений..." />
             <div>
                 {notifications.map((notification, i) => (
                     <NotificationCard key={notification.id || i} notification={notification} />

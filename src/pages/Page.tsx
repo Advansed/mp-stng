@@ -5,10 +5,9 @@ import './Page.css';
 import { Lics }           from '../components/Lics';
 import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, documentTextOutline } 
                           from 'ionicons/icons';
-import { Store }          from '../components/Store';
+import { Store }          from '../components/Store_1';
 import { Profile }        from '../components/Profile/Profile';
 import { Request }        from '../components/Request';
-import { Services }       from '../components/Services';
 import { Queye }          from '../components/Queye';
 import { Contacts }       from '../components/Contacts';
 import { Appeals }        from '../components/Appeals';
@@ -18,39 +17,21 @@ import { Apps }           from '../components/Apps';
 import { Notifications }  from '../components/Notificications';
 import { News }           from '../components/News';
 import { Agzs }           from '../components/AGZS/AGZS';
+import { Services }       from '../components/Services/Services';
+import { useNavigation }  from './useNavigation';
 
 const Page: React.FC = () => {
-  const [ error, setError ] = useState("")
+  const { goTo, goBack }  = useNavigation()
 
-  const { name } = useParams<{ name: string; }>();
+  const { name }          = useParams<{ name: string; }>();
 
-  const ionRouter = useIonRouter();
+  const { getLics }       = useLicsStore()
 
-  const { getLics } = useLicsStore()
-  const token       = useToken()
+  const token             = useToken()
 
   console.log("page " + name)
 
   const lct = useLocation()
-
-  Store.subscribe({ num: 3, type: "route", func: ()=>{
-
-    const route = Store.getState().route;
-    console.log( route)
-
-    if( route === "back") {
-      hist.goBack()
-    }
-    else {
-        hist.push( route )
-    }
-  
-  }})
-
-  Store.subscribe({ num: 4, type: "error", func: ()=>{
-    // setError( Store.getState().error )
-    console.log(error)
-  }})
 
 
   useEffect(()=>{
@@ -67,8 +48,6 @@ const Page: React.FC = () => {
 
   },[])
 
-  const hist  = useHistory();
-  
   function Main():JSX.Element {
     let elem = <></>
       switch ( name ) {
@@ -100,7 +79,6 @@ const Page: React.FC = () => {
     const handleRefresh = async (event: CustomEvent) => {
         // Здесь ваша логика обновления, например, запрос к API
         setTimeout(() => {
-          console.log("refresh")
           getLics( token || '' )
           event.detail.complete();
         }, 1500);
@@ -112,10 +90,7 @@ const Page: React.FC = () => {
           <IonButton
             fill = "clear"
             onClick = {()=>{ 
-              if(name === "lics")
-                Store.dispatch({ type: "back", back: Store.getState().back + 1})
-              else 
-                Store.dispatch({type: "route", route: "back"})
+                goBack( name )
             }}
           >
             <IonIcon icon = { arrowBackOutline } slot = "icon-only" color="light"/>
@@ -152,21 +127,21 @@ const Page: React.FC = () => {
           <IonTabBar slot="bottom">
 
             <IonTabButton tab="services" href="/page/services"
-              onClick={()=>{ hist.push('/page/services')}}
+              onClick={()=>{ goTo('/page/services')}}
             >
               <IonIcon icon={ contractOutline } className='w-1 h-1'/>
               <div className='h-2'> Услуги </div>
             </IonTabButton>
 
             <IonTabButton tab="lics" href="/page/lics"
-              onClick={()=>{ hist.push('/page/lics')}}
+              onClick={()=>{ goTo('/page/lics')}}
             >
                 <IonIcon icon={ documentTextOutline } className='w-1 h-1'/>
               <div className='h-2'>Лицевые счета</div>
             </IonTabButton>
             
             <IonTabButton tab="news" href="/page/push"
-              onClick={()=>{ hist.push('/page/push')}}
+              onClick={()=>{ goTo('/page/push')}}
             >
               <IonIcon icon={ chatboxEllipsesOutline } className='w-1 h-1'/>
               <div className='h-2'>Уведомления</div>
@@ -176,21 +151,6 @@ const Page: React.FC = () => {
         </div> 
       </IonContent>
 
-      <IonAlert
-        header="Ошибка"
-        message={ error }
-        isOpen = { error !== "" }
-        onDidDismiss={()=> setError( "" ) }
-        buttons={[
-          {
-            text: 'Закрыть',
-            role: 'cancel',
-            handler: () => {
-              console.log('Alert canceled');
-            },
-          },
-        ]}
-      ></IonAlert>
     </IonPage>  
   );
 };

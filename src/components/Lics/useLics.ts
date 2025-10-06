@@ -24,7 +24,7 @@ export const useLics    = () => {
   const countersCount   = useLicsStore(selectCountersCount);
 
   useEffect(()=>{
-    console.log("use", lics)
+    console.log("useLics", lics)
   },[ lics])
 
   // Автозагрузка при наличии токена
@@ -62,7 +62,6 @@ export const useLics    = () => {
       order.token   = token || ''
       order.phone   = phone
       order.email   = email
-      console.log(" useLics", order)
       return await api('SBOL',  order )
   }
   

@@ -1,6 +1,6 @@
 import { IonCard, IonIcon, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { getData } from "./Store";
+import { getData } from "./Store_1";
 import { callSharp, chevronDownOutline, chevronUpOutline, homeSharp, mailOpenSharp } from "ionicons/icons";
 
 export function Contacts(){

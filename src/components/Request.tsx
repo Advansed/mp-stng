@@ -1,7 +1,7 @@
 import { IonButton, IonCard, IonIcon, IonLoading, IonText } from "@ionic/react"
 import { chevronForwardOutline, sendOutline } from "ionicons/icons"
 import React, { useEffect, useState } from "react"
-import { Store } from "./Store"
+import { Store } from "./Store_1"
 
 export function Request(){
     const [ load  ] = useState(false)

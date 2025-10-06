@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { IonImg, IonText, IonButton, IonInput, IonIcon } from "@ionic/react";
 import { LoginPage } from "./Login";
-import { version } from "../Store";
+import { version } from "../Store_1";
 import MaskedInput from "../../mask/reactTextMask";
 import { eyeOffOutline, eyeOutline } from "ionicons/icons";
 import { AuthCredentials } from "./useLogin";
@@ -22,7 +22,6 @@ export function LoginForm({ onNavigate, onLogin }: LoginFormProps) {
         login.phone = localStorage.getItem("stngul.phone") || '';
         login.password = localStorage.getItem("stngul.pass") || '';
         
-        console.log( login )
         setInfo( login )
 
     },[])

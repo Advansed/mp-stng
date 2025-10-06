@@ -1,6 +1,5 @@
-import { useEffect } from 'react'
-import { useToken } from '../../Store/loginStore'
-import useNotificationsStore from '../../Store/Notifications'
+import { useToken }             from '../../Store/loginStore'
+import useNotificationsStore    from '../../Store/notificationStore'
 
 export const useNotifications = () => {
 
@@ -8,23 +7,21 @@ export const useNotifications = () => {
     
     const {
         notifications,
+        pages,
         loading,
-        fetchNotifications
+        fetchNext: fetchNotifications
     } = useNotificationsStore()
 
-    useEffect(() => {
-        if (token) {
-            fetchNotifications(token, 0)
-        }
-    }, [token, fetchNotifications])
 
-    const refreshNotifications = (page = 0) => {
+
+    const refreshNotifications = () => {
         if (token) {
-            fetchNotifications(token, page)
+            fetchNotifications(token)
         }
     }
-
+    
     return {
+        pages,
         notifications,
         loading,
         refreshNotifications

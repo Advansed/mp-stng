@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { api } from '../Store/api'
+import { api } from './api'
 
 interface Notification {
   Шапка:    string
@@ -10,27 +10,32 @@ interface Notification {
 
 interface NotificationsStore {
   notifications:    Notification[]
+  pages:            number,
   loading:          boolean
   
   setNotifications: ( notifications: Notification[] ) => void
   setLoading: ( loading: boolean ) => void
   
-  fetchNotifications: ( token: string, page?: number ) => Promise<void>
+  fetchNext: ( token: string, page?: number ) => Promise<void>
 }
 
 const useNotificationsStore = create<NotificationsStore>((set, get) => ({
-    notifications: [],
-    loading: false,
+    notifications:  [],
+    pages:          -1,
+    loading:        false,
 
     setNotifications: (notifications) => set({ notifications }),
     setLoading: (loading) => set({ loading }),
 
-    fetchNotifications: async (token: string, page = 0) => {
+    fetchNext: async ( token: string ) => {
         set({ loading: true })
+        const { pages } = get()
+        const page = pages + 1;
         try {
             const data = await api('GetNotifications', { token, page })
       
             if (!data.error) {
+                set({ pages: page})
                 set({ notifications: data.data })
             }
         } catch (error) {
@@ -39,6 +44,7 @@ const useNotificationsStore = create<NotificationsStore>((set, get) => ({
             set({ loading: false })
         }
     }
+    
 }))
 
 export default useNotificationsStore

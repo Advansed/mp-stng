@@ -7,11 +7,11 @@ import { Browser } from '@capacitor/browser'
 import { LicsItem, LicsPage } from './components/types'
 import { DEBUG_PREFIXES } from './components/constants'
 import { useLics } from './useLics'
-import { useNavigation } from './useNavigation'
 import { AddLic } from './components/AddLic'
 import { FindLic } from './components/FindLic/FindLic'
 import { LicItem } from './components/LicItem'
 import { Indices } from './components/Indices/Indices'
+import { useNavigation } from '../../pages/useNavigation';
 
 
 type WidgetParams = {
@@ -43,7 +43,7 @@ const               openUrl = async (url) =>{
 export function     Lics(): JSX.Element {
 
     const { info, addLic, delLic, setIndice, sberPAY, equaring, getpayments, getIndices } = useLics()
-    const { page, setPage, item, setItem, getCurrentPageName } = useNavigation()
+    const { page, setPage, item, setItem } = useNavigation()
 
     useEffect(()=>{
         console.log( info )
@@ -72,7 +72,6 @@ export function     Lics(): JSX.Element {
         }
     };
 
-    console.log(`${DEBUG_PREFIXES.LICS} Rendering page: ${getCurrentPageName()}`);
 
     return (
         <>
@@ -141,9 +140,7 @@ function            History(props: { item, getpayments }){
     
     async function Load(){
         setLoad( true)
-        console.log('getPayments', item.code )
         const res = await props.getpayments( item.code )  
-        console.log(res)
         if(!res.error){
             if(res.data.length > 0 ){
                 setInfo( res.data[0].payments )
@@ -233,8 +230,6 @@ function            Payments(props:{ item, setPage }){
         let elem = <>
             <div className='mt-1 ml-1 cl-black fs-09'> <b>Начисления</b></div>
         </>
-        console.log('lines')
-        console.log( item.debts)
         for( let i = 0; i < item.debts.length; i++ ){
             elem = <>
                 { elem }
@@ -273,7 +268,6 @@ function            Payments(props:{ item, setPage }){
     for( let i = 0; i < item.debts.length; i++ ){
         if( item.debts[i].pay === undefined ) item.debts[i].pay = item.debts[i].sum > 0 ? item.debts[i].sum : 0
         if( (item.debts[i].pay > 0) || ( item.debts[i].label === 'Газоснабжение природным газом') || ( item.debts[i].label === 'Техническое обслуживание')) {
-            console.log( item.debts[i] )
             items = <>
                 { items }
                 <div className='flex fl-space ml-2 fs-09 mr-1 mt-05'>
@@ -416,8 +410,6 @@ function            PaymentsTO(props:{ item, setPage }){
         let elem = <>
             <div className='mt-1 ml-1 cl-black fs-09'> <b>Начисления</b></div>
         </>
-        console.log('lines')
-        console.log( item.debts)
         for( let i = 0; i < item.debts.length; i++ ){
             elem = <>
                 { elem }
@@ -522,9 +514,7 @@ function            SberPay({ item, setPage, SBOL }:{ item: any, setPage: any, S
     useEffect(()=>{
         async function load(){
             setLoad( true)
-            console.log('sberPay', item.order)
             const res = await SBOL( item.order )
-            console.log('sberPay', res )
             if(res.error){ 
                 setPage( 4 )
             } else {
@@ -552,15 +542,12 @@ function            Equaring({ item, setPage, equairing }:{ item: any, setPage: 
     useEffect(()=>{
         async function load(){
             setLoad( true )
-            console.log(item.order)
             const res = await equairing( item.order )
-            console.log( res )
             if(res.error){ 
 
                 setPage( 4 )
 
             } else {
-                console.log( res.data )
                // setInfo( res.data )
               // window.open( res.data.formUrl, '_blank' )
               openUrl( res.data.formUrl )
@@ -604,7 +591,6 @@ function            HistoryIndices(props: { item, getIndices }){
     async function Load(){
 
         const res = await props.getIndices( item.selected.counterId )  
-        console.log(res )
         if(!res.error){
             if(res.data.length > 0 ){
                 setInfo( res.data[0].indications )
@@ -614,7 +600,6 @@ function            HistoryIndices(props: { item, getIndices }){
     }
 
     useEffect(()=>{
-        console.log( 'useeffect')
         Load()
     },[])
     

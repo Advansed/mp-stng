@@ -24,21 +24,25 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import { getData, Store, version } from './components/Store';
 import { Login } from './components/Login/Login';
 import OneSignal from 'onesignal-cordova-plugin'
 import './app.css'
 import { Registration } from './components/Registration';
 import { ToastProvider } from './components/Toast';
-import { useAuth } from './Store/loginStore';
+import { useAuth, useReg, useSetReg, useSetUser, useUser } from './Store/loginStore';
+import { version, getVersion } from './Store/api';
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const auth = useAuth()
-  const [ reg,  setReg ]  = useState( Store.getState().reg )
-  const [ alert, setAlert ] = useState( false )
+  const  auth     = useAuth()
+  const  reg      = useReg()
+  const  user     = useUser()
+  const  setReg   = useSetReg()
+  const  setUser  = useSetUser()
+  const [ alert, setAlert ]   = useState( false )
   
+  console.log(auth, reg )
 
   function OneSignalInit(): void {
     console.log(" OneSignalInit start")
@@ -57,16 +61,16 @@ const App: React.FC = () => {
     })
 
     console.log(" OneSignalInit  login")
-    OneSignal.login( Store.getState().login.id )
+    OneSignal.login( user?.id || '' )
     console.log(" OneSignalInit  addAlias")
-    OneSignal.User.addAlias("external_id", Store.getState().login.id)
+    OneSignal.User.addAlias("external_id", user?.id || '')
     
     console.log( OneSignal.User )
   }
 
   async function check() {
     console.log("check")
-    const res = await getData("getVersion", {})
+    const res = await getVersion()
     console.log(res)
     if( res.message !== version ){
       console.log('alert')
@@ -74,10 +78,13 @@ const App: React.FC = () => {
     }
   }
 
-  Store.subscribe({ num: 2, type: "reg", func: ()=>{
-    setReg( Store.getState().reg ) 
-  }})
-
+  useEffect(()=>{
+   
+    if( auth ) check
+    
+    if( !user ) OneSignalInit()
+ 
+  },[auth, user])
   
   return (
     auth
@@ -153,7 +160,7 @@ const App: React.FC = () => {
                           return <Login />
                         }
                         if(props.location.hash === '#/registr'){
-                          Store.dispatch({type: "reg", reg: true })
+                          setReg( true )
                           return <Login />
                         } else {
                           let jarr  = props.location.hash.split("?");
@@ -182,8 +189,9 @@ const App: React.FC = () => {
 
                               login.borders = { from: login?.from, to: login?.to }
                               console.log( login )
-                              Store.dispatch({type: "login", login: login })
-                              Store.dispatch({type: "auth", auth: true })
+
+                              setUser( login )
+
                               return <></>    
                             } else return <Login />
                           } else return <Login />

@@ -17,6 +17,8 @@ import './styles.css';
 import { ImageField } from './fields/ImageField';
 import { CheckField } from './fields/CheckField';
 import { RateField } from './fields/RateField';
+import { useLicsStore } from '../../Store/licsStore';
+import { useLoginStore } from '../../Store/loginStore';
 
 const DataEditor: React.FC<DataEditorProps> = ({ 
     data, 
@@ -27,6 +29,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
   const navigation = useNavigation(data.length);
   const formState = useFormState(data);
   const { errors, validateField, setError, clearAll } = useValidation();
+  const lics = useLicsStore(state => state.lics )
  
 
   const [fias, setFias ] = useState('')
@@ -100,6 +103,9 @@ const DataEditor: React.FC<DataEditorProps> = ({
     return (navigation.currentPage + 1) + ' страница из ' +  data.length
   }
 
+  const getLics = () => {
+    return lics.map((e)=> {return e.code})
+  }
   useEffect(()=>{
     console.log(errors)
   },[errors])
@@ -119,10 +125,11 @@ const DataEditor: React.FC<DataEditorProps> = ({
     switch (field.type) {
 
         case 'view':        return <ViewField       { ...props } />;
-        case 'string':      return <TextField       { ...props } />;
+        case 'text':        return <TextField       { ...props } />;
         case 'password':    return <TextField       { ...props } type = { "password" }/>;
         case 'number':      return <NumberField     { ...props } />;
-        case 'select':      return <SelectField     { ...props } options={field.values || []} />;
+        case 'box':         return <SelectField     { ...props } options={field.values || []} />;
+        case 'lics':        return <SelectField     { ...props } options={ getLics() || []} />;
         case 'date':        return <DateField       { ...props } />;
         case 'city':        return <CityField       { ...props } onFIAS={ setFias}/>;
         case 'address':     return <AddressField    { ...props } cityFias = { fias } />;

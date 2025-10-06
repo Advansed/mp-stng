@@ -30,6 +30,7 @@ export interface User {
 interface LoginStore {
 
     auth:           boolean,
+    reg:            boolean,
     user:           User | null;
     token:          string | null;
     phone:          string | null;
@@ -40,6 +41,8 @@ interface LoginStore {
     create:         ( phone: string, name: string, terms: boolean ) => Promise<boolean>;
     restore:        ( phone: string ) => Promise<boolean>;
     compare:        ( sms: string ) => boolean;
+    setReg:         ( reg: boolean ) => void;
+    setUser:        ( user: User ) => void;
     password:       ( password: string ) => Promise<boolean>;
     logout:         ( ) => void;
     getProfile:     ( ) => Promise<void>;
@@ -49,6 +52,7 @@ interface LoginStore {
 
 export const useLoginStore = create<LoginStore>((set, get) => ({
     auth:           false,
+    reg:            false,
     user:           null,
     token:          localStorage.getItem('token'),
     phone:          null,
@@ -77,6 +81,12 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
         }
             
     },
+
+    setUser: async ( login: User) => {
+         set({ user: login, token: login.token, phone: login.phone, auth: true, isLoading: false });
+    },
+
+    setReg:   async( reg: boolean ) => { set({ reg: reg })},
 
     create: async (phone, name, terms) => {
         if (!phone || !terms) return false;
@@ -200,4 +210,12 @@ export const useToken   = () => useLoginStore(state => state.token );
 
 export const useUser    = () => useLoginStore(state => state.user );
 
-export const useAuth    = () => useLoginStore(state => state.auth );
+export const useAuth    = () => useLoginStore(state => state.auth)
+
+export const useReg     = () => useLoginStore(state => state.reg)
+
+export const useSetReg  = () => useLoginStore(state => state.setReg)
+
+export const useSetUser = () => useLoginStore(state => state.setUser)
+
+

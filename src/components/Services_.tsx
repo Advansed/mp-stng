@@ -2,7 +2,7 @@ import React, { IonButton, IonCard, IonIcon, IonInput, IonLoading, IonModal, Ion
 import { addCircleOutline, arrowBackCircleOutline, buildOutline, calculatorOutline, callOutline, closeOutline, documentTextOutline, gitBranchOutline, gitMergeOutline, removeCircleOutline } from "ionicons/icons"
 import { useEffect, useRef, useState } from "react"
 import { AddressSuggestions, FioSuggestions } from "react-dadata"
-import { Store, getData } from "./Store"
+import { Store, getData } from "./Store_1"
 import "./Services.css"
 import "./react-dadata.css"
 import MaskedInput from "../mask/reactTextMask"

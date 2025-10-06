@@ -16,7 +16,7 @@ export const useValidation = () => {
 
     // Базовая валидация по типам
     switch (field.type) {
-      case 'string':
+      case 'text':
         if (!value?.trim()) return 'Обязательное поле';
         break;
       

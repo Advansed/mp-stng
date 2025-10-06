@@ -1,6 +1,6 @@
 import { IonButton, IonCard, IonModal, IonSelect, IonSelectOption, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { Store, getData } from "./Store";
+import { Store, getData } from "./Store_1";
 import MaskedInput from "../mask/reactTextMask";
 import Select from "react-tailwindcss-select";
 

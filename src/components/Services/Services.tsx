@@ -1,113 +1,72 @@
-import React from 'react'
-import { IonButton, IonLoading } from '@ionic/react'
-import './Services.css'
-import { useServices } from './useService'
+import React, { useEffect } from 'react';
+import { useToast } from '../Toast';
+import { useServices } from './useService';
+import { IonCard, IonIcon, IonLoading, IonText } from '@ionic/react';
+import { buildOutline, callOutline, documentTextOutline, gitBranchOutline, gitMergeOutline } from 'ionicons/icons';
+import { useNavigateStore } from '../../Store/navigateStore';
+import { useNavigation } from '../../pages/useNavigation';
+import { Order } from './Order';
+import { TService } from '../../Store/serviceStore';
 
-// TODO: Импортировать нужные компоненты
-// import { FIO, MCHRG, Filess, Rooms, Equips, Meters, Sign } from './ServiceComponents'
 
-export function Services() {
-  const {
-    info,
-    order,
-    loading,
-    setOrder,
-    handleSave
-  } = useServices()
+const icons = {
 
-  // TODO: Перенести логику рендеринга страниц из оригинального кода
-  const renderCurrentPage = () => {
-    if (!info || !order) return null
+    gitMergeOutline:        gitMergeOutline,
+    buildOutline:           buildOutline,
+    documentTextOutline:    documentTextOutline,
+    callOutline:            callOutline,
+    gitBranchOutline:       gitBranchOutline,
 
-    // TODO: Реализовать рендеринг компонентов на основе page и info
-    const pageData = Object.entries(order).find(([key, value]: any) => 
-      value?.Страница === page
-    )
-
-    if (!pageData) return null
-
-    const [key, data] = pageData
-
-    switch (key) {
-      case 'ФИО':
-        // return <FIO info={info.ФИО} />
-        return <div>ФИО компонент</div>
-      case 'МЧРГ':
-        // return <MCHRG info={info.МЧРГ} />
-        return <div>МЧРГ компонент</div>
-      case 'Файлы':
-        // return <Filess info={info.Файлы.Файлы} />
-        return <div>Файлы компонент</div>
-      default:
-        return <div>{info[key]?.Описание}</div>
-    }
-  }
-
-  const renderMessages = () => {
-    if (messages.length === 0) return null
-    
-    return (
-      <div className="error-messages">
-        {messages.map((msg, idx) => (
-          <div key={idx} className="error-message">{msg}</div>
-        ))}
-      </div>
-    )
-  }
-
-  const renderSuccessPage = () => (
-    <div className="success-page">
-      <div className="ml-1 mt-1 flex fl-space">
-        <div className="fs-14">Заявка подана успешно!</div>
-      </div>
-      <div className="ml-2 mr-2">
-        <p>Ваша заявка принята в обработку.</p>
-        <p>В течение нескольких минут ваша заявка появится в разделе Договора, Заявки.</p>
-      </div>
-    </div>
-  )
-
-  const renderFailPage = () => (
-    <div className="fail-page">
-      <div className="ml-1 mt-1 flex fl-space">
-        <div className="fs-14">Ошибка при подаче заявки!</div>
-      </div>
-      <div className="ml-2 mr-2">
-        <p>Что-то пошло не так...</p>
-        <p>Попробуйте подать заявку еще раз</p>
-      </div>
-    </div>
-  )
-
-  // Обработка специальных страниц
-  if (page === 99) return renderSuccessPage()
-  if (page === 98) return renderFailPage()
-
-  return (
-    <>
-      <IonLoading isOpen={loading} message="Обработка..." />
-      
-      {renderMessages()}
-      
-      <div className="services-container">
-        {renderCurrentPage()}
-        
-        <div className="navigation-buttons">
-          {page > 0 && (
-            <IonButton onClick={goBack}>
-              Назад
-            </IonButton>
-          )}
-          
-          <IonButton onClick={() => handlePageChange(page + 1)}>
-            Далее
-          </IonButton>
-          
-          <IonButton onClick={handleSave}>
-            Сохранить
-          </IonButton>
-        </div>
-      </div>
-    </>
-  )
 }
+
+export const Services: React.FC = () => {
+  
+  const toast = useToast();
+
+  const { services, loadServices, loading,saveService } = useServices()
+  const { page, setPage, item, setItem } = useNavigation()
+
+  const currentPage = useNavigateStore(state => state.currentPage)
+
+  useEffect(()=>{
+    console.log("useService", currentPage )
+    if(currentPage === '/page/services'){
+        console.log("useService", currentPage === '/page/services', !services )
+        if(!services || services.length === 0 )
+            loadServices()
+
+    }
+  },[currentPage])
+
+  let elem = <></>
+  
+  for(let i = 0; i < services.length;i++){
+      elem = <>
+          { elem }
+          <IonCard className="pt-2 pb-2">
+              <div className="flex"
+                  onClick={()=>{
+                        setItem( services[i] )
+                        setPage( page + 1)
+                  }}
+              >
+                  <IonIcon icon = { icons[services[0].icon] }  className="h-2 w-20" color="tertiary"/>
+                  <IonText className="cl-prim fs-12 w-80"><b>{ services[i].text }</b> </IonText>
+              </div>
+          </IonCard>
+      </>
+    
+  }
+  return <>
+    <IonLoading isOpen = { loading } message={ "Подождите загрузка услуг..." }/>
+    { 
+        page === 0 
+          ? elem
+          : <Order 
+              service = { item as TService }
+              onSave  = { (orderData: any)=>{ saveService(orderData) } }
+              onBack  = { ()=>{ setPage( 0 )} }
+          />
+    }
+  </> 
+};

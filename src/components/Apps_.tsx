@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { IonButton, IonCard, IonIcon, IonLabel, IonLoading } from "@ionic/react"
-import { Store, getApps, getData } from "./Store"
+import { Store, getApps, getData } from "./Store_1"
 import { Agrees, Filesss } from "./Files";
 
 

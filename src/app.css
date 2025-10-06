@@ -304,3 +304,14 @@
     margin-right: 0.3rem;
 }
 
+
+/* Отключаем CSS переменные темной темы */
+:root {
+    color-scheme:                   light !important;
+    --ion-color-primary:            #086CA2 !important;
+    --ion-color-secondary:          #ffba00 !important;
+    --main-color:                   #0F3C79; /* Основной цвет */
+    --background-color:             #f0f0f0; /* Фоновый цвет */
+    --dop-color:                    #ffba00;
+
+}

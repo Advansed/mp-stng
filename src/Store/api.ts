@@ -18,6 +18,15 @@ export const api = async (endpoint: string, data: any) => {
     return res.json();
 };
 
+export const getVersion = async() => {
+    const res = await fetch('getVersion', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    });
+    return res.json();
+};
+
+
 // Для 1C API
 export async function fetchData1C(
   method: string, 

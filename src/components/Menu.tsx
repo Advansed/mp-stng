@@ -14,7 +14,7 @@ import { callOutline, callSharp, contractOutline, contractSharp, documentSharp, 
     ribbonSharp, videocamOutline, videocamSharp } from 'ionicons/icons';
     
 import './Menu.css';
-import { version, Store } from './Store';
+import { version, Store } from './Store_1';
 
 interface AppPage {
   url: string;

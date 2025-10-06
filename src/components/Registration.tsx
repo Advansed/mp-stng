@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { getData, Store } from "./Store"
+import { getData, Store } from "./Store_1"
 import { IonButton, IonCheckbox, IonImg, IonInput, IonLoading, IonText } from "@ionic/react"
 import MaskedInput from "../mask/reactTextMask"
 import { isPlatform } from "@ionic/core"

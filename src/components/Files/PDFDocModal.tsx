@@ -20,7 +20,7 @@ import {
     RenderZoomOutProps, 
     zoomPlugin 
 } from '@react-pdf-viewer/zoom';
-import { Store, getData } from '../Store';
+import { Store, getData } from '../Store_1';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/zoom/lib/styles/index.css';
