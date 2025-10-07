@@ -565,6 +565,85 @@ export function PDFDoc( props ){
     </>
 }
 
+export function PDFDocument( props ){
+    const [ pages ] = useState<any>(1)
+    const [ page, setPage ] = useState(1)
+    const [ message, setMessage ] = useState("")
+
+    const zoomPluginInstance = zoomPlugin();
+    const { CurrentScale, ZoomIn, ZoomOut } = zoomPluginInstance;
+
+    const base64toBlob = (data: string) => {
+        
+        const jarr = data.split(",")
+
+        const base64WithoutPrefix = jarr[1] //data.substr('data:application/pdf;base64,'.length);
+    
+        const bytes = atob(base64WithoutPrefix);
+
+        let length = bytes.length;
+        const out = new Uint8Array(length);
+    
+        while (length--) {
+            out[length] = bytes.charCodeAt(length);
+        }
+    
+        return new Blob([out], { type: 'application/pdf' });
+    };
+
+    const blob = base64toBlob( props.url );
+    const url = URL.createObjectURL(blob);
+
+    return <>
+        <div className="w-100 flex fl-space">
+            <div>PDF view</div>
+            <div className="flex">
+                <div className="ml-1">
+                    <ZoomOut>
+                        {(props: RenderZoomOutProps) => (
+                            <IonButton
+                                onClick={props.onClick}
+                            >
+                                -
+                            </IonButton>
+                        )}
+                    </ZoomOut>
+                </div>
+                <div className="ml-1">
+                    <CurrentScale>
+                        {(props: RenderCurrentScaleProps) => <>{`${Math.round(props.scale * 100)}%`}</>}
+                    </CurrentScale>
+                </div>
+                <div className="ml-1">
+                    <ZoomIn>
+                        {(props: RenderZoomInProps) => (
+                            <IonButton
+                                onClick={props.onClick}
+                            >
+                                +
+                            </IonButton>
+                        )}
+                    </ZoomIn>
+                </div>
+            </div>
+        </div>
+        <p className="m-stack fs-bold fs-2 cl-prim">{ message }</p>
+        <div className="scroll w-100 h-100"> 
+            {/* <Viewer fileUrl={ url } plugins={ [ zoomPluginInstance ] } /> */}
+            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.js">
+                <div>
+                    <Viewer
+                        fileUrl={ url }
+                        plugins={[
+                            zoomPluginInstance,
+                        ]}
+                    />
+                </div>
+            </Worker>
+        </div>
+    </>
+}
+
 export function Filess(props: { info }){
     const [ info ] = useState( props.info )
     const [ index, setIndex ] = useState( 0 )

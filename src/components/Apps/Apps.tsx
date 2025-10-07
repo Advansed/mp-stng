@@ -1,14 +1,20 @@
-import React, { useState } from "react"
-import { IonButton, IonCard, IonLoading, IonText } from "@ionic/react"
-import { Agrees, Filesss } from "../Files"
+import React, { useEffect, useState } from "react"
+import { IonCard, IonLoading, IonText, IonBadge, IonIcon } from "@ionic/react"
 import { useApps } from "./useApps"
+import { useNavigateStore } from "../../Store/navigateStore"
+import { useToast } from "../Toast"
+import { locationOutline, calendarOutline, documentTextOutline, codeOutline, arrowForwardOutline } from "ionicons/icons"
+import styles from './Apps.module.css'
 
 export function Apps(): JSX.Element {
-    const { apps, loading, refreshApps } = useApps()
-    const [upd, setUpd] = useState(0)
-
-    // TODO: Добавить обработку кнопки назад через Store.subscribe
-    // Store.subscribe({num : 404, type: "back", func: handleBack})
+    const { apps, loading, refreshApps, saveFiles } = useApps()
+    const currentPage = useNavigateStore(state => state.currentPage)
+    
+    useEffect(()=>{
+        console.log("useApps", currentPage )
+        if(currentPage === '/page/apps')
+            refreshApps()
+    },[currentPage])
 
     return (
         <>
@@ -18,95 +24,80 @@ export function Apps(): JSX.Element {
                 </h1>
             </IonText>
             
-            {loading && <IonLoading isOpen={loading} message="Загрузка..." />}
+            {loading && <IonLoading isOpen={loading} message="Загрузка заявок..." />}
             
-            {apps.map((app, i) => (
-                <App key={app.id || i} info={app} onUpdate={() => setUpd(upd + 1)} />
-            ))}
+            <div className={styles.appsContainer}>
+                {apps.map((app, i) => (
+                    <App key={app.id || i} info={app}  />
+                ))}
+            </div>
         </>
     )
 }
 
-function App({ info, onUpdate }: { info: any, onUpdate: () => void }): JSX.Element {
-    const { loading, saveFiles } = useApps()
-    const [localLoading, setLocalLoading] = useState(false)
-    const [message, setMessage] = useState("")
+function App({ info }: { info: any }): JSX.Element {
     const [mode, setMode] = useState(false)
+    const toast = useToast()
 
-    const handleSaveFiles = async () => {
-        setLocalLoading(true)
-        const success = await saveFiles(info.id, info.files)
-        if (success) {
-            setMode(false)
-            onUpdate()
+    // Функция для определения цвета статуса
+    const getStatusColor = (status: string) => {
+        const statusLower = status.toLowerCase()
+        if (statusLower.includes('обработке') || statusLower.includes('выполн') || statusLower.includes('готов')) {
+            return "success"
+        } else if (statusLower.includes('ожидан') || statusLower.includes('проверк') || statusLower.includes('в процессе')) {
+            return "warning"
+        } else if (statusLower.includes('отказ') || statusLower.includes('отмен') || statusLower.includes('проблем')) {
+            return "danger"
+        } else {
+            return "medium"
         }
-        setLocalLoading(false)
-    }
-
-    const handleCancel = () => {
-        setMode(false)
-        onUpdate()
     }
 
     return (
-        <IonCard className="pb-1 pr-1 s-card">
-            <div className="mt-1 ml-1 t-underline">
-                <b>{info.service}</b>
-            </div>
-            
-            <div className="flex">
-                <div className="flex fl-space ml-1 mt-1 w-50">
-                    <div className="cl-gray">Дата</div>
-                    <div>{info.date}</div>
-                </div>
-                <div className="flex fl-space ml-1 mt-1 w-50">
-                    <div className="cl-gray">Номер</div>
-                    <div>{info.number}</div>
+        <IonCard className={styles.appCard}>
+            <div className={styles.appHeader}>
+                <div className={styles.appService}>
+                    <IonIcon icon={documentTextOutline} className={styles.serviceIcon} />
+                    <span className={styles.serviceText}>{info.service}</span>
                 </div>
             </div>
-            
-            <div className="flex fl-space ml-1 mt-1">
-                <div className="cl-gray">Адрес</div>
-                <div>{info.address}</div>
-            </div>
-            
-            <div className="flex fl-space ml-1 mt-1">
-                <div className="cl-gray">Статус</div>
-                <div>{info.status}</div>
-            </div>
 
-            {info.agreements?.Файлы?.length > 0 && (
-                <Agrees info={info.agreements.Файлы} />
-            )}
-
-            {info.files?.Файлы?.length > 0 && (
-                <>
-                    <Filesss 
-                        info={info.files.Файлы} 
-                        onMode={setMode} 
-                    />
-                    <p className="ml-2">{message}</p>
-                    
-                    <div className="flex fl-space">
-                        <div></div>
-                        {mode && (
-                            <div className="flex">
-                                <IonButton onClick={handleCancel}>
-                                    Отмена
-                                </IonButton>
-                                <IonButton onClick={handleSaveFiles}>
-                                    Сохранить
-                                </IonButton>
-                            </div>
-                        )}
+            <div className={styles.appContent}>
+                <div className={styles.infoRow}>
+                    <div className={styles.infoItem}>
+                        <div className={ styles.infoContent}>
+                            <IonBadge color={getStatusColor(info.status)} className={styles.statusBadge}>
+                                {info.status}
+                            </IonBadge>
+                        </div>
                     </div>
-                </>
-            )}
-            
-            <IonLoading 
-                isOpen={localLoading || loading} 
-                message="Подождите" 
-            />
+
+                        <div className={styles.infoItem}>
+                            <IonIcon icon={calendarOutline} className={styles.infoIcon} />
+                            <div className={ styles.infoContent}>
+                                <div className={styles.infoLabel}>Дата</div>
+                                <div className={styles.infoValue}>{info.date.substring(0, 10)}</div>
+                            </div>
+                        </div>
+                        
+                        <div className={styles.infoItem}>
+                            <IonIcon icon={ codeOutline} className={styles.infoIcon} />
+                            <div className={styles.infoContent}>
+                                <div className={styles.infoLabel}>Номер</div>
+                                <div className={`${styles.infoValue} ${styles.numberValue}`}>{info.number}</div>
+                            </div>
+                        </div>
+
+                </div>
+
+                <div className={`${styles.infoItem} ${styles.fullWidth}`}>
+                    <IonIcon icon={locationOutline} className={styles.infoIcon} />
+                    <div className={styles.infoContent}>
+                        <div className={styles.infoLabel}>Адрес</div>
+                        <div className={`${styles.infoValue} ${styles.addressValue}`}>{info.address.address || info.address}</div>
+                    </div>
+                </div>
+            </div>
         </IonCard>
     )
 }

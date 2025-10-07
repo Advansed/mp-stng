@@ -1,9 +1,10 @@
 import { IonCard, IonIcon, IonInput, IonLoading, IonModal, IonText } from "@ionic/react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import "./Appeals.css"
 import { cameraOutline, imageOutline, syncCircleOutline } from "ionicons/icons"
 import { useAppeals } from "./useAppeals"
 import { takePicture } from "../Files"
+import { useNavigateStore } from "../../Store/navigateStore"
 
 export function Appeals() {
     const { 
@@ -17,15 +18,18 @@ export function Appeals() {
         sendAppealMessage
     } = useAppeals()
     
-    const [upd, setUpd] = useState(0)
+    const currentPage = useNavigateStore(state => state.currentPage)
+    
+    useEffect(()=>{
+        console.log("useAppeals", currentPage )
+        if(currentPage === '/page/appeals')
+            refreshAppeals()
+    },[currentPage])
 
-    // TODO: Добавить обработку кнопки назад через Store.subscribe
-    // Store.subscribe({num : 404, type: "back", func: handleBack})
-
+    
     const handleRefresh = () => {
         refreshAppeals()
         clearSelection()
-        setUpd(upd + 1)
     }
 
     return (

@@ -16,6 +16,7 @@ import { callOutline, callSharp, contractOutline, contractSharp, documentSharp, 
 import './Menu.css';
 import { useLoginStore } from '../Store/loginStore';
 import { version } from '../Store/api';
+import { useNavigation } from '../pages/useNavigation';
 
 interface AppPage {
   url: string;
@@ -89,8 +90,8 @@ const appPages: AppPage[] = [
 ];
 
 const Menu: React.FC = () => {
-  const hist      = useHistory();
   const { setAuth} = useLoginStore()
+  const { goTo } = useNavigation();
 
   return (
     <IonMenu contentId="main" type="overlay">
@@ -115,7 +116,7 @@ const Menu: React.FC = () => {
                         setAuth( false )
                       } 
                         
-                      else hist.push( appPage.url )
+                      else goTo( appPage.url )
                     }}
                   >
                      <div >

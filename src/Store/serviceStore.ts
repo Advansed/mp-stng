@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { api } from './api'
 
+let storeInstanceId = 0;
+
 export interface TService {
     icon:       string,
     text:       string,
@@ -50,6 +52,8 @@ interface ServiceState {
 
 export const useServiceStore = create<ServiceState>((set, get) => ({
   
+    _storeInstanceId: ++storeInstanceId,
+    
     services:       [],
 
     order:          { icon: "", text: "", chapters: [] },
@@ -61,18 +65,17 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
     setLoading:     ( loading )   => set({ loading }),
   
     saveService:    async ( orderData: any) => {
-        const { setLoading } = get()
-        setLoading(true)
-        
+        console.log("setLoading", true)
+        set({ loading: true})
         try {
             // TODO: Заменить на fetch вместо getData
             console.log(orderData)
             const res = await api('services', orderData )
             console.log("saveService", res)
-            setLoading(false)
+            set((state) => ({ ...state, loading: false })) // Функциональное обновление
             return res
         } catch (error:any) {
-            setLoading(false)
+            set((state) => ({ ...state, loading: false })) // Функциональное обновление
             console.log(error)
             return { error: true, message: error.message }
         }
@@ -111,6 +114,7 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
         } catch(e) {
             console.log("error loadservice", e)
             set({ loading: false})
+        
         }
     },
 

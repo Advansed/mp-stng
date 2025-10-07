@@ -15,11 +15,6 @@ export const useAppeals = () => {
     sendMessage
   } = useAppealsStore()
 
-  useEffect(() => {
-    if (token) {
-      fetchAppeals(token)
-    }
-  }, [token, fetchAppeals])
 
   const selectAppeal = (appeal: any) => {
     setSelectedAppeal(appeal)

@@ -19,6 +19,9 @@ import { CheckField } from './fields/CheckField';
 import { RateField } from './fields/RateField';
 import { useLicsStore } from '../../Store/licsStore';
 import { FioField } from './fields/FIOField';
+import { IonLoading } from '@ionic/react';
+import { PreviewField } from './fields/PreviewField';
+import { SignField } from './fields/SignField';
 
 const DataEditor: React.FC<DataEditorProps> = ({ 
     data, 
@@ -29,6 +32,9 @@ const DataEditor: React.FC<DataEditorProps> = ({
   const scrollRef   = useRef<HTMLDivElement>(null);
   const navigation  = useNavigation(data.length);
   const formState   = useFormState(data);
+
+  const [ info,     setInfo]    = useState<any>()
+  const [ loading, setLoading ] = useState(false);
   
   const { errors, validateField, setError, clearAll } = useValidation();
 
@@ -37,7 +43,8 @@ const DataEditor: React.FC<DataEditorProps> = ({
 
   const [fias, setFias ] = useState('')
 
-  const scrollToTop = () => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToTop               = () => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+
 
   const handleBackNavigation      = () => {
     if (navigation.currentPage > 0) {
@@ -97,7 +104,10 @@ const DataEditor: React.FC<DataEditorProps> = ({
       }
   }
 
-  const handlePreview             = () => {
+  const handlePreview             = async() => {
+
+      setLoading( true )
+
       const currentSection = data[navigation.currentPage];
       let hasErrors = false;
       
@@ -115,8 +125,14 @@ const DataEditor: React.FC<DataEditorProps> = ({
       // Переход только если нет ошибок
       if (!hasErrors) {
         clearAll();
+        setLoading( false )
         return onPreview( formState.data )
-      } else return <></>
+      } else { 
+        setLoading( true )
+        return undefined
+      }
+
+
   }
 
   const handleClose               = () => {
@@ -164,6 +180,11 @@ const DataEditor: React.FC<DataEditorProps> = ({
         case 'check':       return <CheckField      { ...props } />;
         case 'rate':        return <RateField       { ...props } />;
         case 'fio':         return <FioField        { ...props } />;
+        case 'sign':        return <SignField       { ...props } />;
+        case 'preview':     return <>
+            <IonLoading isOpen = { loading } message={ "Подождите..." }/>
+            <PreviewField getPreview = { handlePreview } />
+        </>
 
         default:            return null;
     }
@@ -191,13 +212,11 @@ const DataEditor: React.FC<DataEditorProps> = ({
         <div className="step-container">
           <div className="page-content">
             {
-              currentSection.title === "Просмотр"
-                ? handlePreview()
-                : currentSection.data.map((field, idx) => (
-                    <div key={idx}>
-                      {renderField(field, navigation.currentPage, idx)}
-                    </div>
-                  ))
+                currentSection.data.map((field, idx) => (
+                  <div key={idx}>
+                    {renderField(field, navigation.currentPage, idx)}
+                  </div>
+                ))
             }
             
             {/* Большая кнопка Сохранить на последней странице */}

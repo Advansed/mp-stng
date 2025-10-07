@@ -10,7 +10,7 @@ import styles                                         from './ImageField.module.
 interface ImagesFieldProps {
   label:        string;
   value:        string[];
-  onChange:     (value: string[]) => void;
+  onChange:     (value: any) => void;
   placeholder?: string;
   disabled?:    boolean;
   error?:       string;
@@ -37,7 +37,7 @@ export const ImagesField: React.FC<ImagesFieldProps> = ({
     try {
       const photo = await takePicture();
       if (photo?.dataUrl) {
-        onChange([...value, photo.dataUrl]);
+        onChange([...value, photo]);
       }
     } catch (error) {
       console.error("Ошибка добавления фото:", error);

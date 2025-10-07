@@ -23,8 +23,8 @@ interface AppsStore {
   setApps:      (apps: AppItem[]) => void
   setLoading:   (loading: boolean) => void
   
-  fetchApps:    (token: string) => Promise<void>
-  saveFiles:    (token: string, id: string, files: any) => Promise<boolean>
+  fetchApps:    (token: string) => Promise<any>
+  saveFiles:    (token: string, id: string, files: any) => Promise<any>
 }
 
 const useAppsStore = create<AppsStore>((set, get) => ({
@@ -42,9 +42,11 @@ const useAppsStore = create<AppsStore>((set, get) => ({
       console.log("Apps", response)
       if (!response.error) {
         set({ apps: response.data })
+        return response
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка загрузки заявок:', error)
+      return {error: true, message: error.message}
     } finally {
       set({ loading: false })
     }
@@ -53,26 +55,18 @@ const useAppsStore = create<AppsStore>((set, get) => ({
   saveFiles: async (token: string, id: string, files: any) => {
     set({ loading: true })
     try {
-      const response = await fetch('https://aostng.ru/api/v2/s_files/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, id, files })
-      })
+      const response = await api('s_files', { token, id, files })
+
       const data = await response.json()
-      
-      if (!data.error) {
-        // Перезагрузить заявки после сохранения
-        await get().fetchApps(token)
-        return true
-      }
-      return false
-    } catch (error) {
+      return data
+    } catch (error: any) {
       console.error('Ошибка сохранения файлов:', error)
-      return false
+      return {error: true, mnessage: error.message}
     } finally {
       set({ loading: false })
     }
   }
+
 }))
 
 export default useAppsStore

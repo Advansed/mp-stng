@@ -1,22 +1,21 @@
 // Order.tsx
-import React, { useEffect, useState }                                from 'react';
-import { useToast }                         from '../Toast';
-import { TService, useServiceStore }        from '../../Store/serviceStore';
-import { FieldData, PageData }              from '../DataEditor/types';
-import DataEditor                           from '../DataEditor';
-import { IonLoading } from '@ionic/react';
+import React                    from 'react';
+import { useToast }             from '../Toast';
+import { TService }             from '../../Store/serviceStore';
+import { FieldData, PageData }  from '../DataEditor/types';
+import DataEditor               from '../DataEditor';
 
 interface OrderProps {
   service:      TService;
-  onSave:       (orderData: any) => void;
+  onSave:       (orderData: any) => Promise<void>;
   onBack:       () => void;
   onPreview:    (order: any) => Promise<any>
 }
 
 export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview }) => {
-  const toast = useToast();
+  const toast         = useToast();
 
-  const getFormData = (): PageData => {
+  const getFormData   = (): PageData => {
     if (!service || service.chapters.length === 0 ) {
       return [];
     }
@@ -45,7 +44,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     return data
   };
 
-  const getOrderData = (data: PageData):any =>{
+  const getOrderData  = (data: PageData):any =>{
       const orderData: { [key: string]: any } = {};
       
       orderData.Заявка  = service.text
@@ -56,6 +55,13 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
           if (originalField) {
             orderData[originalField.name] = field.data;
             console.log( field.data)
+          } else {
+            const originalFile = service.chapters[chapterIndex]?.files?.[fieldIndex];
+            if(originalFile){
+              if(orderData.Файлы === undefined) orderData.Файлы = [] as any
+              orderData.Файлы.push({name: originalFile.name, label: originalFile.label, files: field.data })
+              console.log( field.data)
+            }
           }
         });
       });
@@ -63,13 +69,14 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       return orderData
   }
 
-  const handleSave = async (data: PageData) => {
+  const handleSave    = async (data: PageData) => {
     try {
       // Собираем все данные из формы
       
       const orderData = getOrderData( data );
 
-      await onSave( orderData );
+      const res = await onSave( orderData );
+      console.log("ordersave ", res)
       
       onBack()
 
@@ -78,33 +85,6 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       toast.error('Ошибка при отправке заявки');
     }
   };
-
-  const preview  = ( data: PageData) => {
-    const [ info, setInfo ] = useState()
-    const [ load, setLoad ] = useState(false)
-
-    const Load = async() => {
-      
-      setLoad( false )
-      
-      const res = await onPreview( getOrderData(data) )
-      
-      setInfo( res )
-
-      setLoad( true )
-
-    }
-
-    useEffect(()=>{
-      Load()   
-    }, [])
-
-    const elem = <>
-      <IonLoading isOpen = { load } message = { "Подождите" }/>
-        <div>Просмотр</div> 
-    </>
-    return elem
-  }
 
   if (!service || service.chapters.length === 0 ) {
     return <></>
@@ -115,7 +95,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       data      = { getFormData() }
       onSave    = { handleSave }
       onBack    = { onBack }
-      onPreview = { preview }
+      onPreview = { ( data: PageData ) => onPreview( getOrderData( data ) ) }
       title     = { service.text }
     />
   );

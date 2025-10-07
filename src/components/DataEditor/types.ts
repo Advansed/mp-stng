@@ -12,15 +12,16 @@ export interface AddressData {
 
 export interface FieldData {
   label:      string;
-  type:       'text' | 'number' | 'select' | 'date' | 'boolean' | 'city' | 'address' | 'view' | 'party' | 'images' | 'image' | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' ;
+  type:       'preview' |  'text' | 'number' | 'select' | 'date' | 'boolean' | 'city' | 'address' | 'view' | 'party' | 'images' | 'image' 
+                | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' | 'sign';
   values?:    string[] | null;
   validate:   boolean;
   data:       any; 
 }
 
 export interface Section {
-  title: string;
-  data: FieldData[];
+  title:  string;
+  data:   FieldData[];
 }
 
 export type PageData = Section[];
@@ -31,7 +32,7 @@ export interface DataEditorProps {
   onSave?:    (data: PageData) => void;
   onChange?:  (data: Section) => void;
   onBack:     () => void;
-  onPreview:  (data: PageData) => JSX.Element;
+  onPreview:  (data: PageData) => Promise<any>;
   title?:     string;
 }
 

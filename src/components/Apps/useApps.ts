@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { useToken } from '../../Store/loginStore' // Предполагаем что токен берется отсюда
 import useAppsStore from '../../Store/appStore'
+import { useToast } from '../Toast'
 
 export const useApps = () => {
   const token = useToken()
+  const toast = useToast()
   const {
     apps,
     loading,
@@ -11,21 +13,18 @@ export const useApps = () => {
     saveFiles
   } = useAppsStore()
 
-  useEffect(() => {
-    if (token) {
-      fetchApps(token)
-    }
-  }, [token, fetchApps])
 
-  const refreshApps = () => {
-    if (token) {
-      fetchApps(token)
-    }
+
+  const handleRefresh = async () => {
+    const res = await fetchApps( token || '' )
+    console.log(res)
+    if(res.error) toast.error("Ошибка загрузки заявок")
+    else toast.success("Данные загрузились")
   }
 
   const handleSaveFiles = async (id: string, files: any) => {
     if (token) {
-      return await saveFiles(token, id, files)
+      return  await saveFiles(token, id, files)
     }
     return false
   }
@@ -33,7 +32,7 @@ export const useApps = () => {
   return {
     apps,
     loading,
-    refreshApps,
+    refreshApps: handleRefresh,
     saveFiles: handleSaveFiles
   }
 }

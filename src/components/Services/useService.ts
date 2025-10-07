@@ -6,10 +6,8 @@ import { useToken }         from '../../Store/loginStore'
 export const useServices = () => {
   const {
     services,
-    loading,
     saveService: save,
     loadServices: load,
-    resetState,
     preview
   } = useServiceStore()
 
@@ -29,17 +27,17 @@ export const useServices = () => {
     }
   }
 
-  const saveService         = async (order: any) => {
+  const saveService         = async (order: any):Promise<any> => {
     order.token = token
     const res = await save( order )
     if(res.error) toast.error( res.message )
     else toast.success( res.message )
+    return res
   }
 
 
   return {
     services,
-    loading,
     loadServices,
     preview,
     saveService

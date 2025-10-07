@@ -8,7 +8,7 @@ import { buildOutline, callOutline, documentTextOutline, gitBranchOutline, gitMe
 import { useNavigateStore }     from '../../Store/navigateStore';
 import { useNavigation }        from '../../pages/useNavigation';
 import { Order }                from './Order';
-import { TService }             from '../../Store/serviceStore';
+import { TService, useServiceStore }             from '../../Store/serviceStore';
 
 
 const icons = {
@@ -25,10 +25,16 @@ export const Services: React.FC = () => {
   
   const toast = useToast();
 
-  const { services, loadServices, loading, saveService, preview } = useServices()
+  const { services, loadServices, saveService, preview } = useServices()
   const { page, setPage, item, setItem } = useNavigation()
 
+  const loading = useServiceStore((state) => state.loading)
+
   const currentPage = useNavigateStore(state => state.currentPage)
+
+  useEffect(()=>{
+    console.log("services")
+  },[])
 
   useEffect(()=>{
     console.log("useService", currentPage )
@@ -39,6 +45,11 @@ export const Services: React.FC = () => {
 
     }
   },[currentPage])
+
+  useEffect(()=>{
+    console.log("loading", loading)
+  },[loading])
+
 
   let elem = <></>
   
@@ -66,10 +77,7 @@ export const Services: React.FC = () => {
           ? elem
           : <Order 
               service   = { item as TService }
-              onSave    = { (orderData: any)=>{ 
-                console.log( orderData )
-                //saveService(orderData) } 
-              }}
+              onSave    = { async(orderData: any)=>{ return await saveService(orderData)  } }
               onBack    = { ()=>{ setPage( 0 )} }
               onPreview = { preview }
           />
