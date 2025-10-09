@@ -30,7 +30,6 @@ import './app.css'
 import { ToastProvider } from './components/Toast';
 import { useAuth, useReg, useSetReg, useSetUser, useUser } from './Store/loginStore';
 import { version, getVersion } from './Store/api';
-import { RegistrationForm } from './components/Login/RegistrationForm';
 
 setupIonicReact();
 
@@ -71,7 +70,7 @@ const App: React.FC = () => {
   async function check() {
     console.log("check")
     const res = await getVersion()
-    console.log(res)
+    console.log("getVersion", res)
     if( res.message !== version ){
       console.log('alert')
       setAlert( true )
@@ -80,15 +79,17 @@ const App: React.FC = () => {
 
   useEffect(()=>{
    
-    if( auth ) check
-    
-    if( !user ) 
+    console.log('App', user, auth )
+
+    if( user !== null && auth ) {
+      check()
       if( isPlatform("mobile") )
-      try {
-        OneSignalInit(); 
-      } catch (error) {
-        console.log( JSON.stringify( error ) );
-      }
+        try {
+          OneSignalInit(); 
+        } catch (error) {
+          console.log( JSON.stringify( error ) );
+        }
+    }
        
   },[auth, user])
   

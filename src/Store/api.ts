@@ -1,7 +1,7 @@
 // URL базовый адрес API
 export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2";
 
-export const version = '2.3.8'
+export const version = '2.4.1'
 
 interface FetchResponse {
   error: boolean;
@@ -23,7 +23,7 @@ export const getVersion = async() => {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     });
-    return res.json();
+    return res.json()
 };
 
 

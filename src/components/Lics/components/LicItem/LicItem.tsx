@@ -25,6 +25,8 @@ import {
 import { LicsPage } from '../types';
 import { PDFDocModal } from '../../../Files/PDFDocModal';
 import { LicItemProps } from './types';
+import { api } from '../../../../Store/api';
+import { useToken } from '../../../../Store/loginStore';
 
 // TODO: Заменить Store.getState() на zustand store
 // import { useLoginStore } from '../../../../Store/loginStore';
@@ -33,6 +35,8 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
   const [load, setLoad] = useState(false);
   const [modal, setModal] = useState<any>();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+
+  const token = useToken()
 
   const confirmDelete = () => {
     setShowDeleteAlert(true);
@@ -55,19 +59,11 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
     // const token = useLoginStore(state => state.token);
     
     try {
-      const res = await fetch('/api/getQuits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          // token: token,
-          LC: info.code 
-        })
-      });
-      const data = await res.json();
+      const res = await api('getQuits', { token: token, LC: info.code })
       
-      console.log(data);
-      if (!data.error) {
-        setModal(data.data);
+      console.log(res)
+      if (!res.error) {
+        setModal(res.data);
       }
     } catch (error) {
       console.error('Error fetching quits:', error);
@@ -142,48 +138,33 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
                         mode = { 'ios' }
                         color={ "tertiary" }
                         className='fs-09 w-50'
-                        disabled = { info.sum <= 0 }
-                        onClick={()=>{
-                            setItem( info )
-                            setPage( 5 )                  
-                        }}
-                    >
-                        <IonIcon icon = { cardOutline } />
-                        <IonLabel className='ml-1'> { "Оплатить" } </IonLabel>
-                                
-                    </IonButton>
-
-                    <IonButton
-                        mode = { 'ios' }
-                        color={ "tertiary" }
-                        className='fs-09 w-50'
                         onClick={()=>{
                             setItem( info )
                             setPage( 4 )                  
                         }}
                     >
                         <IonIcon icon = { cardOutline } />
-                        <IonLabel className='ml-1'>Подробнее</IonLabel>
+                        <IonLabel className='ml-1'>{ "Оплата" }</IonLabel>
                                 
                     </IonButton>
-          
+                    { info.counters.length > 0 && (
+                      <IonButton
+                          mode = { 'ios' }
+                          color={ "tertiary" }
+                          className='fs-09 w-50'
+                          expand='block'
+                          onClick={()=>{
+                              setItem( info )
+                              setPage( 6 )  
+                          }}
+                      >
+                          <IonIcon icon = { codeWorkingOutline } />
+                          <IonLabel className='ml-1'> { "Показания" } </IonLabel>
+                                      
+                      </IonButton>          
+                    )}
                 </div>
-
-                <IonButton
-                    mode = { 'ios' }
-                    color={ "tertiary" }
-                    className='fs-09 w-100'
-                    expand='block'
-                    onClick={()=>{
-                        setItem( info )
-                        setPage( 6 )  
-                    }}
-                >
-                    <IonIcon icon = { codeWorkingOutline } />
-                    <IonLabel className='ml-1'> { "Передать показания" } </IonLabel>
-                                
-                </IonButton>
-
+                
                 {
                     info.counters.length > 0
                         ? <>
@@ -238,13 +219,13 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
       
       {modal !== undefined && (
         <PDFDocModal
-          isOpen={modal !== undefined}
-          onClose={() => setModal(undefined)}
-          pdfUrl={modal?.dataUrl}
-          fileName="Квитанция.pdf"
-          title="Квитанция"
-          showActions={true}
-          allowEmail={true}
+          isOpen      = { modal !== undefined }
+          onClose     = { () => setModal(undefined) }
+          pdfUrl      = { modal?.dataUrl }
+          fileName    = "Квитанция.pdf"
+          title       = "Квитанция"
+          showActions = { true }
+          allowEmail  = { true }
         />
       )}
       
