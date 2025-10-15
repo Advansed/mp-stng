@@ -28,17 +28,17 @@ import { Login } from './components/Login/Login';
 import OneSignal from 'onesignal-cordova-plugin'
 import './app.css'
 import { ToastProvider } from './components/Toast';
-import { useAuth, useReg, useSetReg, useSetUser, useUser } from './Store/loginStore';
+import { useLoginStore } from './Store/loginStore';
 import { version, getVersion } from './Store/api';
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const  auth     = useAuth()
-  const  reg      = useReg()
-  const  user     = useUser()
-  const  setReg   = useSetReg()
-  const  setUser  = useSetUser()
+  const  auth     = useLoginStore( state => state.auth )
+  const  reg      = useLoginStore( state => state.reg )
+  const  user     = useLoginStore( state => state.user )
+  const  setReg   = useLoginStore( state => state.setReg )
+  const  setUser  = useLoginStore( state => state.setUser )
   const [ alert, setAlert ]   = useState( false )
   
   console.log(auth, reg )
@@ -79,8 +79,6 @@ const App: React.FC = () => {
 
   useEffect(()=>{
    
-    console.log('App', user, auth )
-
     if( user !== null && auth ) {
       check()
       if( isPlatform("mobile") )

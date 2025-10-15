@@ -46,12 +46,12 @@ export const useLics    = () => {
     setSelectedLic(lic || null);
   };
 
-  const addLic = async( lic: string, fio: string) => {
-      await add_Lic( token || '', lic, fio)
+  const addLic = async( lic: string ) => {
+      return await add_Lic( token || '', lic ) 
   }
 
   const delLic = async( lic: string ) => {
-      await del_Lic( token || '', lic )
+      return await del_Lic( token || '', lic )
   }
 
   const setIndice = async( counters: LicCounter[] ) => {

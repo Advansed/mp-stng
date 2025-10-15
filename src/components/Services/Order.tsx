@@ -16,9 +16,9 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
   const toast         = useToast();
 
   const getFormData   = (): PageData => {
-    if (!service || service.chapters.length === 0 ) {
-      return [];
-    }
+    if(!service) return []
+    if( service.chapters === undefined ) return []
+    if ( service.chapters.length === 0 ) return [];
 
     const data = service.chapters.map(( chapter ) => ({
       title: chapter.label,
@@ -86,7 +86,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     }
   };
 
-  if (!service || service.chapters.length === 0 ) {
+  if (!service || service.chapters?.length === 0 ) {
     return <></>
   }
 

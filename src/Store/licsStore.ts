@@ -23,6 +23,7 @@ interface   Debt {
 }
 
 export interface   Lic {
+  
   id:                   string;
   code:                 string;
   name:                 string;
@@ -32,6 +33,8 @@ export interface   Lic {
   debts:                Debt[];
   sum:                  number;
   order:                any;
+  notice?:              any;
+
 }
 
 interface   ApiResponse {
@@ -40,18 +43,41 @@ interface   ApiResponse {
   message?:             string;
 }
 
-interface   LicsState {
+export interface    HistPayment {
+  number:               string;
+  summ:                 number;  
+}
+
+export interface    HistSection {
+  date:                 string;
+  pays:                 HistPayment[];
+  summ:                 number;
+}
+
+export interface    History {
+  LC:                   string;
+  payments:             HistSection[];
+}
+
+interface           LicsState {
   lics:                 Lic[];
+  hist_payment:         History[];
+  hist_indices:         any;
   loading:              boolean;
   selectedLic:          Lic | null;
 }
 
-interface   LicsActions {
-  getLics:              ( token: string) => Promise<void>;
-  addLic:               ( token: string, lic: string, fio: string) => Promise<void>;
-  delLic:               ( token: string, lic: string ) => Promise<void>;
+interface           LicsActions {
+  
+  getLics:              ( token: string) => Promise<any>;
+  addLic:               ( token: string, lic: string ) => Promise<any>;
+  delLic:               ( token: string, lic: string ) => Promise<any>;
+  get_payment:          ( token: string, LC: string ) => Promise<any>
+  get_indices:          ( token: string, counterId: string ) => Promise<any>
   setIndice:            ( token: string, counters: LicCounter[] ) => Promise<boolean>;
-  setSelectedLic:       ( lic: Lic | null) => void;
+  setLoading:           ( loading: boolean ) => void;
+  setSelectedLic:       ( lic: Lic | null ) => void;
+
 }
 
 type        LicsStore = LicsState & LicsActions;
@@ -59,9 +85,11 @@ type        LicsStore = LicsState & LicsActions;
 
 export const useLicsStore = create<LicsStore>()(
   devtools(
-    (set) => ({
+    (set, get) => ({
       // State
       lics:             [],
+      hist_payment:     [],
+      hist_indices:     [],
       loading:          false,
       selectedLic:      null,
 
@@ -70,10 +98,11 @@ export const useLicsStore = create<LicsStore>()(
         set({ loading: true });
         try {
           const res = await api('getAccount', { token });
+          
           console.log('getAccount', res )
           
           if (res.error) {
-            return;
+            return res;
           }
 
           const licsWithSum = res.data?.map(lic => ({
@@ -82,19 +111,23 @@ export const useLicsStore = create<LicsStore>()(
           })) || [];
           
           set({ lics: licsWithSum || [], loading: false });
+
+          return res
         } catch (error) {
           set({ loading: false });
+          return {error: true, message: "Ошибка получения ЛС"}
         }
       },
 
-      addLic:         async ( token: string, lic: string, fio: string ) => {
+      addLic:         async ( token: string, lic: string ) => {
         set({ loading: true })
         
-        const res = await api('addAccount', { token: token, LC: lic, fio: fio });
+        const res = await api('addAccount', { token: token, LC: lic });
         console.log( res )
           
         if (res.error) {
-          return;
+          set({ loading: false })
+          return res;
         }
 
          try {
@@ -102,7 +135,7 @@ export const useLicsStore = create<LicsStore>()(
           console.log('getAccount', res )
           
           if (res.error) {
-            return;
+            return res ;
           }
 
           const licsWithSum = res.data?.map(lic => ({
@@ -111,11 +144,14 @@ export const useLicsStore = create<LicsStore>()(
           })) || [];
           
           set({ lics: licsWithSum || [], loading: false });
+          return res;
         } catch (error) {
           set({ loading: false });
+          return {error: true, message: "Ошибка добавления ЛС "}
+        } finally {
+          set({ loading: false })
         }
-
-        set({ loading: false })
+        
       },
 
       delLic:         async ( token: string, lic: string ) => {
@@ -128,7 +164,7 @@ export const useLicsStore = create<LicsStore>()(
         console.log( res )
           
         if (res.error) {
-          return;
+          return res ;
         }
 
          try {
@@ -136,7 +172,7 @@ export const useLicsStore = create<LicsStore>()(
           console.log('getAccount', res )
           
           if (res.error) {
-            return;
+            return res;
           }
 
           const licsWithSum = res.data?.map(lic => ({
@@ -145,11 +181,13 @@ export const useLicsStore = create<LicsStore>()(
           })) || [];
           
           set({ lics: licsWithSum || [], loading: false });
+          return res
         } catch (error) {
-          set({ loading: false });
+          return {error: true, message: "Ошибка удаления ЛС"}
+        } finally {
+          set({ loading: false })  
         }
         
-        set({ loading: false })
       },
 
       setIndice:      async ( token: string, counters: LicCounter[] ) => { 
@@ -162,7 +200,7 @@ export const useLicsStore = create<LicsStore>()(
               console.log('getAccount', res )
               
               if (res.error) {
-                return;
+                return res;
               }
 
               const licsWithSum = res.data?.map(lic => ({
@@ -171,18 +209,53 @@ export const useLicsStore = create<LicsStore>()(
               })) || [];
               
               set({ lics: licsWithSum || [], loading: false });
-              return true
+              return res
             } catch (error) {
+              return { error: true, message: "Ошибка передачи показаний"}
+            } finally {
               set({ loading: false });
-              return false
             }
         } else {
           set({ loading: false })
-          return false
+          return res
         } 
       },
 
-       
+      get_payment:    async ( token: string, LC: string ) => {
+          set({ loading: true})
+
+          try {
+              const res = await api("getPayments1", { token, LC } )
+              console.log(res)
+              if(!res.error){
+                const { hist_payment } = get()
+                hist_payment.push( res.data[0]) 
+                set({ hist_payment })
+              }
+              return res;
+          } finally {
+            set({ loading: false })
+          }
+      },
+
+      get_indices:     async ( token: string, counterId: string ) => {
+          set({ loading: true})
+
+          try {
+              const res = await api("getIndices1", { token, counterId } )
+              console.log("getIndices",res)
+              if(!res.error){
+                const { hist_indices } = get()
+                hist_indices.push( res.data[0]) 
+                set({ hist_indices })
+              }
+              return res;
+          } finally {
+            set({ loading: false })
+          }
+      },  
+
+      setLoading:     async ( loading: boolean ) => set({ loading }),
 
       setSelectedLic:   (lic) => set({ selectedLic: lic }),
 

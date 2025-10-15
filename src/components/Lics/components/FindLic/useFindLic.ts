@@ -49,7 +49,6 @@ interface FindLicData {
   kv?:              Apartment;
   lc?:              string;
   fio:              string;
-  message:          string;
   load:             boolean;
 }
 
@@ -58,7 +57,7 @@ interface UseFindLicReturn {
   loadSettlements:  () => Promise<void>;
   loadStreets:      (settlement: Settlement) => Promise<void>;
   loadHouses:       (street: Street) => Promise<void>;
-  addAccount:       (params: AddAccountParams) => Promise<void>;
+  addAccount:       (params: AddAccountParams) => Promise<any>;
   setState:         (updates: Partial<FindLicData>) => void;
 }
 
@@ -82,14 +81,13 @@ export const useFindLic = (): UseFindLicReturn => {
     kv:             undefined,
     lc:             undefined,
     fio:            "",
-    message:        "",
     load:           false
   });
 
   const token = useToken()
   const toast = useToast()
 
-  const { addLic } = useLicsStore()
+  const addLic  = useLicsStore( state => state.addLic )
 
   const updateState = (updates: Partial<FindLicData>) => {
     setState(prev => ({ ...prev, ...updates }));
@@ -110,7 +108,8 @@ export const useFindLic = (): UseFindLicReturn => {
     const res = await api("getStreets", { token, s_id: settlement.s_id })
     
     if (res.error) {
-      updateState({ message: res.message, load: false });
+      toast.error(res.message)
+      updateState({load: false });
     } else {
       const settlementWithStreets = { 
         ...settlement, 
@@ -128,7 +127,8 @@ export const useFindLic = (): UseFindLicReturn => {
     const res = await api("getHouses", { token, ids: street.ids })
     
     if (res.error) {
-      updateState({ message: res.message, load: false });
+      toast.error(res.message)
+      updateState({ load: false });
     } else {
       const streetWithHouses = { 
         ...street, 
@@ -144,16 +144,23 @@ export const useFindLic = (): UseFindLicReturn => {
   const addAccount = async (params: AddAccountParams) => {
     
     updateState({ load: true });
+    console.log("addAccount", true)
+    try{
+      const res = await addLic( token || '',  params.LC || '' )    
+      
+      if(res.error) toast.error(res.message)
+      else toast.success("Лицевой счет добавлен")
 
-    await addLic( token || '',  params.LC || '', params.fio || '' )    
-
-    updateState({ load: false });
-
+      console.log( "addAccount", res)
+      return res;
+    } catch {
+      return { error: true, message: "Ошибка добавления ЛС"}
+    } finally {
+      updateState({ load: false });  
+      console.log("addAccount", false)
+    }
   };
-
-  useEffect(() => {
-    loadSettlements();
-  }, []);
+   
 
   return {
     state,

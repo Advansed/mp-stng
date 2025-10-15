@@ -1,3 +1,3 @@
 // src/components/Lics/components/LicItem/index.ts
 
-export type { LicItemProps, LicItemData, LicItemCounter, LicItemDebt } from './types';
+export type { LicItemProps, LicItemCounter, LicItemDebt } from './types';

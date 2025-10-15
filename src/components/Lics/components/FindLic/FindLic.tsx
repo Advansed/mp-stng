@@ -1,15 +1,22 @@
 // src/components/Lics/FindLic.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IonButton, IonCard, IonInput, IonItem, IonLoading } from '@ionic/react';
 import { useFindLic, type Ulus, type Settlement, type Street, type House, type Apartment, type Lic } from './useFindLic';
 import { AddAccountParams } from '../types';
+import { useToast } from '../../../Toast';
 
 interface FindLicProps {
   setPage: (page: number) => void;
 }
 
 export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
-  const { state, loadStreets, loadHouses, addAccount, setState } = useFindLic();
+  const { state, loadSettlements, loadStreets, loadHouses, addAccount, setState } = useFindLic();
+
+  useEffect(() => {
+    console.log(state.info )
+    if(state.info.length === 0)
+      loadSettlements();
+  }, []);
 
   // Обработчики для компонентов списков
   const handleUlusSelect = (ulus: Ulus) => {
@@ -37,14 +44,15 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
   };
 
   const handleSubmit = async () => {
-    setState({ message: "" });
-    
-    if (state.lc && state.fio) {
-      await addAccount({LC: state.lc, fio: state.fio } as AddAccountParams);
+    console.log("submit begin")
+    if ( state.lc ) {
+      const res = await addAccount({ LC: state.lc } as AddAccountParams);
+      console.log("submit addAccount")
       setPage(0);
     } else {
       setPage(0);
     }
+      console.log("submit end")
   };
 
   const handleUlusClear = () => {
@@ -70,6 +78,10 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
   const handlelcClear = () => {
     setState({lc : undefined });
   };
+
+  useEffect(()=>{
+    console.log(state.load )
+  },[state.load])
 
   return (
     <>
@@ -119,23 +131,6 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
           />
         )}
 
-        {/* Форма ввода ФИО */}
-        {state.lc && (
-          <div className="s-input mt-1 mr-1 ml-2">
-            <IonInput
-              className="s-input-1 ml-1 mt-1"
-              placeholder="Первые три буквы фамилии"
-              value={state.fio}
-              maxlength={3}
-              onIonInput={(e) => setState({ fio: e.detail.value as string })}
-            />
-          </div>
-        )}
-
-        {/* Сообщение */}
-        <div className="ml-1 mr-1 mt-1">
-          <p>{state.message}</p>
-        </div>
 
         {/* Кнопка действия */}
         <div className="mt-1 ml-1 mr-1">
@@ -145,7 +140,7 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
             mode="ios"
             onClick={handleSubmit}
           >
-            {state.lc && state.fio ? "Добавить л/с" : "Закрыть"}
+            {state.lc ? "Добавить л/с" : "Закрыть"}
           </IonButton>
         </div>
       </IonCard>

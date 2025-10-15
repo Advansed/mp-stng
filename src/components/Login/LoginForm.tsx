@@ -22,6 +22,7 @@ export function LoginForm({ onNavigate, onLogin }: LoginFormProps) {
         login.phone = localStorage.getItem("stngul.phone") || '';
         login.password = localStorage.getItem("stngul.pass") || '';
         
+        console.log( login )
         setInfo( login )
 
     },[])

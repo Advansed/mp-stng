@@ -27,7 +27,10 @@ export const useLogin = (): UseAuthReturn => {
         console.log(res)
 
         if ( res.error ) toast.error('Ошибка авторизации:' + res.message);
-        else  toast.success('Авторизировация прошла успешно');
+        else {  toast.success('Авторизировация прошла успешно');
+            localStorage.setItem("stngul.phone", credentials.phone );
+            localStorage.setItem("stngul.pass", credentials.password )
+        }
     };
 
     const ucreate = async (phone: string, name: string, terms: boolean): Promise<boolean> => {

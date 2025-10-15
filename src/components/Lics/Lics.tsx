@@ -11,6 +11,8 @@ import { FindLic } from './components/FindLic/FindLic'
 import { Indices } from './components/Indices/Indices'
 import { useNavigation } from '../../pages/useNavigation';
 import { LicItem } from './components/LicItem/LicItem';
+import History from './components/History';
+import HistoryIndices from './components/HistoryIndice';
 
 
 type WidgetParams = {
@@ -52,16 +54,16 @@ export function     Lics(): JSX.Element {
     const renderPageComponent = (): JSX.Element => {
         try {
             switch(page) {
-                case LicsPage.MAIN:             return <Items info={info} setItem={setItem} setPage={setPage} delAccount = { delLic }  addLic = { addLic }/>
-                case LicsPage.ADD_LIC_1:        return <AddLic setPage = {setPage}  addLic = { addLic } />;
-                case LicsPage.FIND_LIC:         return <FindLic setPage = { setPage } />; 
-                case LicsPage.HISTORY:          return <History item={item} getpayments = { getpayments }/>;
-                case LicsPage.PAYMENTS:         return <Payments item={item} setPage={setPage} />;
-                case LicsPage.PAYMENTS_TO:      return <PaymentsTO item={item} setPage={setPage} />;
-                case LicsPage.INDICES:          return <Indices item = { item as LicsItem} setPage ={ setPage } setIndice = { setIndice }/>
-                case LicsPage.EQUARING:         return <Equaring item={item} setPage={setPage} equairing={ equaring }/>;
-                case LicsPage.SBER_PAY:         return <SberPay item={item} setPage={setPage} SBOL = { sberPAY } />;
-                case LicsPage.HISTORY_INDICES:  return <HistoryIndices item={item}  getIndices={ getIndices }/>;
+                case LicsPage.MAIN:             return <Items           info = { info } setItem={setItem} setPage={setPage} delAccount = { delLic }  addLic = { addLic }/>
+                case LicsPage.ADD_LIC_1:        return <AddLic          setPage = {setPage}  addLic = { addLic } />;
+                case LicsPage.FIND_LIC:         return <FindLic         setPage = { setPage } />; 
+                case LicsPage.HISTORY:          return <History         item = { item } />;
+                case LicsPage.PAYMENTS:         return <Payments        item = { item } setPage={setPage} />;
+                case LicsPage.PAYMENTS_TO:      return <PaymentsTO      item = { item } setPage={setPage} />;
+                case LicsPage.INDICES:          return <Indices         item = { item as LicsItem} setPage ={ setPage } setIndice = { setIndice }/>
+                case LicsPage.EQUARING:         return <Equaring        item = { item } setPage={setPage} equairing={ equaring }/>;
+                case LicsPage.SBER_PAY:         return <SberPay         item = { item } setPage={setPage} SBOL = { sberPAY } />;
+                case LicsPage.HISTORY_INDICES:  return <HistoryIndices  item = { item } />;
                 // case LicsPage.ALFA_BANK:        return <AlfaBank item={item} setPage={setPage} />;
                 // case LicsPage.SBP:              return <SBP item={item} setPage={setPage} />;
                 default:                        return <></>;
@@ -129,95 +131,6 @@ function            AddLics(props:{ setPage, addLic }) {
             </div>
         </IonCard>
     </>
-}
-
-function            History(props: { item, getpayments }){
-    const [ info, setInfo ] = useState<any>([])
-    const [ load, setLoad] = useState( false )
-
-    const item = props.item
-    
-    async function Load(){
-        setLoad( true)
-        const res = await props.getpayments( item.code )  
-        if(!res.error){
-            if(res.data.length > 0 ){
-                setInfo( res.data[0].payments )
-            }
-        }
-        setLoad( false )            
-    }
-
-    useEffect(()=>{
-        Load()
-    },[])
-
-
-    function Items(props:{ info }){
-
-        let elem = <></>
-
-        for(let i = 0; i < props.info.length; i++){
-            elem = <>
-                { elem }
-                <div className='flex fl-space ml-2 mr-2 mt-05'>
-                    <div className='fs-09'>{ props.info[i].number }</div>
-                    <div className='fs-1'>
-                        <b>
-                            { 
-                                new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( props.info[i].summ )    
-                            }
-                        </b>
-                    </div>
-                </div>
-            </>
-        }
-
-
-        return elem
-    }
-    
-    let items = <></>
-    for(let i = 0; i < info.length; i++ ){
-        
-        items = <>
-            { items }
-            <div className='ml-1 cl-prim'>
-                <div className='mt-1 '> <b>{ info[i].date }</b> </div>
-                <Items info = { info[i].pays }/>
-                <div className='flex fl-space ml-2 mr-2 t-upperline pt-05'>
-                    <div className='fs-09'> <b>Итого</b></div>
-                    <div><b>{ new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( info[i].summ )  }</b></div>
-                </div>
-            </div>
-        </>
-    }
-
-    const elem = <>
-        <IonLoading isOpen = { load } message = {"Подождите"} />
-      <IonCard className='pb-1'>
-            <div className='flex fl-space mt-1 ml-1'>
-                <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
-            </div>
-            <div className='ml-2 mr-1 cl-prim'>
-                { item.name}
-            </div>    
-            <div className='ml-2 mr-1 pb-1 mt-1 cl-prim'>
-                { item.address}
-            </div>  
-            <div className='mt-1 ml-1 mr-1 t-underline cl-prim'>
-                <b>{ "История платежей" }</b>
-            </div>
-
-            {
-                items
-            }
-
-        </IonCard>
-    </>
-
-    return elem
-
 }
 
 function            Payments(props:{ item, setPage }){
@@ -582,62 +495,62 @@ function            Equaring({ item, setPage, equairing }:{ item: any, setPage: 
     return elem
 }
 
-function            HistoryIndices(props: { item, getIndices }){
-    const [ info, setInfo ] = useState<any>([])
+// function            HistoryIndices(props: { item, getIndices }){
+//     const [ info, setInfo ] = useState<any>([])
 
-    const item = props.item
+//     const item = props.item
     
-    async function Load(){
+//     async function Load(){
 
-        const res = await props.getIndices( item.selected.counterId )  
-        if(!res.error){
-            if(res.data.length > 0 ){
-                setInfo( res.data[0].indications )
-            }
-        }
+//         const res = await props.getIndices( item.selected.counterId )  
+//         if(!res.error){
+//             if(res.data.length > 0 ){
+//                 setInfo( res.data[0].indications )
+//             }
+//         }
             
-    }
+//     }
 
-    useEffect(()=>{
-        Load()
-    },[])
+//     useEffect(()=>{
+//         Load()
+//     },[])
     
-    let items = <></>
-    for(let i = 0; i < info.length; i++ ){
-        items = <>
-            { items }
-            <IonRow className='ml-2 mt-1 mr-2 cl-prim'>
-                <IonCol size = "8"> { info[i].date } </IonCol>
-                <IonCol size = "4" className="a-right"> <b>{ info[i].indication }</b> </IonCol>
-            </IonRow>
-        </>
-    }
+//     let items = <></>
+//     for(let i = 0; i < info.length; i++ ){
+//         items = <>
+//             { items }
+//             <IonRow className='ml-2 mt-1 mr-2 cl-prim'>
+//                 <IonCol size = "8"> { info[i].date } </IonCol>
+//                 <IonCol size = "4" className="a-right"> <b>{ info[i].indication }</b> </IonCol>
+//             </IonRow>
+//         </>
+//     }
 
-    const elem = <>
-      <IonCard className='pb-1'>
-            <div className='flex fl-space mt-1 ml-1'>
-                <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
-            </div>
-            <div className='ml-2 mr-1 cl-prim'>
-                { item.name}
-            </div>    
-            <div className='ml-2 mr-1 pb-1 mt-1 cl-prim'>
-                { item.address}
-            </div>  
-            <div className='mt-1 ml-1 mr-1 t-underline cl-prim'>
-                <b>{ "История показаний" }</b>
-            </div>
+//     const elem = <>
+//       <IonCard className='pb-1'>
+//             <div className='flex fl-space mt-1 ml-1'>
+//                 <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
+//             </div>
+//             <div className='ml-2 mr-1 cl-prim'>
+//                 { item.name}
+//             </div>    
+//             <div className='ml-2 mr-1 pb-1 mt-1 cl-prim'>
+//                 { item.address}
+//             </div>  
+//             <div className='mt-1 ml-1 mr-1 t-underline cl-prim'>
+//                 <b>{ "История показаний" }</b>
+//             </div>
 
-            {
-                items
-            }
+//             {
+//                 items
+//             }
 
-        </IonCard>
-    </>
+//         </IonCard>
+//     </>
 
-    return elem
+//     return elem
 
-}
+// }
 
 // function            AlfaBank(props: { item, setPage }) {
 //     const [load, setLoad] = useState(false)

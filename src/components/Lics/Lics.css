@@ -111,6 +111,29 @@
     justify-content: center;
 }
 
+.ls-item4 {
+    margin-top: 0.5em;
+    background-color: #a6f39f;
+    height: 4em;
+    display: flex;
+    align-items: center;
+    padding-left: 0.5em;
+    border-radius: 5px;
+    padding-right: 1em;
+}
+
+.ls-item5 {
+    margin-top: 0.5em;
+    background-color: #b35550;
+    height: 4em;
+    display: flex;
+    color: white;
+    align-items: center;
+    padding-left: 0.5em;
+    border-radius: 5px;
+    padding-right: 1em;
+}
+
 /* Базовые кнопки (мобильные) */
 .ls-button {
     font-size: 1em;

@@ -22,7 +22,7 @@ const Page: React.FC = () => {
 
   const { name }          = useParams<{ name: string; }>();
 
-  const { getLics }       = useLicsStore()
+  const getLics           = useLicsStore( state => state.getLics )
 
   const token             = useToken()
 
@@ -66,7 +66,7 @@ const Page: React.FC = () => {
     };
 
   return (
-    <IonPage>
+    <IonPage className='mt-2'>
         <div className={ isPlatform("ios") ? 'p-header flex fl-space mt-3' : "p-header flex fl-space" }>
           <IonButton
             fill = "clear"

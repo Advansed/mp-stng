@@ -1,29 +1,34 @@
 import React, { useState } from 'react'
 import { IonCard, IonInput, IonButton, IonLoading } from '@ionic/react'
 import { LicsPage } from './types'
+import { useToast } from '../../Toast'
 
 interface Props {
     setPage:    ( page: number ) => void,
-    addLic:     ( lic: string, fio: string) => Promise<void>
+    addLic:     ( lic: string ) => Promise<any>
 }
 
 export function AddLic({ setPage, addLic }: Props) {
     
-    const [form,    setForm]    = useState({ LC: "", fio: "" })
+    const [form,    setForm]    = useState({ LC: "" })
     const [message, setMessage] = useState("")
     const [loading, setLoading] = useState(false)
+    const toast = useToast()
 
     async function handleAdd() {
         setLoading(true)
-        await addLic( form.LC, form.fio )
+        const res = await addLic( form.LC )
+        if(res.error) toast.error(res.message)
+        else toast.success("Лицевой счет добавлен")
         setLoading(false)       
 
         setPage( LicsPage.MAIN )
+
     }   
 
     return <>
 
-        <IonLoading isOpen={loading} message="Подождите..." />
+        <IonLoading isOpen={ loading } message="Подождите..." />
 
         <IonCard className='pb-1'>
             
@@ -44,7 +49,7 @@ export function AddLic({ setPage, addLic }: Props) {
                 />
             </div>
             
-            <div className='ml-1 mr-1 mt-1 t-underline s-input'>
+            {/* <div className='ml-1 mr-1 mt-1 t-underline s-input'>
                 <IonInput
                     className='s-input-1 ml-1'
                     placeholder='Первые три буквы фамилии'
@@ -56,7 +61,7 @@ export function AddLic({ setPage, addLic }: Props) {
                         setMessage("")
                     }}
                 />
-            </div>
+            </div> */}
             
             { message && <div className='ml-1 mr-1'><p>{message}</p></div> }
             
@@ -67,10 +72,10 @@ export function AddLic({ setPage, addLic }: Props) {
                     mode="ios"
                     onClick={() => {
                         setMessage("")
-                        form.LC && form.fio ? handleAdd() : setPage(0)
+                        form.LC  ? handleAdd() : setPage(0)
                     }}
                 >
-                    {form.LC && form.fio ? "Добавить" : "Закрыть"}
+                    {form.LC  ? "Добавить" : "Закрыть"}
                 </IonButton>
             </div>
 

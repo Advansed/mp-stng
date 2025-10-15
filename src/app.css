@@ -225,6 +225,7 @@
 .fs-3 { font-size: 2em }
 .fs-4 { font-size: 2.5em }
 .fs-bold { font-weight: 700 };
+.fs-italic { font-style: italic;}
 
 .borders {
     border-radius: 0.5em;

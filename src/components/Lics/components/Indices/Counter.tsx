@@ -144,7 +144,7 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
         </div>
       ) : avail === 3 ? (
         <div className="ml-1 mt-2 fs-09 pb-1">
-          <b>В настоящее время прием показаний недоступен. Показания принимаются с 20 по 25 число каждого месяца.</b>
+          <b>В настоящее время прием показаний недоступен. Показания принимаются с 15 по 25 число каждого месяца.</b>
         </div>
       ) : avail === 4 ? (
         <div className="ml-1 mt-2 fs-09 pb-1">
@@ -174,7 +174,7 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
           <p className="a-right fs-08">
             <b>
               {delta === 0 ? "Передать нулевое показание" :
-               delta > 3000 ? "Нельзя передать слишком большое показание" :
+               delta > 10000 ? "Нельзя передать слишком большое показание" :
                delta < 0 ? "" : <></>}
             </b>
           </p>

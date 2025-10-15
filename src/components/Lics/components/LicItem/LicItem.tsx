@@ -1,35 +1,13 @@
 // src/components/Lics/components/LicItem/LicItem.tsx
 import React, { FC, useState } from 'react';
-import { 
-  IonAlert, 
-  IonButton, 
-  IonCard, 
-  IonIcon, 
-  IonLabel, 
-  IonLoading, 
-  IonSegment, 
-  IonSegmentButton, 
-  IonSegmentContent, 
-  IonSegmentView 
-} from '@ionic/react';
-import { 
-  alertCircleOutline, 
-  cardOutline, 
-  closeCircleOutline, 
-  codeWorkingOutline, 
-  documentAttachOutline, 
-  listOutline, 
-  locationOutline, 
-  personOutline 
-} from 'ionicons/icons';
+import { IonAlert, IonButton, IonCard, IonIcon, IonLabel, IonLoading, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView } from '@ionic/react';
+import { alertCircleOutline, cardOutline, closeCircleOutline, codeWorkingOutline, documentAttachOutline, listOutline, locationOutline, personOutline } from 'ionicons/icons';
 import { LicsPage } from '../types';
 import { PDFDocModal } from '../../../Files/PDFDocModal';
 import { LicItemProps } from './types';
 import { api } from '../../../../Store/api';
 import { useToken } from '../../../../Store/loginStore';
-
-// TODO: Заменить Store.getState() на zustand store
-// import { useLoginStore } from '../../../../Store/loginStore';
+import { User, MapPin } from 'lucide-react';
 
 export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }) => {
   const [load, setLoad] = useState(false);
@@ -92,16 +70,17 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
         
         <div className="ml-1 mr-1 t-underline pb-05 fs-09 flex">
           <div>
-            <IonIcon icon={personOutline} className="h-15 w-15" color="tertiary" />
+             <User size={16} className={ "w-15 h-15 cl-prim " } />
+            {/* <IonIcon icon={personOutline} className="h-15 w-15" color="tertiary" /> */}
           </div>
-          <div className="ml-1">{info.name}</div>
+          <div className="ml-1 cl-prim "><b>{info.name}</b></div>
         </div>
         
         <div className="ml-1 mr-1 t-underline pb-05 mt-1 flex fs-09">
           <div>
-            <IonIcon icon={locationOutline} className="h-15 w-15" color="tertiary" />
+            <MapPin size={16} className={ "w-15 h-15 cl-prim "} />
           </div>
-          <div className="ml-1">{info.address}</div>
+          <div className="ml-1 cl-black">{info.address}</div>
         </div>
         
         <div className="pl-1 pr-1 pt-1">
@@ -165,25 +144,39 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
                     )}
                 </div>
                 
-                {
-                    info.counters.length > 0
-                        ? <>
-                              <div className='ls-item2'
-                                  onClick={()=>{
-                                      console.log("quits")
-                                      // Quits()
-                                  }}
-                              >
-                                  <div className='ml-05'>
-                                      <IonIcon icon = { alertCircleOutline }  className='h-15 w-15' color="primary"/>
-                                  </div>
-                                  <div className='ml-1'>
-                                      <div className='fs-09'><b>Напоминание: </b> Пожалуйста, вносите показания счетчика ежемесячно  </div>
-                                  </div>
-                              </div> 
-                          </>
-                        : <></>
-                }            
+                <div className={
+                    info.notice.type === "Срочное" 
+                      ? 'ls-item5'
+                    : info.notice.type === "Уведомление" 
+                      ? 'ls-item4'
+                    : 'ls-item2'
+                  }
+                    onClick={()=>{
+                    console.log("quits")
+                    // Quits()
+                    }}
+                >
+                                  
+                <div className='ml-05'>
+                    <IonIcon icon = { alertCircleOutline }  className='h-15 w-15' />
+                </div>
+                                  
+                <div className='ml-1'>
+                    <div className='fs-09'>
+                      { 
+                        info.notice.type === "Напоминание" 
+                            ? <div><b>Напоминание: </b> { info.notice.label }</div> 
+                        : info.notice.type === "Уведомление" 
+                            ? <div><b>Уведомление: </b> { info.notice.label }</div> 
+                        : info.notice.type === "Срочное" 
+                            ? <div><b>Срочно: </b> { info.notice.label }</div> 
+                        :<></>
+                      
+                      }
+                        
+                    </div>
+                </div>
+            </div> 
                 
             </IonSegmentContent>
             
