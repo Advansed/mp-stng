@@ -69,15 +69,15 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
         set({ loading: true})
         try {
             // TODO: Заменить на fetch вместо getData
-            console.log(orderData)
-            const res = await api('services', orderData )
+            console.log('services1', orderData)
+            const res = await api('services1', orderData )
             console.log("saveService", res)
-            set((state) => ({ ...state, loading: false })) // Функциональное обновление
             return res
         } catch (error:any) {
-            set((state) => ({ ...state, loading: false })) // Функциональное обновление
             console.log(error)
             return { error: true, message: error.message }
+        } finally {
+            set((state) => ({ ...state, loading: false })) // Функциональное обновление
         }
         
     },
@@ -98,10 +98,9 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
     loadServices:   async( token: string) => {
 
         set({ loading: true })
-        console.log("s_detals")
         try {
-            const res = await api("s_details1", { token: token })
-            console.log( res.data )
+            const res = await api("s_details", { token: token })
+            console.log('s_details', res.data )
             if(res.error){
                 set({ loading: false})
                 return res

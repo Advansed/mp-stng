@@ -22,6 +22,8 @@ import { FioField } from './fields/FIOField';
 import { IonLoading } from '@ionic/react';
 import { PreviewField } from './fields/PreviewField';
 import { SignField } from './fields/SignField';
+import { EquipField } from './fields/Equip';
+import { EmailField } from './fields/EmailField';
 
 const DataEditor: React.FC<DataEditorProps> = ({ 
     data, 
@@ -147,9 +149,6 @@ const DataEditor: React.FC<DataEditorProps> = ({
   const getLics                   = () => {
     return lics.map((e)=> {return e.code})
   }
-  useEffect(()=>{
-    console.log(errors)
-  },[errors])
   
   const renderField = (field: FieldData, sectionIdx: number, fieldIdx: number) => {
     const update = (value: any) => formState.updateField(sectionIdx, fieldIdx, value);
@@ -170,6 +169,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
         case 'password':    return <TextField       { ...props } type = { "password" }/>;
         case 'number':      return <NumberField     { ...props } />;
         case 'box':         return <SelectField     { ...props } options={field.values || []} />;
+        case 'select':      return <SelectField     { ...props } options={field.values || []} />;
         case 'lics':        return <SelectField     { ...props } options={ getLics() || []} />;
         case 'date':        return <DateField       { ...props } />;
         case 'city':        return <CityField       { ...props } onFIAS={ setFias}/>;
@@ -181,6 +181,8 @@ const DataEditor: React.FC<DataEditorProps> = ({
         case 'rate':        return <RateField       { ...props } />;
         case 'fio':         return <FioField        { ...props } />;
         case 'sign':        return <SignField       { ...props } />;
+        case 'equip':       return <EquipField      { ...props } />;
+        case 'email':       return <EmailField      { ...props } />;        
         case 'preview':     return <>
             <IonLoading isOpen = { loading } message={ "Подождите..." }/>
             <PreviewField getPreview = { handlePreview } />

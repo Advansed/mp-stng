@@ -10,10 +10,18 @@ export interface AddressData {
   lon: string;
 }
 
+export interface EquipData {
+  type: string;
+  manufacturer: string;
+  number: string;
+  plomb: string;
+  release_date: string;
+}
+
 export interface FieldData {
   label:      string;
   type:       'preview' |  'text' | 'number' | 'select' | 'date' | 'boolean' | 'city' | 'address' | 'view' | 'party' | 'images' | 'image' 
-                | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' | 'sign';
+                | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' | 'sign' | 'equip' | 'email';
   values?:    string[] | null;
   validate:   boolean;
   data:       any; 

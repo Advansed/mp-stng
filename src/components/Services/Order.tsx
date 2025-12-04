@@ -1,5 +1,5 @@
 // Order.tsx
-import React                    from 'react';
+import React, { useState }                    from 'react';
 import { useToast }             from '../Toast';
 import { TService }             from '../../Store/serviceStore';
 import { FieldData, PageData }  from '../DataEditor/types';
@@ -40,9 +40,11 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
         } as FieldData
       }) || []
     }));
-    console.log("formdata", data)
     return data
   };
+
+  const [ orderData ] = useState<any>( getFormData() )
+
 
   const getOrderData  = (data: PageData):any =>{
       const orderData: { [key: string]: any } = {};
@@ -54,13 +56,11 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
           const originalField = service.chapters[chapterIndex]?.data?.[fieldIndex];
           if (originalField) {
             orderData[originalField.name] = field.data;
-            console.log( field.data)
           } else {
             const originalFile = service.chapters[chapterIndex]?.files?.[fieldIndex];
             if(originalFile){
               if(orderData.Файлы === undefined) orderData.Файлы = [] as any
               orderData.Файлы.push({name: originalFile.name, label: originalFile.label, files: field.data })
-              console.log( field.data)
             }
           }
         });
@@ -92,7 +92,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
 
   return (
     <DataEditor
-      data      = { getFormData() }
+      data      = { orderData }
       onSave    = { handleSave }
       onBack    = { onBack }
       onPreview = { ( data: PageData ) => onPreview( getOrderData( data ) ) }

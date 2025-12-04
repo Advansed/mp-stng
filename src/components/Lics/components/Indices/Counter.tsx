@@ -100,7 +100,7 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
     info.indice = parsedValue;
     info.period = item.current || '';
     
-    if (parsedValue >= (info.predIndice || 0) && (parsedValue - (info.predIndice || 0)) < 3001) {
+    if (parsedValue >= (info.predIndice || 0) && (parsedValue - (info.predIndice || 0)) < 10001) {
       setMode(true);
     } else {
       setMode(false);

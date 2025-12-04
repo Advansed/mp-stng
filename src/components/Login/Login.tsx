@@ -23,11 +23,13 @@ export function Login(props:{ reg: boolean}) {
                     onNavigate  = { setCurrentPage }
                     onLogin     = { ulogin }
                 />;
+
             case 'restore':
                 return <RestoreForm 
                     onNavigate  = { setCurrentPage }
                     onRestore   = { urestore }
                 />;
+
             case 'SMS':
                 return <SMSForm 
                     phone       = { user.code }
@@ -35,21 +37,25 @@ export function Login(props:{ reg: boolean}) {
                     onRestore   = { urestore }
                     onCompare   = { ucompare }
                 />;
+
             case 'Pass':
                 return <PassForm 
                     onNavigate  = { setCurrentPage }
                     onPassword  = { upassword }
                 />;
+
             case 'Reg':
                 return <RegistrationForm 
                     onNavigate  = { setCurrentPage }
                     onCreate    = { ucreate }
                 />;
+
             default:
                 return <LoginForm 
                     onNavigate  = { setCurrentPage }
                     onLogin     = { ulogin }
                 />;
+                
         }
     };
 

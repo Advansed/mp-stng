@@ -61,11 +61,6 @@ export const DateField: React.FC<DateFieldProps> = ({
         <div className={styles.iconWrapper}>
           <IonIcon icon={calendarOutline} className={styles.icon} />
         </div>
-        {value && (
-          <div className={styles.displayValue}>
-            {formatDateForDisplay(value)}
-          </div>
-        )}
       </div>
       {error && <span className={styles.errorMessage}>{error}</span>}
     </div>

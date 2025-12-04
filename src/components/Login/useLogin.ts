@@ -33,9 +33,9 @@ export const useLogin = (): UseAuthReturn => {
         }
     };
 
-    const ucreate = async (phone: string, name: string, terms: boolean): Promise<boolean> => {
+    const ucreate = async (phone: string, name: string, terms: boolean): Promise<any> => {
         const result = await create(phone, name, terms);
-        if (!result) toast.error('Ошибка регистрации');
+        if (result.error) toast.error( result.message );
         return result;
     };
 

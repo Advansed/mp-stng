@@ -80,8 +80,8 @@ const App: React.FC = () => {
   useEffect(()=>{
    
     if( user !== null && auth ) {
-      check()
       if( isPlatform("mobile") )
+        check()
         try {
           OneSignalInit(); 
         } catch (error) {

@@ -138,7 +138,7 @@
   50% { transform: scale(1.1); }
 }
 
-/* Отображение форматированной даты */
+/*
 .displayValue {
   position: absolute;
   left: 1em;
@@ -149,14 +149,17 @@
   pointer-events: none;
   background: white;
   padding: 0 0.2em;
-  display: none; /* По умолчанию скрыто */
-}
+  display: none; 
+} */
 
 /* Для браузеров, которые не показывают дату красиво */
 @supports not (-webkit-calendar-picker-indicator: none) {
+  
+  /*
   .displayValue {
     display: block;
   }
+  */
   
   .dateInput {
     color: transparent;

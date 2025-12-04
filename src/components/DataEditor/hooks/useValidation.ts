@@ -65,6 +65,31 @@ export const useValidation = () => {
         if (!value) return 'Выберите значение';
         break;
 
+      case 'email':
+        if (!value?.trim()) return 'Обязательное поле';
+        // Простая валидация email
+        { 
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value.trim())) return 'Введите корректный email адрес';
+        }
+        break;
+
+      case 'equip':
+        if (!value || !Array.isArray(value) || value.length === 0) {
+          return 'Добавьте хотя бы один прибор учета';
+        }
+        
+        // Проверяем каждый прибор учета
+        for (let i = 0; i < value.length; i++) {
+          const equipment = value[i];
+          if (!equipment.type?.trim() || 
+              !equipment.manufacturer?.trim() || 
+              !equipment.number?.trim() || 
+              !equipment.release_date) {
+            return `Прибор учета #${i + 1} имеет незаполненные обязательные поля`;
+          }
+        }
+        break;
     }
 
     return null;

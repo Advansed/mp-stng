@@ -1,12 +1,13 @@
 // RegistrationForm.tsx
 import React, { useState } from "react";
-import { IonImg, IonText, IonButton, IonCheckbox, IonInput } from "@ionic/react";
+import { IonImg, IonText, IonButton, IonCheckbox, IonInput, IonModal } from "@ionic/react";
 import { LoginPage } from "./Login";
 import MaskedInput from "../../mask/reactTextMask";
+import UserAgree from "./userAgree";
 
 interface RegistrationFormProps {
     onNavigate:     ( page: LoginPage ) => void;
-    onCreate:       ( phone: string, name: string, terms: boolean ) => Promise<boolean>;
+    onCreate:       ( phone: string, name: string, terms: boolean ) => Promise<any>;
 
 }
 
@@ -14,10 +15,11 @@ export function RegistrationForm({ onNavigate, onCreate }: RegistrationFormProps
     const [ phone,  setPhone ]  = useState("")
     const [ name,   setName ]   = useState("")
     const [ agree,  setAgree ]  = useState( false)
+    const [ modal,  setModal ]  = useState( false)
 
     const handleCreate = async() =>{
          const res = await onCreate( phone, name, agree )
-         if(res)   onNavigate('SMS')
+         if(!res.error)   onNavigate('SMS')
     }
 
     return (
@@ -101,7 +103,9 @@ export function RegistrationForm({ onNavigate, onCreate }: RegistrationFormProps
                 Запросить СМС
             </div>
 
-            <IonButton className="login-text-url ion-text-wrap" fill="clear">
+            <IonButton className="login-text-url ion-text-wrap" fill="clear"
+                onClick = { () => setModal(true) }
+            >
                 Пользовательское соглашение
             </IonButton>
 
@@ -113,6 +117,13 @@ export function RegistrationForm({ onNavigate, onCreate }: RegistrationFormProps
                 onClick={() => onNavigate('login')}>
                 Авторизируйтесь
             </IonButton>
+
+            <IonModal
+                isOpen          = { modal }
+                onDidDismiss    = { () => setModal(false) }
+            >
+                <UserAgree  onClose = { () => setModal(false) }/>
+            </IonModal>
         </>
     );
 }

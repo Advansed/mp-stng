@@ -23,9 +23,9 @@ export function Profile() {
                 onClick={()=>{
                     save({
                         passport:   info?.passport,
-                        surname:    mode.surname,
-                        name:       mode.name,
-                        lastname:   mode.lastname
+                        surname:    mode.surname || info.surname,
+                        name:       mode.name || info.name,
+                        lastname:   mode.lastname || info.lastname
                     })
                     setMode({});
                 }}
@@ -35,7 +35,7 @@ export function Profile() {
         <div className={ "ml-1 mr-1 mt-1 cl-prim fs-bold" }>
             <FioSuggestions  token="50bfb3453a528d091723900fdae5ca5a30369832"
                 value={{ 
-                    value: info?.surname + " " + info?.name + " " + info?.lastname, 
+                    value: (info?.surname || "" ) + " " + (info?.name || "") + " " + (info?.lastname || ""), 
                     unrestricted_value: info?.surname + " " + info?.name + " " + info?.lastname,
                     data: {
                         surname:            info?.surname || '',
@@ -141,6 +141,7 @@ export function Profile() {
                         onIonInput = {(e)=>{
                             info.passport.issuedBy = e.detail.value;
                             mode.issuedBy = e.target.value  
+                            setUpd( upd + 1)
                         }}
                     />
                 </div>                    

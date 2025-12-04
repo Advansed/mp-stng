@@ -29,13 +29,13 @@ export function PassForm({ onNavigate, onPassword }: PassFormProps) {
             <div className="login-header mt-1">
                 <IonImg className="login-logo" src="assets/img/logoSTNG.png" alt="logo"></IonImg>
                 <IonText>
-                    <p className="login-title">Восстановление пароля</p>
+                    <p className="login-title">Создание пароля</p>
                 </IonText>
             </div>
 
             <IonText>
                 <p className="login-text a-center ml-1 mr-1">
-                    Для завершения восстановления пароля введите пароль и подтвердите его
+                    Введите пароль и подтвердите его
                 </p>
             </IonText>
 

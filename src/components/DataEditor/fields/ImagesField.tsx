@@ -37,7 +37,8 @@ export const ImagesField: React.FC<ImagesFieldProps> = ({
     try {
       const photo = await takePicture();
       if (photo?.dataUrl) {
-        onChange([...value, photo]);
+        console.log( photo?.dataUrl )
+        onChange([...value, photo.dataUrl ]);
       }
     } catch (error) {
       console.error("Ошибка добавления фото:", error);
@@ -52,8 +53,6 @@ export const ImagesField: React.FC<ImagesFieldProps> = ({
     onChange(newImages);
   }
 
-  console.log(label, value)
-
   return (
     <div className={styles.field}>
       <label className={styles.label}>{label}</label>
@@ -64,7 +63,7 @@ export const ImagesField: React.FC<ImagesFieldProps> = ({
           {value.map((image, index) => (
             <div key={index} className={styles.imageItem}>
               <img 
-                src={image} 
+                src={ image } 
                 alt={`${label} ${index + 1}`}
                 className={styles.imageItem}
                 onClick={() => !disabled && setModalImage(image)}

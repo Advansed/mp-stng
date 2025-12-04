@@ -1,7 +1,7 @@
 // src/components/Lics/components/LicItem/LicItem.tsx
 import React, { FC, useState } from 'react';
 import { IonAlert, IonButton, IonCard, IonIcon, IonLabel, IonLoading, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView } from '@ionic/react';
-import { alertCircleOutline, cardOutline, closeCircleOutline, codeWorkingOutline, documentAttachOutline, listOutline, locationOutline, personOutline } from 'ionicons/icons';
+import { alertCircleOutline, cardOutline, closeCircleOutline, codeWorkingOutline, documentAttachOutline, listOutline } from 'ionicons/icons';
 import { LicsPage } from '../types';
 import { PDFDocModal } from '../../../Files/PDFDocModal';
 import { LicItemProps } from './types';

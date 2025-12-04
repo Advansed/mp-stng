@@ -38,7 +38,7 @@ interface LoginStore {
     error:          string | null;
   
     login:          ( phone: string, password: string ) => Promise<any>;
-    create:         ( phone: string, name: string, terms: boolean ) => Promise<boolean>;
+    create:         ( phone: string, name: string, terms: boolean ) => Promise<any>;
     restore:        ( phone: string ) => Promise<boolean>;
     compare:        ( sms: string ) => boolean;
     setAuth:        ( auth: boolean ) => void;
@@ -100,13 +100,14 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
             console.log(res)
             if (!res.error) {
                 set({ user: res.data, token: res.data.token, isLoading: false });
-                return true;
+                return res;
+            } else {
+                set({ isLoading: false });
+                return res;
             }
-            set({ isLoading: false });
-            return false;
         } catch {
             set({ isLoading: false });
-            return false;
+            return {error: true, message: "Ошибка регистрации"};
         }
     },
 
@@ -189,7 +190,10 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
 
             const { user } = get()
 
-            const res =  await api('set_profile', { token: token, ...data });
+            console.log("user", user )
+            const params = { token: token, ...data }
+            console.log("params", params)
+            const res =  await api('set_profile', params);
             
             if(!res.error)
                 set({ user: {...user, ...data} as User, isLoading: false });

@@ -66,7 +66,7 @@ const Page: React.FC = () => {
     };
 
   return (
-    <IonPage className='mt-2'>
+    <IonPage className=''>
         <div className={ isPlatform("ios") ? 'p-header flex fl-space mt-3' : "p-header flex fl-space" }>
           <IonButton
             fill = "clear"
