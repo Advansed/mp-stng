@@ -105,6 +105,11 @@ export function LoginForm({ onNavigate, onLogin }: LoginFormProps) {
                 Пройдите регистрацию
             </IonButton>
 
+            <IonButton fill="clear" className="login-text-url"
+                onClick={() => onNavigate('video')}>
+                Видео инструкция
+            </IonButton>
+
             <div className="cl-white fs-09 ml-1 mt-4">
                 { "Версия " + version }
             </div>

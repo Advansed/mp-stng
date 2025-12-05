@@ -11,6 +11,9 @@ export interface   LicCounter {
   tip:                  string;
   predIndice:           number;
   predPeriod:           string;
+  poverka:              number;
+  p_text:               string;
+  p_data:               string;
   indice:               number;
   period:               string;
 }

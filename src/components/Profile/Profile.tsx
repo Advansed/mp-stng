@@ -1,17 +1,19 @@
-import {  IonCard, IonCheckbox, IonIcon, IonInput, IonLoading, IonText, IonTextarea } from "@ionic/react"
-import React, { useState } from "react"
+import {  IonButton, IonCard, IonCheckbox, IonIcon, IonInput, IonLoading, IonModal, IonText, IonTextarea } from "@ionic/react"
+import React, { useEffect, useState } from "react"
 import { FioSuggestions } from "react-dadata"
 import 'react-dadata/dist/react-dadata.css'
 import { atOutline, barcodeOutline, businessOutline, calendarOutline, callOutline, codeWorkingOutline, ellipsisHorizontalOutline, eyeOffOutline, eyeOutline, saveOutline } from "ionicons/icons"
 import { Maskito } from "../Classes"
 import { useProfile } from "./useProfile"
+import UserAgree from "../Login/userAgree"
 
 
 export function Profile() {
     const { profile, isLoading, save } = useProfile()
     const [ info ] = useState<any>( profile )
+    const [ modal, setModal ] = useState( false )
 
-
+    console.log("modal", modal)
     function Passport(props:{ info }) {
         const [ upd,    setUpd ]  = useState( 0 )
         const [ mode,   setMode ] = useState<any>({})
@@ -225,6 +227,18 @@ export function Profile() {
                 </div>                    
             </div>
 
+            <div className='flex fl-space ml-2 mt-1 mr-1'
+                onClick={()=>{
+                    setModal( !modal)
+                }}
+            >
+                <div className="a-link ml-3">
+                    <b className="wrap">
+                        Пользовательское соглашение
+                    </b>                    
+                </div>
+            </div>
+            
             {
                 info?.email === undefined || info?.email === ""
                     ?<></>
@@ -269,6 +283,9 @@ export function Profile() {
         return elem 
     }
 
+    useEffect(() => {
+    console.log('Profile render, modal =', modal)
+    }, [modal])
 
     const elem = <>
         <IonLoading isOpen = { isLoading } message = { "Идет обновление..." }/>
@@ -294,6 +311,14 @@ export function Profile() {
                 </IonCard>
             </div>    
         </div>
+             
+        <IonModal
+            isOpen          = { modal }
+            onDidDismiss    = { () => setModal(false) }
+        >
+            <UserAgree  onClose = { () => setModal(false) }/>
+        </IonModal> 
+
     </>
     
     return elem

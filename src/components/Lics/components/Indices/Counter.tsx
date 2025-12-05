@@ -117,8 +117,19 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
   return (
     <>
       <div className="flex fl-space cl-prim">
-        <div><b>{info.name}</b></div>
+        <div><b>{ info.name }</b></div>
       </div>
+      
+      { info.poverka > 0 && (
+        <div className='borders'>
+          <div className={ "flex fl-space " + ( info.poverka === 1 ? "cl-red" : "cl-red1" ) }>
+            <div><b> { info.poverka === 1 ? "Истекает срок поверки" : "Истек срок поверки " } </b></div>
+            <div><b>{ info.p_data }</b></div>
+          </div>
+          <div className='mt-05 fs-08'> { info.p_text } </div>
+        </div>
+      )}
+      
       
       <div className="flex fl-space mt-1 ml-1 cl-prim">
         <div>{"Дата показания"}</div>
@@ -131,11 +142,11 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
       </div>
 
       {avail === 1 ? (
-        <div className="ml-1 mt-2 fs-09 pb-1">
+        <div className="ml-1 mt-2 fs-08 pb-1">
           <b>Показания уже приняты</b>
         </div>
       ) : avail === 2 ? (
-        <div className="ml-1 mt-2 fs-09 pb-1" onClick={() => {
+        <div className="ml-1 mt-2 fs-08 pb-1" onClick={() => {
           // TODO: Заменить на роутер
           // Store.dispatch({type: "route", route: "services"})
         }}>
@@ -143,11 +154,11 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
           <b className="cl-prim fs-11">{" Единый контакт-центр 509-555"}</b>
         </div>
       ) : avail === 3 ? (
-        <div className="ml-1 mt-2 fs-09 pb-1">
+        <div className="ml-1 mt-2 fs-08 pb-1">
           <b>В настоящее время прием показаний недоступен. Показания принимаются с 15 по 25 число каждого месяца.</b>
         </div>
       ) : avail === 4 ? (
-        <div className="ml-1 mt-2 fs-09 pb-1">
+        <div className="ml-1 mt-2 fs-08 pb-1">
           <b>Ваши показания приняты, сумму начислений Вы увидите после 01 числа следующего месяца</b>
         </div>
       ) : (
@@ -179,7 +190,7 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
             </b>
           </p>
           
-          <p className="fs-09">
+          <p className="fs-08">
             {"С 20 марта 2025 года показания должны быть введены не более 5 знаков, а также разница не должна превышать объем в 10 000 м3, в противном случае Вам необходимо вызвать инспекторов для снятия показаний"}
           </p>
         </>

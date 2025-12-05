@@ -27,7 +27,7 @@ interface AppPage {
 
 const appPages: AppPage[] = [
   {
-    title: 'Личный кабинет',
+    title: 'Личные данные',
     url: '/page/profile',
     iosIcon: personOutline,
     mdIcon: personSharp
@@ -62,12 +62,12 @@ const appPages: AppPage[] = [
     iosIcon: notificationsOutline,
     mdIcon: notificationsSharp
   },
-  {
-    title: 'Обращения',
-    url: '/page/appeals',
-    iosIcon: notificationsOutline,
-    mdIcon: notificationsSharp
-  },
+  // {
+  //   title: 'Обращения',
+  //   url: '/page/appeals',
+  //   iosIcon: notificationsOutline,
+  //   mdIcon: notificationsSharp
+  // },
   {
     title: 'Лицевые счета',
     url: '/page/lics',
@@ -77,6 +77,12 @@ const appPages: AppPage[] = [
   {
     title: 'Контакты',
     url: '/page/contacts',
+    iosIcon: callOutline,
+    mdIcon: callSharp
+  },
+  {
+    title: 'Видео инструкция',
+    url: '/page/video',
     iosIcon: callOutline,
     mdIcon: callSharp
   },

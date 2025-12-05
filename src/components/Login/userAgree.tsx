@@ -18,7 +18,7 @@ type UserAgreeProps = {
 
 const UserAgree: React.FC<UserAgreeProps> = ({ onClose }) => {
   return (
-    <IonPage>
+    <div>
       <IonHeader>
         <IonToolbar>
             <IonTitle>Пользовательское соглашение</IonTitle>
@@ -219,7 +219,7 @@ const UserAgree: React.FC<UserAgreeProps> = ({ onClose }) => {
           </a>
         </p>
       </IonContent>
-    </IonPage>
+    </div>
   );
 };
 

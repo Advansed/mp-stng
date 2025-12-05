@@ -9,8 +9,9 @@ import { RegistrationForm } from "./RegistrationForm";
 import { useLogin } from "./useLogin";
 import SMSForm from "./SMSForm";
 import { PassForm } from "./PassForm";
+import VideoPage from "./VideoPage";
 
-export type LoginPage = 'login' | 'restore' | 'SMS' | 'Pass' | 'Reg';
+export type LoginPage = 'login' | 'restore' | 'SMS' | 'Pass' | 'Reg' | 'video';
 
 export function Login(props:{ reg: boolean}) {
     const [currentPage, setCurrentPage] = useState<LoginPage>( props.reg ? 'Reg' : 'login');
@@ -42,6 +43,11 @@ export function Login(props:{ reg: boolean}) {
                 return <PassForm 
                     onNavigate  = { setCurrentPage }
                     onPassword  = { upassword }
+                />;
+
+            case 'video':
+                return <VideoPage 
+                    onNavigate  = { setCurrentPage }
                 />;
 
             case 'Reg':

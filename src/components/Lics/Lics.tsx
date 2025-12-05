@@ -228,7 +228,7 @@ function            Payments(props:{ item, setPage }){
             
             { items }
 
-            <div className='mt-2 ml-1 fs-09'>Способы оплаты</div>
+            <div className='mt-2 ml-1 fs-09'>Способы оплаты (без комиссии)</div>
             <div className='flex fl-space ml-1 mr-1'>
 
                 {/* НОВАЯ КНОПКА АЛЬФА-БАНКА */}

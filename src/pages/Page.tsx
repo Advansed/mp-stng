@@ -16,6 +16,7 @@ import { News }           from '../components/News';
 import { Agzs }           from '../components/AGZS/AGZS';
 import { Services }       from '../components/Services/Services';
 import { useNavigation }  from './useNavigation';
+import VideoPage from './VideoPage';
 
 const Page: React.FC = () => {
   const { goTo, goBack }  = useNavigation()
@@ -29,6 +30,11 @@ const Page: React.FC = () => {
   console.log("page " + name)
 
   const lct = useLocation()
+
+  useEffect(()=>{ console.log("page", name) },[name])
+  useEffect(()=>{ console.log("page", token) },[token])
+  useEffect(()=>{ console.log("page getLics") },[getLics])
+  useEffect(()=>{ console.log("page use Navig") },[goTo, goBack])
 
   function Main():JSX.Element {
     let elem = <></>
@@ -46,6 +52,7 @@ const Page: React.FC = () => {
         case "appeals":           elem = <Appeals />; break;
         case "contacts":          elem = <Contacts />; break;
         case "push":              elem = <Notifications />; break;
+        case "video":             elem = <VideoPage onNavigate = { ()=> goTo("lics")} />; break;
 
         default: elem = <></>
       }
