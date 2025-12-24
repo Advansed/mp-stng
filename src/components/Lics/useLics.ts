@@ -69,7 +69,14 @@ export const useLics    = () => {
       order.token   = token || ''
       order.phone   = phone
       order.email   = email
-      return await api('SBOL1', order )
+      return await api('VTB', order )
+  }
+
+  const sbp         = async( order: any ) => {
+      order.token   = token || ''
+      order.phone   = phone
+      order.email   = email
+      return await api('SBP', order )
   }
   
   const getpayments    = async(LC : string ) => {
@@ -93,6 +100,7 @@ export const useLics    = () => {
     delLic,
     sberPAY,
     equaring,
+    sbp,
     getpayments,
     getIndices,
     isLoading:      loading

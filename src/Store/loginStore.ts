@@ -71,6 +71,8 @@ export const useLoginStore = create<LoginStore>((set, get) => ({
             version :   version, 
             mode:       "android"
         })
+
+        console.log(res)
         
         if( !res.error ){
             set({ user: res.data, token: res.data.token, phone: res.data.code, auth: true, isLoading: false });

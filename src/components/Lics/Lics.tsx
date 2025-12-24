@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import './Lics.css'
-import { IonCard, IonCol, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonLoading, IonRow } from '@ionic/react'
-import { documentTextOutline, pencilOutline } from 'ionicons/icons'
-import { createWidget } from '@sber-ecom-core/sberpay-widget';
-import { Browser } from '@capacitor/browser'
-import { LicsItem, LicsPage } from './components/types'
-import { useLics } from './useLics'
-import { AddLic } from './components/AddLic'
-import { FindLic } from './components/FindLic/FindLic'
-import { Indices } from './components/Indices/Indices'
-import { useNavigation } from '../../pages/useNavigation';
-import { LicItem } from './components/LicItem/LicItem';
-import History from './components/History';
-import HistoryIndices from './components/HistoryIndice';
+import { IonCard, IonIcon, IonImg, IonInput, IonLabel, IonLoading }     from '@ionic/react'
+import { documentTextOutline, pencilOutline }                           from 'ionicons/icons'
+import { createWidget }                                                 from '@sber-ecom-core/sberpay-widget';
+import { Browser }                                                      from '@capacitor/browser'
+import { LicsItem, LicsPage }                                           from './components/types'
+import { useLics }                                                      from './useLics'
+import { AddLic }                                                       from './components/AddLic'
+import { FindLic }                                                      from './components/FindLic/FindLic'
+import { Indices }                                                      from './components/Indices/Indices'
+import { useNavigation }                                                from '../../pages/useNavigation';
+import { LicItem }                                                      from './components/LicItem/LicItem';
+import History                                                          from './components/History';
+import HistoryIndices                                                   from './components/HistoryIndice';
 
 
 type WidgetParams = {
@@ -43,7 +43,7 @@ const               openUrl = async (url) =>{
 
 export function     Lics(): JSX.Element {
 
-    const { info, addLic, delLic, setIndice, sberPAY, equaring, getpayments, getIndices } = useLics()
+    const { info, addLic, delLic, setIndice, sberPAY, equaring, sbp } = useLics()
     const { page, setPage, item, setItem } = useNavigation()
 
     useEffect(()=>{
@@ -65,7 +65,7 @@ export function     Lics(): JSX.Element {
                 case LicsPage.SBER_PAY:         return <SberPay         item = { item } setPage={setPage} SBOL = { sberPAY } />;
                 case LicsPage.HISTORY_INDICES:  return <HistoryIndices  item = { item } />;
                 // case LicsPage.ALFA_BANK:        return <AlfaBank item={item} setPage={setPage} />;
-                // case LicsPage.SBP:              return <SBP item={item} setPage={setPage} />;
+                case LicsPage.SBP:              return <SBP             item={item} setPage={setPage} sbp = { sbp } />;
                 default:                        return <></>;
             }
         } catch (error) {
@@ -231,26 +231,6 @@ function            Payments(props:{ item, setPage }){
             <div className='mt-2 ml-1 fs-09'>Способы оплаты (без комиссии)</div>
             <div className='flex fl-space ml-1 mr-1'>
 
-                {/* НОВАЯ КНОПКА АЛЬФА-БАНКА */}
-                {/* <div className='ls-item3 ml-05 w-30'>
-                    <div className=''
-                        onClick={() => {
-                            item.order = new Object()
-                            item.order.token = Store.getState().login.token
-                            item.order.LC = item.code,
-                            item.order.sum = item.debts,
-                            item.order.sumto = [],
-                            item.order.phone = Store.getState().login.phone,
-                            item.order.email = Store.getState().login.email,
-                            item.order.ios = false
-                            props.setPage(10) // НОВАЯ СТРАНИЦА ДЛЯ АЛЬФА-БАНКА
-                        }}
-                    >   
-                        <img src="assets/gazprom.webp" alt="ГазПромБанк" />
-                        
-                    </div>               
-                </div> */}
-
                <div className='ls-item3 ml-05 w-50'>
                     <div
                         className=''
@@ -286,23 +266,20 @@ function            Payments(props:{ item, setPage }){
                 </div>
                 
                 {/* НОВАЯ КНОПКА АЛЬФА-БАНКА */}
-                {/* <div className='ls-item3 ml-05 w-30'>
+                <div className='ls-item3 ml-05 w-30'>
                     <div className=''
                         onClick={() => {
-                            item.order = new Object()
-                            item.order.token = Store.getState().login.token
-                            item.order.LC = item.code,
-                            item.order.sum = item.debts,
-                            item.order.sumto = [],
-                            item.order.phone = Store.getState().login.phone,
-                            item.order.email = Store.getState().login.email,
-                            item.order.ios = false
+                            item.order          = new Object()
+                            item.order.LC       = item.code,
+                            item.order.sum      = item.debts,
+                            item.order.sumto    = [],
+                            item.order.ios      = false
                             props.setPage(11) // НОВАЯ СТРАНИЦА ДЛЯ АЛЬФА-БАНКА
                         }}
                     >   
                         <img src="assets/sbp.webp" alt="ГазПромБанк" />
                     </div>               
-                </div> */}
+                </div>
  
             </div>
 
@@ -320,7 +297,7 @@ function            PaymentsTO(props:{ item, setPage }){
     function Lines() {
 
         let elem = <>
-            <div className='mt-1 ml-1 cl-black fs-09'> <b>Начисления</b></div>
+            <div className='mt-1 ml-1 cl-black fs-09'> <b>Начис ления</b></div>
         </>
         for( let i = 0; i < item.debts.length; i++ ){
             elem = <>
@@ -460,9 +437,9 @@ function            Equaring({ item, setPage, equairing }:{ item: any, setPage: 
                 setPage( 4 )
 
             } else {
-               // setInfo( res.data )
+               setInfo( res.data )
               // window.open( res.data.formUrl, '_blank' )
-              openUrl( res.data.formUrl )
+              //openUrl( res.data.formUrl )
   
             }
             setLoad( false )
@@ -495,133 +472,52 @@ function            Equaring({ item, setPage, equairing }:{ item: any, setPage: 
     return elem
 }
 
-// function            HistoryIndices(props: { item, getIndices }){
-//     const [ info, setInfo ] = useState<any>([])
+function            SBP({ item, setPage, sbp }:{ item: any, setPage: any, sbp: any }){
+    const [ load, setLoad ] = useState( false)
+    const [ info, setInfo ] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
 
-//     const item = props.item
+
+    useEffect(()=>{
+        async function load(){
+            setLoad( true )
+            const res = await sbp( item.order )
+            console.log("SBP", res )
+            if(res.error){ 
+
+                setPage( 4 )
+
+            } else {
+               setInfo( res.data )
+              // window.open( res.data.formUrl, '_blank' )
+              //openUrl( res.data.formUrl )
+  
+            }
+            setLoad( false )
+        }
+        load()
+    },[])
+
+    const elem = <>
+        <IonLoading isOpen = { load } message={"Подождите..."}/>
+        {
+            info !== undefined
+                ? <>
+                    <div className='w-100 h-100'>
+                        <iframe 
+                            // ref="iframeRef" 
+                            id      = "iframe" 
+                            // className="video" 
+                            height  = "100%" 
+                            width   = "100%" 
+                            src     = { info.qr.payload }
+                            allow   = "autoplay; fullscreen; picture-in-picture" 
+                        ></iframe>
+                    </div>
+                </>
+                : <></>
+        }
+
+    </>
     
-//     async function Load(){
-
-//         const res = await props.getIndices( item.selected.counterId )  
-//         if(!res.error){
-//             if(res.data.length > 0 ){
-//                 setInfo( res.data[0].indications )
-//             }
-//         }
-            
-//     }
-
-//     useEffect(()=>{
-//         Load()
-//     },[])
-    
-//     let items = <></>
-//     for(let i = 0; i < info.length; i++ ){
-//         items = <>
-//             { items }
-//             <IonRow className='ml-2 mt-1 mr-2 cl-prim'>
-//                 <IonCol size = "8"> { info[i].date } </IonCol>
-//                 <IonCol size = "4" className="a-right"> <b>{ info[i].indication }</b> </IonCol>
-//             </IonRow>
-//         </>
-//     }
-
-//     const elem = <>
-//       <IonCard className='pb-1'>
-//             <div className='flex fl-space mt-1 ml-1'>
-//                 <div className='cl-black'> <h4><b>{ "Лицевой счет №" + item.code }</b></h4></div>
-//             </div>
-//             <div className='ml-2 mr-1 cl-prim'>
-//                 { item.name}
-//             </div>    
-//             <div className='ml-2 mr-1 pb-1 mt-1 cl-prim'>
-//                 { item.address}
-//             </div>  
-//             <div className='mt-1 ml-1 mr-1 t-underline cl-prim'>
-//                 <b>{ "История показаний" }</b>
-//             </div>
-
-//             {
-//                 items
-//             }
-
-//         </IonCard>
-//     </>
-
-//     return elem
-
-// }
-
-// function            AlfaBank(props: { item, setPage }) {
-//     const [load, setLoad] = useState(false)
-//     const item = props.item
-
-//     useEffect(() => {
-//         async function load() {
-//             setLoad(true)
-//             console.log('GPB order:', item.order)
-            
-//             try {
-//                 const res = await getData("GAZPROM", item.order)
-//                 console.log('GPB response:', res)
-                
-//                 if (res.error) { 
-//                     props.setPage(4) // Возвращаемся к странице оплаты
-//                 } else {
-//                     // Открываем форму оплаты Альфа-банка
-//                     console.log( res.data )
-//                     openUrl(res.data.formUrl)
-//                 }
-//             } catch (error) {
-//                 console.error('GPB payment error:', error)
-//                 props.setPage(4)
-//             }
-            
-//             setLoad(false)
-//         }
-//         load()
-//     }, [])
-
-//     const elem = <>
-//         <IonLoading isOpen={load} message={"Переход к оплате через Альфа-Банк..."}/>
-//     </>
-    
-//     return elem
-// }
-
-// function            SBP(props: { item, setPage }) {
-//     const [load, setLoad] = useState(false)
-//     const item = props.item
-
-//     useEffect(() => {
-//         async function load() {
-//             setLoad(true)
-//             console.log('SBP order:', item.order)
-            
-//             try {
-//                 const res = await api("GAZPROMSBP", item.order)
-//                 console.log('SBP response:', res)
-                
-//                 if (res.error) { 
-//                     props.setPage(4) // Возвращаемся к странице оплаты
-//                 } else {
-//                     // Открываем форму оплаты Альфа-банка
-//                     console.log( res.data )
-//                     openUrl(res.data.formUrl)
-//                 }
-//             } catch (error) {
-//                 console.error('SBP payment error:', error)
-//                 props.setPage(4)
-//             }
-            
-//             setLoad(false)
-//         }
-//         load()
-//     }, [])
-
-//     const elem = <>
-//         <IonLoading isOpen={load} message={"Переход к оплате через Альфа-Банк..."}/>
-//     </>
-    
-//     return elem
-// }
+    return elem
+}
