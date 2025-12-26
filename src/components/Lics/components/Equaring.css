@@ -1,0 +1,262 @@
+/* Equaring.css — мобильная версия под экран + клавиатуру */
+
+/* Общий фон экрана оплаты */
+.vtb-payment-page {
+  padding: 12px 12px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: linear-gradient(156.39deg, #1B80B9 7.75%, #0E3977 100.99%);
+}
+
+/* Карточка формы */
+.vtb-payment-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+/* Шапка */
+.vtb-card-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #0a2973, #009fdf);
+  color: #ffffff;
+}
+
+.vtb-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: #ffffff;
+  margin-right: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0a2973;
+  font-size: 12px;
+}
+
+.vtb-logo::after {
+  content: 'VTB';
+}
+
+.vtb-title-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.vtb-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.vtb-subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Тело формы */
+.vtb-card-body {
+  padding: 14px 14px 10px;
+  background: #fafbfc;
+}
+
+.vtb-row {
+  margin-bottom: 12px;
+}
+
+.vtb-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Две колонки (срок / CVC) — на мелких экранах оставляем, но с небольшим gap */
+.vtb-row-inline {
+  display: flex;
+  gap: 8px;
+}
+
+.vtb-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Подписи к полям */
+.vtb-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.vtb-label::after {
+  content: ' *';
+  color: #dc2626;
+  font-weight: 700;
+}
+
+/* Контейнеры для полей карты (пан/expiry/cvc) */
+.vtb-input {
+  height: 3em;          /* Жёстко фиксируем высоту */
+  min-height: 3em;      /* На всякий случай */
+  max-height: 3em;
+  border-radius: 6px;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 0 8px;       /* Без вертикальных паддингов, чтобы не раздувать высоту */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;  /* Центруем содержимое по высоте */
+  overflow: hidden;     /* Если iframe вдруг выше — обрезаем */
+}
+
+
+/* Фокус: подсвечиваем контейнер, когда iframe внутри активен */
+.vtb-input:focus-within {
+  border-color: #009fdf;
+  box-shadow: 0 0 0 2px rgba(0, 159, 223, 0.18);
+  background-color: #ffffff;
+}
+
+/* Можно чуть уменьшить иконку, чтобы поместилась в 2em */
+.vtb-input#pan::after {
+  content: '💳';
+  position: absolute;
+  right: 6px;
+  font-size: 14px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Селект выбора карты (биндинги) */
+.vtb-select {
+  width: 100%;
+  border-radius: 9px;
+  border: 1.5px solid #d1d5db;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0a2973;
+  background-color: #ffffff;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%230a2973' d='M4.427 6.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 6H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vtb-select:focus {
+  outline: none;
+  border-color: #009fdf;
+  box-shadow: 0 0 0 2px rgba(0,159,223,0.18);
+}
+
+/* "Сохранить карту" — достаточно крупный тап-таргет */
+.vtb-save-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4b5563;
+  margin-top: 6px;
+  padding: 10px 10px;
+  background: #ffffff;
+  border-radius: 9px;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+}
+
+.vtb-save-card input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: #009fdf;
+}
+
+/* Футер с кнопкой — БЕЗ fixed, чтобы не драться с клавиатурой [web:28] */
+.vtb-card-footer {
+  padding: 10px 14px 14px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Кнопка оплаты — большая, удобная для тапа */
+.vtb-pay-button {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #009fdf, #0a2973);
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 159, 223, 0.35);
+}
+
+.vtb-pay-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0, 159, 223, 0.3);
+}
+
+.vtb-pay-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Ошибки */
+.vtb-error {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #fef2f2;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 13px;
+  border: 1px solid #fecaca;
+}
+
+.vtb-error-text {
+  font-size: 12px;
+  color: #dc2626;
+  padding: 0 14px 10px;
+}
+
+/* Скрытый блок */
+.visually-hidden {
+  display: none;
+}
+
+/* Маленькая подпись/хинт под полем (если захочешь добавить) */
+.vtb-field-hint {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 3px;
+}
+
+/* Немного адаптивности по ширине — только отступы */
+@media (min-width: 480px) {
+  .vtb-payment-page {
+    padding: 16px;
+  }
+
+  .vtb-payment-card {
+    border-radius: 16px;
+  }
+}

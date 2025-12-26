@@ -13,6 +13,7 @@ import { useNavigation }                                                from '..
 import { LicItem }                                                      from './components/LicItem/LicItem';
 import History                                                          from './components/History';
 import HistoryIndices                                                   from './components/HistoryIndice';
+import { Equaring } from './components/Equaring';
 
 
 type WidgetParams = {
@@ -423,7 +424,7 @@ function            SberPay({ item, setPage, SBOL }:{ item: any, setPage: any, S
     return elem
 }
 
-function            Equaring({ item, setPage, equairing }:{ item: any, setPage: any, equairing: any }){
+function            Equaring_({ item, setPage, equairing }:{ item: any, setPage: any, equairing: any }){
     const [ load, setLoad ] = useState( false)
     const [ info, setInfo ] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
 
