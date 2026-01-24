@@ -15,7 +15,6 @@ export function PassForm({ onNavigate, onPassword }: PassFormProps) {
     const toast  = useToast()
 
     const handlePassword = async() => {
-        console.log("handle password ")
         if( info.password === info.password1) {
             await  onPassword ( info.password )  
         } else {
@@ -70,7 +69,6 @@ export function PassForm({ onNavigate, onPassword }: PassFormProps) {
 
             <div className="ml-1 mr-1 login-button"
                 onClick = { ()=> {
-                    console.log("onClick")
                     handlePassword()
                 }}
             >

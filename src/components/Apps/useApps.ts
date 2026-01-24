@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useToken } from '../../Store/loginStore' // Предполагаем что токен берется отсюда
+import { useToken } from '../Login/authStore'
 import useAppsStore from '../../Store/appStore'
 import { useToast } from '../Toast'
 
@@ -17,7 +17,6 @@ export const useApps = () => {
 
   const handleRefresh = async () => {
     const res = await fetchApps( token || '' )
-    console.log(res)
     if(res.error) toast.error("Ошибка загрузки заявок")
     else toast.success("Данные загрузились")
   }

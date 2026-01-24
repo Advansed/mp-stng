@@ -143,9 +143,7 @@ export function PDFDocModal({
         setMessage('');
         
         try {
-           
-            console.log("sendemail") 
-           
+           console.log("handleEmailSend")
         } catch (error) {
             setMessage('Ошибка отправки документа');
             console.error('Email send error:', error);

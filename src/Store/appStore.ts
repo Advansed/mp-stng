@@ -39,7 +39,6 @@ const useAppsStore = create<AppsStore>((set, get) => ({
     try {
       const response = await api('ListServices', { token: token })
 
-      console.log("Apps", response)
       if (!response.error) {
         set({ apps: response.data })
         return response

@@ -1,4 +1,4 @@
-import { useToken }             from '../../Store/loginStore'
+import { useToken }             from '../Login/authStore'
 import useNotificationsStore    from '../../Store/notificationStore'
 
 export const useNotifications = () => {

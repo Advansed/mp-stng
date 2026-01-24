@@ -1,5 +1,5 @@
 // useLogin.ts
-import { useLoginStore } from '../../Store/loginStore';
+import { useAuthStore } from './authStore';
 import { useToast } from '../Toast';
 
 export interface AuthCredentials {
@@ -20,16 +20,14 @@ interface UseAuthReturn {
 
 export const useLogin = (): UseAuthReturn => {
     const toast = useToast();
-    const { user, isLoading, login, create, restore, compare, password, logout } = useLoginStore();
+    const { user, isLoading, login, create, restore, compare, password, logout } = useAuthStore();
 
     const ulogin = async (credentials: AuthCredentials): Promise<void> => {
         const res = await login(credentials.phone, credentials.password);
-        console.log(res)
 
         if ( res.error ) toast.error('Ошибка авторизации:' + res.message);
         else {  toast.success('Авторизировация прошла успешно');
-            localStorage.setItem("stngul.phone", credentials.phone );
-            localStorage.setItem("stngul.pass", credentials.password )
+            // Учетные данные сохраняются автоматически в authStore
         }
     };
 

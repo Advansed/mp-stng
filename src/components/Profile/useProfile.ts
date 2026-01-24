@@ -1,8 +1,29 @@
-import { useLoginStore, useToken } from '../../Store/loginStore';
+import { useEffect } from 'react';
+import { 
+  useProfileData, 
+  useProfileLoading, 
+  useProfileError,
+  useAuthStore,
+  useToken
+} from '../Login/authStore';
 
 export const useProfile = () => {
-  const { user, isLoading, error, getProfile, updateProfile } = useLoginStore();
-  const token = useToken()
+  const profile         = useProfileData();
+  const isLoading       = useProfileLoading();
+  const error           = useProfileError();
+
+  const getProfile      = useAuthStore(state => state.getProfile);
+  const updateProfile   = useAuthStore(state => state.updateProfile);
+
+  const token           = useToken();
+  
+  // Автоматическая загрузка профиля при наличии токена
+  // Проверяем, что профиль еще не загружен (пустые поля) и есть токен
+  useEffect(() => {
+    if (token && !profile.id && !isLoading) {
+      getProfile();
+    }
+  }, [token]);
   
   const save = async (data: any) => {
     await updateProfile(data);
@@ -13,7 +34,7 @@ export const useProfile = () => {
   };
 
   return {
-    profile: user,
+    profile,
     isLoading,
     error,
     save,

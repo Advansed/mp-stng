@@ -15,14 +15,12 @@ const VideoPage: React.FC<VideoPageProps> = ({ onNavigate }) => {
     const currentPage = useNavigateStore(state => state.currentPage )
 
     useEffect(() => {
-        console.log("play")
-        console.log("play", currentPage)
         const v = videoRef.current;
         if (!v) return;
 
         if (currentPage === "/page/video") {
             v.muted = false;
-            v.play().catch((e) => { console.log(e)});
+            v.play().catch((e) => { console.error('Error playing video:', e)});
         } else {
             v.pause();
             v.currentTime = 0; // если нужно возвращать в начало

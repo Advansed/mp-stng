@@ -90,7 +90,7 @@ export function Files(props: { info, name, check, title }) {
             props.info.push( imageUrl )
                 
         } catch (error) {
-            console.log( error )
+            console.error('Error adding image:', error)
         }
         setUpd(upd + 1)   
     }
@@ -106,7 +106,7 @@ export function Files(props: { info, name, check, title }) {
             }
 
         } catch (error) {
-            console.log( error )
+            console.error('Error adding image:', error)
         }
 
     }
@@ -220,10 +220,10 @@ export function Files(props: { info, name, check, title }) {
                     { props.info.map((e, ind) =>{
                         return e.format === "pdf"
                             ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                                onClick = {()=>{ setModal( e ); }}
                             />
                             : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                                onClick = {()=>{ setModal( e ); }}
                             />
                             
                         })
@@ -266,7 +266,7 @@ export function Files1(props: { info, name, check, title, onMode }) {
             props.onMode( true )
 
         } catch (error) {
-            console.log( error )
+            console.error('Error adding image:', error)
         }
         setUpd(upd + 1)   
     }
@@ -283,7 +283,7 @@ export function Files1(props: { info, name, check, title, onMode }) {
             }
 
         } catch (error) {
-            console.log( error )
+            console.error('Error adding image:', error)
         }
 
     }
@@ -311,10 +311,10 @@ export function Files1(props: { info, name, check, title, onMode }) {
                 { props.info.map((e, ind) =>{
                     return e.format === "pdf"
                         ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                            onClick = {()=>{ setModal( e ); }}
                         />
                         : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                            onClick = {()=>{ setModal( e ); }}
                         />
                         
                     })}
@@ -401,10 +401,10 @@ export function Files1(props: { info, name, check, title, onMode }) {
                     { props.info.map((e, ind) =>{
                         return e.format === "pdf"
                             ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                                onClick = {()=>{ setModal( e ); }}
                             />
                             : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                                onClick = {()=>{ setModal( e ); console.log(e) }}
+                                onClick = {()=>{ setModal( e ); }}
                             />
                             
                         })
@@ -446,10 +446,10 @@ export function Agree(props: { info, name, check, title }) {
                 { props.info.map((e, ind) =>{
                     return e.format === "pdf"
                         ? <img key = { ind as number } src = { "assets/pdf.png" } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                            onClick = {()=>{ setModal( e ); }}
                         />
                         : <img key = { ind as number } src = { e.dataUrl } alt="" className="w-4 h-4 ml-1 mt-1 s-point"
-                            onClick = {()=>{ setModal( e ); console.log(e) }}
+                            onClick = {()=>{ setModal( e ); }}
                         />
                         
                     })}
@@ -540,7 +540,6 @@ export function PDFDoc( props ){
                     onClick={()=>{ 
                         async function send() {
                            
-                            console.log("senMail")
                             
                         }
                         send()

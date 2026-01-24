@@ -9,11 +9,10 @@ import UserAgree from "../Login/userAgree"
 
 
 export function Profile() {
-    const { profile, isLoading, save } = useProfile()
-    const [ info ] = useState<any>( profile )
+    const { profile: info, isLoading, save } = useProfile()
     const [ modal, setModal ] = useState( false )
 
-    console.log("modal", modal)
+
     function Passport(props:{ info }) {
         const [ upd,    setUpd ]  = useState( 0 )
         const [ mode,   setMode ] = useState<any>({})
@@ -37,12 +36,12 @@ export function Profile() {
         <div className={ "ml-1 mr-1 mt-1 cl-prim fs-bold" }>
             <FioSuggestions  token="50bfb3453a528d091723900fdae5ca5a30369832"
                 value={{ 
-                    value: (info?.surname || "" ) + " " + (info?.name || "") + " " + (info?.lastname || ""), 
-                    unrestricted_value: info?.surname + " " + info?.name + " " + info?.lastname,
+                    value: (info.surname || "" ) + " " + (info.name || "") + " " + (info.lastname || ""), 
+                    unrestricted_value: (info.surname || "") + " " + (info.name || "") + " " + (info.lastname || ""),
                     data: {
-                        surname:            info?.surname || '',
-                        name:               info?.name || '',
-                        patronymic:         info?.lastname || '',
+                        surname:            info.surname || '',
+                        name:               info.name || '',
+                        patronymic:         info.lastname || '',
                         gender:             "MALE",
                         source:             null,
                         qc:                 "0"
@@ -50,21 +49,15 @@ export function Profile() {
                 }}
                 onChange={(e)=>{
 
-                    if(info) {
+                    info.surname            = e?.data.surname || '';  
+                    info.name               = e?.data.name || '';  
+                    info.lastname           = e?.data.patronymic || '';  
 
-                        info.surname            = e?.data.surname;  
-                        info.name               = e?.data.name;  
-                        info.lastname           = e?.data.patronymic;  
-
-                    }
-
-                    mode.surname            = e?.data.surname;  
-                    mode.name               = e?.data.name;  
-                    mode.lastname           = e?.data.patronymic;  
+                    mode.surname            = e?.data.surname || '';  
+                    mode.name               = e?.data.name || '';  
+                    mode.lastname           = e?.data.patronymic || '';  
 
                     setUpd( upd + 1)
-
-                    console.log( Object.keys(mode).length )
 
             }}/>
         </div>  
@@ -77,8 +70,17 @@ export function Profile() {
                             <Maskito
                                 mask = { [ /\d/, /\d/, /\d/, /\d/ ] }
                                 placeholder="Серия"
-                                value={ info?.passport?.serial }
+                                value={ info.passport?.serial || '' }
                                 onIonInput = {(e)=>{
+                                    if (!info.passport) {
+                                        info.passport = {
+                                            serial: '',
+                                            number: '',
+                                            issuedDate: '',
+                                            issuedBy: '',
+                                            codePodr: ''
+                                        };
+                                    }
                                     info.passport.serial = e.detail.value;
                                     mode.serial = e.target.value  
                                     setUpd( upd + 1)      
@@ -90,8 +92,17 @@ export function Profile() {
                             <Maskito
                                 mask = { [ /\d/, /\d/, /\d/, /\d/, /\d/, /\d/ ] }
                                 placeholder="Номер"
-                                value={ info?.passport?.number }
+                                value={ info.passport?.number || '' }
                                 onIonInput = {(e)=>{
+                                    if (!info.passport) {
+                                        info.passport = {
+                                            serial: '',
+                                            number: '',
+                                            issuedDate: '',
+                                            issuedBy: '',
+                                            codePodr: ''
+                                        };
+                                    }
                                     info.passport.number = e.detail.value;
                                     mode.number = e.target.value  
                                     setUpd( upd + 1)      
@@ -108,9 +119,18 @@ export function Profile() {
                     <IonInput
                         type = "date"
                         placeholder="Когда выдан"
-                        value={ info?.passport?.issuedDate }
+                        value={ info.passport?.issuedDate || '' }
                         onIonInput = {(e)=>{
-                            info.passport.issuedDate = e.detail.value;
+                            if (!info.passport) {
+                                info.passport = {
+                                    serial: '',
+                                    number: '',
+                                    issuedDate: '',
+                                    issuedBy: '',
+                                    codePodr: ''
+                                };
+                            }
+                            info.passport.issuedDate = (e.detail.value as string) || '';
                             mode.issuedDate = e.target.value  
                             setUpd( upd + 1)      
                         }}
@@ -124,9 +144,18 @@ export function Profile() {
                     <Maskito
                         mask = { [ /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/ ] }
                         placeholder="Код подразделения"
-                        value={ info?.passport?.codePodr }
+                        value={ info.passport?.codePodr || '' }
                         onIonInput = {(e)=>{
-                            info.passport.codePodr = e.detail.value;
+                            if (!info.passport) {
+                                info.passport = {
+                                    serial: '',
+                                    number: '',
+                                    issuedDate: '',
+                                    issuedBy: '',
+                                    codePodr: ''
+                                };
+                            }
+                            info.passport.codePodr = e.detail.value || '';
                             mode.codePodr = e.target.value  
                             setUpd( upd + 1)      
                         }}
@@ -139,9 +168,18 @@ export function Profile() {
                 <div className="ml-1 w-80 mr-1 t-underline">
                     <IonTextarea
                         placeholder="Кем выдан"
-                        value={ info?.passport?.issuedBy }
+                        value={ info.passport?.issuedBy || '' }
                         onIonInput = {(e)=>{
-                            info.passport.issuedBy = e.detail.value;
+                            if (!info.passport) {
+                                info.passport = {
+                                    serial: '',
+                                    number: '',
+                                    issuedDate: '',
+                                    issuedBy: '',
+                                    codePodr: ''
+                                };
+                            }
+                            info.passport.issuedBy = (e.detail.value as string) || '';
                             mode.issuedBy = e.target.value  
                             setUpd( upd + 1)
                         }}
@@ -179,9 +217,9 @@ export function Profile() {
                     <IonInput
                         type = "text"
                         placeholder="Когда выдан"
-                        value={ info?.email }
+                        value={ info.email || '' }
                         onIonInput = {(e)=>{
-                            info.email = e.detail.value;
+                            info.email = (e.detail.value as string) || '';
                             mode.email = e.target.value  
                             setUpd( upd + 1)      
                         }}
@@ -199,7 +237,7 @@ export function Profile() {
                 <IonIcon icon = { callOutline } className="w-15 h-15 ml-1" color="primary"/>
                 <div className="ml-1 w-80 mr-1 t-underline">
                     <div className="mt-05 pb-05 ml-1">
-                        { profile?.phone }     
+                        { info.phone }     
                     </div>
                 </div>                    
             </div>
@@ -212,9 +250,9 @@ export function Profile() {
                     <IonInput
                         type = { show ? "text" : "password" }
                         placeholder="Пароль"
-                        value={ info?.password }
+                        value={ info.password || '' }
                         onIonInput = {(e)=>{
-                            info.password = e.detail.value;
+                            info.password = e.detail.value || '';
                             mode.password = e.target.value  
                             setUpd( upd + 1)      
                         }}
@@ -282,10 +320,6 @@ export function Profile() {
         </>
         return elem 
     }
-
-    useEffect(() => {
-    console.log('Profile render, modal =', modal)
-    }, [modal])
 
     const elem = <>
         <IonLoading isOpen = { isLoading } message = { "Идет обновление..." }/>

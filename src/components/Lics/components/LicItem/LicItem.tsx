@@ -6,7 +6,7 @@ import { LicsPage } from '../types';
 import { PDFDocModal } from '../../../Files/PDFDocModal';
 import { LicItemProps } from './types';
 import { api } from '../../../../Store/api';
-import { useToken } from '../../../../Store/loginStore';
+import { useToken } from '../../../Login/authStore';
 import { User, MapPin } from 'lucide-react';
 
 export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }) => {
@@ -18,7 +18,6 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
 
   const confirmDelete = () => {
     setShowDeleteAlert(true);
-    console.log("alert");
   };
 
   const handleDeleteConfirm = () => {
@@ -39,7 +38,6 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
     try {
       const res = await api('getQuits', { token: token, LC: info.code })
       
-      console.log(res)
       if (!res.error) {
         setModal(res.data);
       }
@@ -60,7 +58,6 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
           <IonButton
             fill="clear"
             onClick={() => {
-              console.log(" click");
               confirmDelete();
             }}
           >
@@ -152,7 +149,6 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
                     : 'ls-item2'
                   }
                     onClick={()=>{
-                    console.log("quits")
                     // Quits()
                     }}
                 >

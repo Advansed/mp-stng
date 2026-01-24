@@ -9,7 +9,7 @@ import { Profile }        from '../components/Profile/Profile';
 import { Contacts }       from '../components/Contacts';
 import { Appeals }        from '../components/Appeals';
 import { useLicsStore }   from '../Store/licsStore';
-import { useToken }       from '../Store/loginStore';
+import { useToken }       from '../components/Login/authStore';
 import { Apps }           from '../components/Apps';
 import { Notifications }  from '../components/Notificications';
 import { News }           from '../components/News';
@@ -27,14 +27,7 @@ const Page: React.FC = () => {
 
   const token             = useToken()
 
-  console.log("page " + name)
-
   const lct = useLocation()
-
-  useEffect(()=>{ console.log("page", name) },[name])
-  useEffect(()=>{ console.log("page", token) },[token])
-  useEffect(()=>{ console.log("page getLics") },[getLics])
-  useEffect(()=>{ console.log("page use Navig") },[goTo, goBack])
 
   function Main():JSX.Element {
     let elem = <></>

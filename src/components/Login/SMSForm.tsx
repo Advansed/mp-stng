@@ -78,7 +78,6 @@ const SMSForm: React.FC<SMSFormProps> = ({ phone, onNavigate, onCompare, onResto
     }
     
     const res = await onCompare( fullCode );
-    console.log('onCompare', res)
     if(res) onNavigate('Pass')
     else setCode(['', '', '', ''])
   };
@@ -138,7 +137,6 @@ const SMSForm: React.FC<SMSFormProps> = ({ phone, onNavigate, onCompare, onResto
     
       <div className="ml-1 mr-1 login-button"
           onClick = { ()=> {
-              console.log("onClick")
                 handleSubmit()
           }}
       >

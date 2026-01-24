@@ -1,9 +1,9 @@
 // src/components/Lics/hooks/useFindLic.ts
 import { useState, useEffect } from 'react';
 import { api } from '../../../../Store/api';
-import { useToken } from '../../../../Store/loginStore';
 import { useLicsStore } from '../../../../Store/licsStore';
 import { useToast } from '../../../Toast';
+import { useToken } from '../../../Login/authStore';
 
 // TODO: Миграция на zustand - заменить useState на store
 // TODO: Миграция на fetch - заменить getData на нативный fetch API
@@ -96,7 +96,6 @@ export const useFindLic = (): UseFindLicReturn => {
   const loadSettlements = async () => {
     updateState({ load: true });
     const res = await api("getSettlements", { token })
-    console.log(res)
     updateState({ 
       info: res.data as Ulus[],
       load: false 
@@ -144,20 +143,17 @@ export const useFindLic = (): UseFindLicReturn => {
   const addAccount = async (params: AddAccountParams) => {
     
     updateState({ load: true });
-    console.log("addAccount", true)
     try{
       const res = await addLic( token || '',  params.LC || '' )    
-      
+    
       if(res.error) toast.error(res.message)
       else toast.success("Лицевой счет добавлен")
 
-      console.log( "addAccount", res)
       return res;
     } catch {
       return { error: true, message: "Ошибка добавления ЛС"}
     } finally {
       updateState({ load: false });  
-      console.log("addAccount", false)
     }
   };
    

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { IonLoading, IonCard } from '@ionic/react';
 import { useLicsStore } from '../../../../Store/licsStore';
-import { useToken } from '../../../../Store/loginStore';
 import styles from './styles.module.css';
 import { User, MapPin, Gauge } from 'lucide-react';
+import { useToken } from '../../../Login/authStore';
 
 // Типы для props
 interface HistoryIndicesProps {

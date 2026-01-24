@@ -6,6 +6,7 @@ import MaskedInput from "../../mask/reactTextMask";
 import { eyeOffOutline, eyeOutline } from "ionicons/icons";
 import { AuthCredentials } from "./useLogin";
 import { version } from "../../Store/api";
+import { Check } from "lucide-react";
 
 interface LoginFormProps {
     onNavigate:     (page: LoginPage) => void;
@@ -16,13 +17,15 @@ export function LoginForm({ onNavigate, onLogin }: LoginFormProps) {
     const [ info, setInfo ] = useState( { phone: "", password: "" } )
     const [ showPassword, setShowPassword ] = useState( false )
 
+
     useEffect(()=>{
+
+        console.log('check')
         
         const login = { phone: "'", password: ""}
         login.phone = localStorage.getItem("stngul.phone") || '';
         login.password = localStorage.getItem("stngul.pass") || '';
         
-        console.log( login )
         setInfo( login )
 
     },[])

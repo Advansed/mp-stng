@@ -16,7 +16,6 @@ export const useNavigation = () => {
   }, [ionRouter, setCurrentPage]);
 
   const goBack      = useCallback((currentPage?: string) => {
-    console.log("goBack", currentPage)
     if ( page > LicsPage.MAIN) {
         if(page === LicsPage.HISTORY_INDICES) setPage(LicsPage.INDICES)
         else setPage( LicsPage.MAIN)

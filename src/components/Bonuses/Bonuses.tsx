@@ -5,7 +5,7 @@ import "./Bonuse.css"
 import { FioSuggestions } from "react-dadata"
 import { useBonuses } from "./useBonuses"
 import useBonusesStore from "../../Store/bonusesStore"
-import { useLoginStore } from "../../Store/loginStore"
+import { useAuthStore } from "../Login/authStore"
 
 export function Bonuses({ name }: { name: string }) {
     const { bonusCard, loading, message, handleCreateCard, clearMessage } = useBonuses()
@@ -99,7 +99,7 @@ function FIOComponent() {
     const { profile, handleSaveProfile } = useBonuses()
     const [upd, setUpd] = useState(0)
     
-    const user = useLoginStore( state => state.user )
+    const user = useAuthStore( state => state.user )
 
     const handleFIOChange = (e: any) => {
         const newProfile = {

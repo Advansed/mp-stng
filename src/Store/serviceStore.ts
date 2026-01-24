@@ -65,16 +65,12 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
     setLoading:     ( loading )   => set({ loading }),
   
     saveService:    async ( orderData: any) => {
-        console.log("setLoading", true)
         set({ loading: true})
         try {
-            // TODO: Заменить на fetch вместо getData
-            console.log('services1', orderData)
             const res = await api('services1', orderData )
-            console.log("saveService", res)
             return res
         } catch (error:any) {
-            console.log(error)
+            console.error('Error saving service:', error);
             return { error: true, message: error.message }
         } finally {
             set((state) => ({ ...state, loading: false })) // Функциональное обновление
@@ -84,13 +80,10 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
     
     preview:        async ( orderData: any) => {
         try {
-            // TODO: Заменить на fetch вместо getData
-            console.log(orderData)
             const res = await api('preview', orderData )
-            console.log("preview", res)
             return res
         } catch (error:any) {
-            console.log(error)
+            console.error('Error previewing service:', error);
             return { error: true, message: error.message }
         }        
     },
@@ -100,7 +93,6 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
         set({ loading: true })
         try {
             const res = await api("s_details", { token: token })
-            console.log('s_details', res.data )
             if(res.error){
                 set({ loading: false})
                 return res
@@ -111,7 +103,7 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
                 return res
             }
         } catch(e) {
-            console.log("error loadservice", e)
+            console.error("Error loading services:", e)
             set({ loading: false})
         
         }

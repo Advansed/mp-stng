@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { LicCounter, selectCountersCount, selectTotalDebts, useLicsStore } from '../../Store/licsStore';
-import { useLoginStore, useToken } from '../../Store/loginStore';
+import { useToken, useAuthStore } from '../Login/authStore';
 import { api } from '../../Store/api';
 
 export const useLics    = () => {
@@ -15,17 +15,14 @@ export const useLics    = () => {
     setSelectedLic
   } = useLicsStore();
 
-  const token           = useToken(); // получаем токен из loginStore
-  const phone           = useLoginStore(state => state.user?.phone )
-  const email           = useLoginStore(state => state.user?.email )
+  const token           = useToken(); // получаем токен из authStore
+  const phone           = useAuthStore(state => state.user?.phone )
+  const email           = useAuthStore(state => state.user?.email )
 
   // Селекторы
   const totalDebts      = useLicsStore(selectTotalDebts);
   const countersCount   = useLicsStore(selectCountersCount);
 
-  useEffect(()=>{
-    console.log("useLics", lics)
-  },[ lics])
 
   // Автозагрузка при наличии токена
   useEffect(() => {

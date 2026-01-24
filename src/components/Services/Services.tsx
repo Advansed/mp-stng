@@ -32,23 +32,14 @@ export const Services: React.FC = () => {
 
   const currentPage = useNavigateStore(state => state.currentPage)
 
-  useEffect(()=>{
-    console.log("services")
-  },[])
 
   useEffect(()=>{
-    console.log("useService", currentPage )
     if(currentPage === '/page/services'){
-        console.log("useService", currentPage === '/page/services', !services )
         if(!services || services.length === 0 )
             loadServices()
 
     }
   },[currentPage])
-
-  useEffect(()=>{
-    console.log("loading", loading)
-  },[loading])
 
 
   let elem = <></>

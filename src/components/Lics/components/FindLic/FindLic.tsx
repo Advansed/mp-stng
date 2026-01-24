@@ -13,7 +13,6 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
   const { state, loadSettlements, loadStreets, loadHouses, addAccount, setState } = useFindLic();
 
   useEffect(() => {
-    console.log(state.info )
     if(state.info.length === 0)
       loadSettlements();
   }, []);
@@ -44,15 +43,12 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
   };
 
   const handleSubmit = async () => {
-    console.log("submit begin")
     if ( state.lc ) {
       const res = await addAccount({ LC: state.lc } as AddAccountParams);
-      console.log("submit addAccount")
       setPage(0);
     } else {
       setPage(0);
     }
-      console.log("submit end")
   };
 
   const handleUlusClear = () => {
@@ -79,9 +75,6 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
     setState({lc : undefined });
   };
 
-  useEffect(()=>{
-    console.log(state.load )
-  },[state.load])
 
   return (
     <>

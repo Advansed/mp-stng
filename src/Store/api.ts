@@ -41,11 +41,9 @@ export async function fetchData1C(
 
     const data = await res.json();
     
-    if (data.Код === 200) console.log(data);
-    
     return data;
   } catch (error) {
-    console.log(error);
+    console.error('Error in fetchData1C:', error);
     return { Код: 200 };
   }
 }
@@ -62,12 +60,12 @@ export async function getCameras() {
         const data = await response.json();
         
         if (data.error) {
-            console.log(data);
+            console.error('Error in getCameras response:', data);
         }
         
         return data;
     } catch (error) {
-        console.log(error);
+        console.error('Error in getCameras:', error);
         return { error: true, message: error };
     }
 }

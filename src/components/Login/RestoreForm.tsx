@@ -14,7 +14,6 @@ export function RestoreForm({ onNavigate, onRestore }: RestoreFormProps) {
     const [ info, setInfo ] = useState({ phone: "", sms: "",})
 
     const handleRestore = async() => {
-        console.log("handle restore ")
         const res = await  onRestore ( info.phone )  
         if(res)    
             onNavigate('SMS')
@@ -58,7 +57,6 @@ export function RestoreForm({ onNavigate, onRestore }: RestoreFormProps) {
 
             <div className="ml-1 mr-1 login-button"
                 onClick = { ()=> {
-                    console.log("onClick")
                     handleRestore()
                 }}
             >

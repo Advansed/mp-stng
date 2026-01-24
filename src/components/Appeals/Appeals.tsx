@@ -21,7 +21,6 @@ export function Appeals() {
     const currentPage = useNavigateStore(state => state.currentPage)
     
     useEffect(()=>{
-        console.log("useAppeals", currentPage )
         if(currentPage === '/page/appeals')
             refreshAppeals()
     },[currentPage])

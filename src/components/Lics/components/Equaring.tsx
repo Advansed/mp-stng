@@ -121,7 +121,6 @@ export function Equaring({ item, setPage, equairing }: EquaringProps) {
     }
 
     const mdOrder = info.orderId;
-    console.log("mdOrder", mdOrder);
 
     const webSdkPaymentForm = new window.PaymentForm({
       mdOrder,
@@ -235,7 +234,6 @@ export function Equaring({ item, setPage, equairing }: EquaringProps) {
         // например:
         // setPage(5);
         // или запрос статуса /payment/rest/getOrderStatusExtended.do
-        console.log("payment result", result);
       })
       .catch((e: any) => {
         console.error("doPayment error", e);

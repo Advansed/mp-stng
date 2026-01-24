@@ -47,9 +47,6 @@ export function     Lics(): JSX.Element {
     const { info, addLic, delLic, setIndice, sberPAY, equaring, sbp } = useLics()
     const { page, setPage, item, setItem } = useNavigation()
 
-    useEffect(()=>{
-        console.log( info )
-    },[ info ])
 
     // Рендеринг компонентов на основе текущей страницы
     const renderPageComponent = (): JSX.Element => {
@@ -482,7 +479,6 @@ function            SBP({ item, setPage, sbp }:{ item: any, setPage: any, sbp: a
         async function load(){
             setLoad( true )
             const res = await sbp( item.order )
-            console.log("SBP", res )
             if(res.error){ 
 
                 setPage( 4 )

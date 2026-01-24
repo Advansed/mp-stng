@@ -2,12 +2,9 @@
 import React, { FC, useState, useEffect } from 'react';
 import { IonButton, IonInput } from '@ionic/react';
 import { CounterProps } from './types';
-import { useLoginStore } from '../../../../Store/loginStore';
+import { useAuthStore } from '../../../Login/authStore';
 import {LicCounter } from '../../../../Store/licsStore';
 import { useToast } from '../../../Toast';
-
-// TODO: Заменить Store.getState() на zustand store
-// import { useLoginStore } from '../../../../Store/loginStore';
 
 export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) => {
   const [mode, setMode] = useState(false);
@@ -16,10 +13,8 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
 
   const toast = useToast()
 
-  // TODO: Получить из zustand store
-  // const login = useLoginStore(state => state.login);
-  const borders = useLoginStore(state => state.user?.borders ) || {from: 20, to: 25}
-  const monthes = useLoginStore(state => state.user?.monthes ) || 0
+  const borders = useAuthStore(state => state.user?.borders ) || {from: 20, to: 25}
+  const monthes = useAuthStore(state => state.user?.monthes ) || 0
 
   const monthDiff = (dateFrom: Date, dateTo: Date): number => {
     let months = dateTo.getMonth() - dateFrom.getMonth() + 
@@ -122,8 +117,8 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
       
       { info.poverka > 0 && (
         <div className='borders'>
-          <div className={ "flex fl-space " + ( info.poverka === 1 ? "cl-red" : "cl-red1" ) }>
-            <div><b> { info.poverka === 1 ? "Истекает срок поверки" : "Истек срок поверки " } </b></div>
+          <div className={ "flex fl-space " + ( info.poverka === 3 ? "cl-red" : info.poverka === 2 ? "cl-green" : "cl-red1" ) }>
+            <div><b> { info.poverka === 2 ? "Истек срок поверки " : "Истекает срок поверки" } </b></div>
             <div><b>{ info.p_data }</b></div>
           </div>
           <div className='mt-05 fs-08'> { info.p_text } </div>

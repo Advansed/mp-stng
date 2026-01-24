@@ -4,6 +4,7 @@ import { useToast }             from '../Toast';
 import { TService }             from '../../Store/serviceStore';
 import { FieldData, PageData }  from '../DataEditor/types';
 import DataEditor               from '../DataEditor';
+import { useProfileData }       from '../Login/authStore';
 
 interface OrderProps {
   service:      TService;
@@ -14,6 +15,55 @@ interface OrderProps {
 
 export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview }) => {
   const toast         = useToast();
+  const profile       = useProfileData();
+
+  /**
+   * Получает значение из профиля по имени поля формы
+   */
+  const getProfileValue = (fieldName: string): any => {
+    if (!profile) return null;
+
+    // Нормализуем имя поля для сравнения (нижний регистр, убираем пробелы)
+    const normalizedName = fieldName.toLowerCase().trim();
+
+    // Маппинг имен полей формы на поля профиля
+    const fieldMapping: { [key: string]: any } = {
+      // ФИО
+      
+      'фио':                profile.surname + ' ' + profile.name + ' ' + profile.lastname,
+      'имя':                profile.name,
+      'отчество':           profile.lastname,
+      'фамилия':            profile.surname,
+      'контактныйтелефон':  profile.phone,
+      'почта':              profile.email,
+      
+      // Паспортные данные
+      'паспортсерия':       profile.passport?.serial,
+      'паспортномер':       profile.passport?.number,
+      'паспортдатавыдачи':  profile.passport?.issuedDate,
+      'датавыдачипаспорта': profile.passport?.issuedDate,
+      'паспорткемвыдан':    profile.passport?.issuedBy,
+      'доп6':               profile.passport?.codePodr,
+    };
+
+    // Проверяем точное совпадение
+    const value = fieldMapping[normalizedName]
+    if (value !== undefined) {
+      console.log(fieldName, value )
+      return value || null;
+    }
+
+    // Проверяем частичное совпадение (если имя поля содержит ключевое слово)
+    // for (const [key, value] of Object.entries(fieldMapping)) {
+    //   if (normalizedName.includes(key) && value) {
+    //     return value;
+    //   } 
+    // }
+
+    console.log(fieldName, undefined )
+
+    return null;
+  };
 
   const getFormData   = (): PageData => {
     if(!service) return []
@@ -23,10 +73,18 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     const data = service.chapters.map(( chapter ) => ({
       title: chapter.label,
       data: chapter.data?.map(( field ) => {
+        // Получаем значение из профиля, если оно есть
+        const profileValue = getProfileValue(field.name);
+        
+        // Используем значение из профиля, если оно есть, иначе значение из поля или пустую строку
+        const fieldValue = profileValue !== null && profileValue !== undefined 
+          ? profileValue 
+          : (field.value || '');
+
         return {
           label:    field.label,
           type:     field.type,
-          data:     field.value || '',
+          data:     fieldValue,
           values:   field.values,    
           validate: field.validate
         } as FieldData;
@@ -76,7 +134,6 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       const orderData = getOrderData( data );
 
       const res = await onSave( orderData );
-      console.log("ordersave ", res)
       
       onBack()
 

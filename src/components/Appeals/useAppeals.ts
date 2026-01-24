@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useToken } from '../../Store/loginStore'
+import { useToken } from '../Login/authStore'
 import useAppealsStore from '../../Store/appealsStore'
 
 export const useAppeals = () => {

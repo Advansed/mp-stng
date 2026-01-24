@@ -1,7 +1,7 @@
 import { useEffect }        from 'react'
 import { useServiceStore }  from '../../Store/serviceStore'
 import { useToast }         from '../Toast'
-import { useToken }         from '../../Store/loginStore'
+import { useToken }         from '../Login/authStore'
 
 export const useServices = () => {
   const {
@@ -30,7 +30,6 @@ export const useServices = () => {
   const saveService         = async (order: any):Promise<any> => {
     order.token = token
     const res = await save( order )
-    console.log('saveservice', res)
     if(res.error) toast.error( res.message )
     else toast.success( res.message )
     return res

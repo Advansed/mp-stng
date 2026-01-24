@@ -102,8 +102,6 @@ export const useLicsStore = create<LicsStore>()(
         try {
           const res = await api('getAccount', { token });
           
-          console.log('getAccount', res )
-          
           if (res.error) {
             return res;
           }
@@ -126,7 +124,6 @@ export const useLicsStore = create<LicsStore>()(
         set({ loading: true })
         
         const res = await api('addAccount', { token: token, LC: lic });
-        console.log( res )
           
         if (res.error) {
           set({ loading: false })
@@ -135,7 +132,6 @@ export const useLicsStore = create<LicsStore>()(
 
          try {
           const res = await api('getAccount', { token });
-          console.log('getAccount', res )
           
           if (res.error) {
             return res ;
@@ -159,12 +155,8 @@ export const useLicsStore = create<LicsStore>()(
 
       delLic:         async ( token: string, lic: string ) => {
         set({ loading: true })
-
-        console.log("LC", lic)
         
         const res = await api('delAccount', { token: token, LC: lic });
-
-        console.log( res )
           
         if (res.error) {
           return res ;
@@ -172,7 +164,6 @@ export const useLicsStore = create<LicsStore>()(
 
          try {
           const res = await api('getAccount', { token });
-          console.log('getAccount', res )
           
           if (res.error) {
             return res;
@@ -200,7 +191,6 @@ export const useLicsStore = create<LicsStore>()(
          if(!res.error){
             try {
               const res = await api('getAccount', { token });
-              console.log('getAccount', res )
               
               if (res.error) {
                 return res;
@@ -229,7 +219,6 @@ export const useLicsStore = create<LicsStore>()(
 
           try {
               const res = await api("getPayments1", { token, LC } )
-              console.log(res)
               if(!res.error){
                 const { hist_payment } = get()
                 hist_payment.push( res.data[0]) 
@@ -246,7 +235,6 @@ export const useLicsStore = create<LicsStore>()(
 
           try {
               const res = await api("getIndices1", { token, counterId } )
-              console.log("getIndices",res)
               if(!res.error){
                 const { hist_indices } = get()
                 hist_indices.push( res.data[0]) 

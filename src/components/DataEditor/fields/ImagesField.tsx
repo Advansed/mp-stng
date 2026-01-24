@@ -37,7 +37,6 @@ export const ImagesField: React.FC<ImagesFieldProps> = ({
     try {
       const photo = await takePicture();
       if (photo?.dataUrl) {
-        console.log( photo?.dataUrl )
         onChange([...value, photo.dataUrl ]);
       }
     } catch (error) {

@@ -11,7 +11,6 @@ export function Apps(): JSX.Element {
     const currentPage = useNavigateStore(state => state.currentPage)
     
     useEffect(()=>{
-        console.log("useApps", currentPage )
         if(currentPage === '/page/apps')
             refreshApps()
     },[currentPage])

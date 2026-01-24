@@ -14,9 +14,9 @@ import { callOutline, callSharp, contractOutline, contractSharp, documentSharp, 
     ribbonSharp, videocamOutline, videocamSharp } from 'ionicons/icons';
     
 import './Menu.css';
-import { useLoginStore } from '../Store/loginStore';
 import { version } from '../Store/api';
 import { useNavigation } from '../pages/useNavigation';
+import { useAuthStore } from './Login/authStore';
 
 interface AppPage {
   url: string;
@@ -96,7 +96,7 @@ const appPages: AppPage[] = [
 ];
 
 const Menu: React.FC = () => {
-  const { setAuth} = useLoginStore()
+  const { setAuth } = useAuthStore()
   const { goTo } = useNavigation();
 
   return (
