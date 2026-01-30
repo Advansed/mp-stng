@@ -70,34 +70,33 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     if( service.chapters === undefined ) return []
     if ( service.chapters.length === 0 ) return [];
 
+    console.log('service', service)
+
     const data = service.chapters.map(( chapter ) => ({
       title: chapter.label,
       data: chapter.data?.map(( field ) => {
         // Получаем значение из профиля, если оно есть
-        const profileValue = getProfileValue(field.name);
-        
-        // Используем значение из профиля, если оно есть, иначе значение из поля или пустую строку
-        const fieldValue = profileValue !== null && profileValue !== undefined 
-          ? profileValue 
-          : (field.value || '');
 
         return {
-          label:    field.label,
-          type:     field.type,
-          data:     fieldValue,
-          values:   field.values,    
-          validate: field.validate
+          label:        field.label,
+          type:         field.type,
+          data:         field.value,
+          values:       field.values,    
+          validate:     field.validate
         } as FieldData;
       }) || chapter.files?.map(( field ) =>{
         return {
-          label:    field.label,
-          type:     'images',
-          data:     field.data || [],
-          values:   [],    
-          validate: field.validate
+          label:        field.label,
+          type:         'images',
+          data:         field.data || [],
+          values:       [],    
+          validate:     field.validate
         } as FieldData
       }) || []
     }));
+
+    console.log('orderData', data)
+
     return data
   };
 

@@ -92,7 +92,7 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
 
         set({ loading: true })
         try {
-            const res = await api("s_details", { token: token })
+            const res = await api("s_details1", { token: token })
             if(res.error){
                 set({ loading: false})
                 return res
