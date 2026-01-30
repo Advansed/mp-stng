@@ -37,13 +37,16 @@ export function Apps(): JSX.Element {
     }, [currentPage])
 
     const handleEdit = async (id: string) => {
-        console.log("edit service")
         const res = await get_details1(id)
-        console.log("edit service", res )
-        if (res !== undefined) {
-            console.log(id, res);
+        if (res !== undefined && res.details) {
+            // Извлекаем details из ответа API
+            const serviceData = res.details;
             setAppId(id)
-            setEditingApp(res)
+            setEditingApp(serviceData as TService)
+        } else if (res !== undefined) {
+            // Fallback: если структура отличается, пробуем использовать res напрямую
+            setAppId(id)
+            setEditingApp(res as TService)
         }
     }
 
@@ -62,7 +65,6 @@ export function Apps(): JSX.Element {
 
     // Экран редактирования заявки
     if (editingApp) {
-        console.log("editingApp", editingApp)
         return (
             <AppOrder
                 service={editingApp}

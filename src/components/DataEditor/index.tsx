@@ -83,6 +83,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
   };
 
   const handleSave                = () => {
+
       const currentSection = data[navigation.currentPage];
       let hasErrors = false;
       

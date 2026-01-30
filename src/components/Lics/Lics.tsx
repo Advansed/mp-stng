@@ -13,7 +13,6 @@ import { useNavigation }                                                from '..
 import { LicItem }                                                      from './components/LicItem/LicItem';
 import History                                                          from './components/History';
 import HistoryIndices                                                   from './components/HistoryIndice';
-import { Equaring } from './components/Equaring';
 
 
 type WidgetParams = {
@@ -47,6 +46,9 @@ export function     Lics(): JSX.Element {
     const { info, addLic, delLic, setIndice, sberPAY, equaring, sbp } = useLics()
     const { page, setPage, item, setItem } = useNavigation()
 
+    useEffect(()=>{
+        console.log( info )
+    },[ info ])
 
     // Рендеринг компонентов на основе текущей страницы
     const renderPageComponent = (): JSX.Element => {
@@ -421,9 +423,10 @@ function            SberPay({ item, setPage, SBOL }:{ item: any, setPage: any, S
     return elem
 }
 
-function            Equaring_({ item, setPage, equairing }:{ item: any, setPage: any, equairing: any }){
+function            Equaring({ item, setPage, equairing }:{ item: any, setPage: any, equairing: any }){
     const [ load, setLoad ] = useState( false)
     const [ info, setInfo ] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [ iframeLoading, setIframeLoading ] = useState( true )
 
 
     useEffect(()=>{
@@ -436,6 +439,7 @@ function            Equaring_({ item, setPage, equairing }:{ item: any, setPage:
 
             } else {
                setInfo( res.data )
+               setIframeLoading( true )
               // window.open( res.data.formUrl, '_blank' )
               //openUrl( res.data.formUrl )
   
@@ -445,12 +449,28 @@ function            Equaring_({ item, setPage, equairing }:{ item: any, setPage:
         load()
     },[])
 
+    const handleIframeLoad = () => {
+        setIframeLoading( false )
+        console.log('load frame')
+    }
+
     const elem = <>
         <IonLoading isOpen = { load } message={"Подождите..."}/>
         {
             info !== undefined
                 ? <>
-                    <div className='w-100 h-100'>
+                    <div className='w-100 h-100' style={{ position: 'relative' }}>
+                        { iframeLoading && (
+                            <div className="iframe-skeleton">
+                                <div className="skeleton-content">
+                                    <div className="skeleton-line skeleton-line-1"></div>
+                                    <div className="skeleton-line skeleton-line-2"></div>
+                                    <div className="skeleton-line skeleton-line-3"></div>
+                                    <div className="skeleton-line skeleton-line-4"></div>
+                                    <div className="skeleton-line skeleton-line-5"></div>
+                                </div>
+                            </div>
+                        )}
                         <iframe 
                             // ref="iframeRef" 
                             id="iframe" 
@@ -458,7 +478,12 @@ function            Equaring_({ item, setPage, equairing }:{ item: any, setPage:
                             height="100%" 
                             width="100%" 
                             src = { info.formUrl }
-                            allow="autoplay; fullscreen; picture-in-picture" 
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            onLoad={ handleIframeLoad }
+                            style={{ 
+                                opacity: iframeLoading ? 0 : 1,
+                                transition: 'opacity 0.3s ease-in-out'
+                            }}
                         ></iframe>
                     </div>
                 </>
@@ -479,6 +504,7 @@ function            SBP({ item, setPage, sbp }:{ item: any, setPage: any, sbp: a
         async function load(){
             setLoad( true )
             const res = await sbp( item.order )
+            console.log("SBP", res )
             if(res.error){ 
 
                 setPage( 4 )

@@ -33,12 +33,14 @@ export const useApps = () => {
     try {
       const res = await api('get_details1', { token, id })
 
-      if (res.success) return res.data
-      else {
+      if (res.success) {
+        return res.data
+      } else {
         toast.error(res.message || "Ошибка загрузки заявки")
         return undefined
       }
     } catch (error) {
+      console.error("get_details1 error:", error)
       toast.error("Ошибка загрузки заявки")
       return undefined
     } finally {
@@ -51,9 +53,12 @@ export const useApps = () => {
     orderData.token = token
     setLoading(true)
     try {
-      const res = await api('save_details1', orderData)
+      console.log("save orderData", orderData )
+      const res = await api("upd_details1", orderData)
+      console.log("upd_details1", res)
       if (res.error) toast.error(res.message || "Ошибка сохранения")
       else toast.success(res.message || "Заявка сохранена")
+
       return res
     } catch (error: any) {
       toast.error("Ошибка сохранения заявки")

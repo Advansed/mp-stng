@@ -18,12 +18,16 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>use camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>use location</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>use gallery</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>use gallery</string>
 	<key>UIBackgroundModes</key>
