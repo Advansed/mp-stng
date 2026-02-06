@@ -1,6 +1,6 @@
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonImg, IonLoading, IonText } from "@ionic/react"
 import React, { useEffect, useState } from "react"
-import './AGZS.css'
+import styles from "./AGZS.module.css"
 import { getCameras } from "../../Store/api"
 
 export function Agzs(){
@@ -8,36 +8,34 @@ export function Agzs(){
     const [ info, setInfo ] = useState<any>([]) // eslint-disable-line @typescript-eslint/no-explicit-any
 
     useEffect(()=>{
-        async function load(){
+        async function loadData(){
             const res = await getCameras();
             if(res.status)
                 setInfo(res.data)
         }
-        load()
+        loadData()
     },[])
 
     function Card(props: { info }) :JSX.Element{
         const info = props.info
         const elem = <>
-            <IonCard
-                className="v-card"
-            >
+            <IonCard className={styles.vCard}>
                 {
                     info.status 
-                        ? <>
+                        ? <div className={styles.videoWrap}>
                             <iframe 
-                                // ref="iframeRef" 
                                 id="iframe" 
-                                className="video" 
+                                className={styles.video} 
                                 height="100%" 
                                 width="100%" 
-                                src = { info.url }
-                                allow="autoplay; fullscreen; picture-in-picture" 
-                            ></iframe>
-                        </>
-                        : <>
-                            <IonImg src = { info.preview } alt = ""/>
-                        </>
+                                src={info.url}
+                                allow="autoplay; picture-in-picture" 
+                                title="Камера"
+                            />
+                        </div>
+                        : <div className={styles.previewWrap}>
+                            <IonImg src={info.preview} alt="" />
+                        </div>
                 }
                 <IonCardHeader>
                     <IonButton
@@ -69,20 +67,18 @@ export function Agzs(){
     }
     const elem = <>
         <IonLoading isOpen = { load } message={ "Подождите..." }/>
-        <div className='fone'>
-            <div className="header">
-                <IonImg class="pattern" src = 'assets/img/pattern2.png' />
+        <div className={styles.fone}>
+            <div className={styles.header}>
+                <IonImg className={styles.pattern} src="assets/img/pattern2.png" alt="" />
                 <IonText>
-                    <h1 className="main-title ion-text-wrap ion-text-start">
-                        { "Мониторинг АГЗС" }
+                    <h1 className={`${styles.mainTitle} ion-text-wrap ion-text-start`}>
+                        Мониторинг АГЗС
                     </h1>
                 </IonText>
             </div>
         </div>
 
-        <div
-            className='l-content'
-        >
+        <div className={styles.lContent}>
             {
                 items
             }

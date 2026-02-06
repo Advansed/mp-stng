@@ -7,6 +7,7 @@ import { eyeOffOutline, eyeOutline } from "ionicons/icons";
 import { AuthCredentials } from "./useLogin";
 import { version } from "../../Store/api";
 import { Check } from "lucide-react";
+import ESIALoginButton from "./ESIALoginButton";
 
 interface LoginFormProps {
     onNavigate:     (page: LoginPage) => void;
@@ -93,6 +94,10 @@ export function LoginForm({ onNavigate, onLogin }: LoginFormProps) {
                     Войти
                 </div>
             </div>
+
+            {/* <div>
+                <ESIALoginButton />
+            </div> */}
 
             <IonButton className="login-text-url ion-text-wrap" fill="clear"
                 onClick={() => onNavigate('restore')}>

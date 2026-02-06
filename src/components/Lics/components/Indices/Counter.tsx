@@ -124,6 +124,12 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
           <div className={'mt-05 fs-08 '  + ( info.poverka === 3 ? "cl-red" : info.poverka === 2 ? "cl-green" : "cl-red1" )  }> { info.p_text } </div>
         </div>
       )}
+      { info.poverka === 0 && (
+          <div className={ "flex fl-space cl-green mt-05 ml-1" }>
+            <div><b> Срок следующей поверки </b></div>
+            <div><b>{ info.p_data }</b></div>
+          </div>
+      )}
       
       
       <div className="flex fl-space mt-1 ml-1 cl-prim">
