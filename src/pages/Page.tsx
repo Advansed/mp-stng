@@ -14,6 +14,7 @@ import { Apps }           from '../components/Apps';
 import { Notifications }  from '../components/Notificications';
 import { News }           from '../components/News';
 import { Agzs }           from '../components/AGZS/AGZS';
+import { Queye }          from '../components/Queye';
 import { Services }       from '../components/Services/Services';
 import { useNavigation }  from './useNavigation';
 import VideoPage from './VideoPage';
@@ -39,7 +40,7 @@ const Page: React.FC = () => {
         case "profile":           elem = <Profile />; break;
         case "agzs":              elem = <Agzs />; break;
         case "apps":              elem = <Apps />; break;
-        // case "queye":             elem = <Queye />; break;
+        case "queye":             elem = <Queye />; break;
         case "bonuse":            elem = <></>; break; //<Bonuses name = { name }/>; break;
         case "services":          elem = <Services />; break;
         case "appeals":           elem = <Appeals />; break;

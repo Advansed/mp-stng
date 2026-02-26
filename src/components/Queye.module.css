@@ -1,0 +1,288 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #F3F4F6;
+  color: #1F2937;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.screen {
+  padding: 20px;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 24px;
+  margin: 0;
+  font-weight: 800;
+  color: #111827;
+}
+
+.header p {
+  color: #6B7280;
+  font-size: 14px;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+/* --- БЛОК С ДАТОЙ --- */
+.dateBlock {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #E5E7EB;
+}
+
+.dateIcon {
+  font-size: 24px;
+  color: #3B82F6;
+  background-color: #EFF6FF;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.dateInfo {
+  flex: 1;
+}
+
+.dateDay {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.dateTime {
+  font-size: 14px;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeUpdate {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-left: auto;
+}
+
+/* --- СПИСОК С ДВУМЯ РЯДАМИ --- */
+.listContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* --- КАРТОЧКА (Обычная) --- */
+.listItem {
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  min-width: 0;
+}
+
+/* --- АКТИВНАЯ КАРТОЧКА (СИНИЙ АКЦЕНТ) --- */
+.listItemActive {
+  background-color: #EFF6FF;
+  border-color: #3B82F6;
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.15), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+}
+
+/* --- Верхняя часть карточки --- */
+.ticketSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ticketNumber {
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Цвет талона в активной строке */
+.listItemActive .ticketNumber {
+  color: #1E40AF;
+}
+
+.windowBadge {
+  background-color: #F3F4F6;
+  color: #374151;
+  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Бейдж окна (АКТИВНЫЙ) */
+.listItemActive .windowBadge {
+  background-color: #3B82F6;
+  color: white;
+}
+
+/* --- Нижняя часть карточки --- */
+.infoSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #F3F4F6;
+}
+
+.opName {
+  font-size: 12px;
+  color: #9CA3AF;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* Цвет операции в активной строке */
+.listItemActive .opName {
+  color: #60A5FA;
+}
+
+.timeLabel {
+  font-size: 12px;
+  color: #9CA3AF;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.listItemActive .timeLabel {
+  color: #1E40AF;
+}
+
+/* --- Полоска сбоку --- */
+.glowBar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background-color: #3B82F6;
+}
+
+/* --- СТАТИСТИКА (опционально) --- */
+.statsBlock {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 16px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+}
+
+.statItem {
+  text-align: center;
+  flex: 1;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 360px) {
+  .listContainer {
+    gap: 8px;
+  }
+
+  .listItem {
+    padding: 12px 8px;
+  }
+
+  .ticketNumber {
+    font-size: 20px;
+  }
+
+  .windowBadge {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .dateBlock {
+    padding: 10px 12px;
+  }
+
+  .dateDay {
+    font-size: 16px;
+  }
+}
+
+/* Добавьте в конец файла Queye.module.css */
+
+.windowInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.timeBadge {
+  background-color: #F3F4F6;
+  color: #374151;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.listItemActive .timeBadge {
+  background-color: #3B82F6;
+  color: white;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 360px) {
+  .timeBadge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}

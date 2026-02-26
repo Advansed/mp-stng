@@ -10,6 +10,8 @@ import {
 
 import { useHistory } from 'react-router-dom';
 import { callOutline, callSharp, contractOutline, contractSharp, documentSharp, documentTextOutline, exitOutline, exitSharp, 
+    notificationsCircleOutline, 
+    notificationsCircleSharp, 
     notificationsOutline, notificationsSharp, pencilOutline, pencilSharp, personOutline, personSharp, ribbonOutline, 
     ribbonSharp, videocamOutline, videocamSharp } from 'ionicons/icons';
     
@@ -62,12 +64,12 @@ const appPages: AppPage[] = [
     iosIcon: notificationsOutline,
     mdIcon: notificationsSharp
   },
-  // {
-  //   title: 'Обращения',
-  //   url: '/page/appeals',
-  //   iosIcon: notificationsOutline,
-  //   mdIcon: notificationsSharp
-  // },
+  {
+    title: 'Эл. очередь',
+    url: '/page/queye',
+    iosIcon: notificationsCircleOutline,
+    mdIcon: notificationsCircleSharp
+  },
   {
     title: 'Лицевые счета',
     url: '/page/lics',
