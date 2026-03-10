@@ -1,7 +1,7 @@
 // URL базовый адрес API
 export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2";
 
-export const version = '2.4.8'
+export const version = '2.4.9'
 
 interface FetchResponse {
   error: boolean;
@@ -10,26 +10,26 @@ interface FetchResponse {
 }
 
 export const api = async (endpoint: string, data: any) => {
-    const res = await fetch(`${URL}/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-    return res.json();
+  const res = await fetch(`${URL}/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
 };
 
-export const getVersion = async() => {
-    const res = await fetch(`${URL}/getVersion`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-    });
-    return res.json()
+export const getVersion = async () => {
+  const res = await fetch(`${URL}/getVersion`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return res.json()
 };
 
 
 // Для 1C API
 export async function fetchData1C(
-  method: string, 
+  method: string,
   params: any
 ): Promise<any> {
   try {
@@ -40,7 +40,7 @@ export async function fetchData1C(
     });
 
     const data = await res.json();
-    
+
     return data;
   } catch (error) {
     console.error('Error in fetchData1C:', error);
@@ -50,22 +50,22 @@ export async function fetchData1C(
 
 
 export async function getCameras() {
-    try {
-        const response = await fetch('https://aostng.ru/api/v2/camera/get');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.error) {
-            console.error('Error in getCameras response:', data);
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('Error in getCameras:', error);
-        return { error: true, message: error };
+  try {
+    const response = await fetch('https://aostng.ru/api/v2/camera/get');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    if (data.error) {
+      console.error('Error in getCameras response:', data);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getCameras:', error);
+    return { error: true, message: error };
+  }
 }
