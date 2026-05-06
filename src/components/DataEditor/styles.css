@@ -90,17 +90,18 @@
 .big-save-button:active {
   transform: scale(0.95);
 }
+
 /* Мобильная адаптация */
 @media (max-width: 480px) {
   .wizard-content {
     padding: 1em;
     padding-bottom: 14em;
   }
-  
+
   .page-content {
     padding: 15px;
   }
-  
+
   .field {
     margin-bottom: 12px;
   }

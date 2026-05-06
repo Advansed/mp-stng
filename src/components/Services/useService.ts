@@ -29,6 +29,7 @@ export const useServices = () => {
 
   const saveService         = async (order: any):Promise<any> => {
     order.token = token
+    console.log("saveService", order )
     const res = await save( order )
     if(res.error) toast.error( res.message )
     else toast.success( res.message )

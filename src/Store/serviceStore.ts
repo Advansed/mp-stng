@@ -4,6 +4,7 @@ import { api } from './api'
 let storeInstanceId = 0;
 
 export interface TService {
+    id:         string,
     icon:       string,
     text:       string,
     chapters:   TChapter[]
@@ -16,19 +17,24 @@ export interface TChapter {
 }
 
 export interface TField {
+    doc?:       string,
     name:       string,
     value:      any,
     type:       string,
+    ai_method:  string,
     label:      string,
     values:     string[],
     validate:   boolean
 }
 
 export interface TFile {
+    doc?:       string,
     name:       string,
     label:      string,
     validate:   boolean,
-    data:       TURL[]
+    data:       TURL[],
+    ai_method:  string,
+    ai_status?: any,
 }
 
 export interface TURL {
@@ -92,7 +98,8 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
 
         set({ loading: true })
         try {
-            const res = await api("s_details1", { token: token })
+            const res = await api("s_details", { token: token })
+            console.log( "s_details", res );
             if(res.error){
                 set({ loading: false})
                 return res

@@ -13,6 +13,7 @@ import { useNavigation }                                                from '..
 import { LicItem }                                                      from './components/LicItem/LicItem';
 import History                                                          from './components/History';
 import HistoryIndices                                                   from './components/HistoryIndice';
+import { useToast } from '../Toast';
 
 
 type WidgetParams = {
@@ -46,9 +47,6 @@ export function     Lics(): JSX.Element {
     const { info, addLic, delLic, setIndice, sberPAY, equaring, sbp } = useLics()
     const { page, setPage, item, setItem } = useNavigation()
 
-    useEffect(()=>{
-        console.log( info )
-    },[ info ])
 
     // Рендеринг компонентов на основе текущей страницы
     const renderPageComponent = (): JSX.Element => {
@@ -440,8 +438,8 @@ function            Equaring({ item, setPage, equairing }:{ item: any, setPage: 
             } else {
                setInfo( res.data )
                setIframeLoading( true )
-              // window.open( res.data.formUrl, '_blank' )
-              //openUrl( res.data.formUrl )
+               //window.open( res.data.formUrl, '_blank' )
+               //openUrl( res.data.formUrl )
   
             }
             setLoad( false )
@@ -498,6 +496,7 @@ function            Equaring({ item, setPage, equairing }:{ item: any, setPage: 
 function            SBP({ item, setPage, sbp }:{ item: any, setPage: any, sbp: any }){
     const [ load, setLoad ] = useState( false)
     const [ info, setInfo ] = useState<any>() // eslint-disable-line @typescript-eslint/no-explicit-any
+    const toast = useToast()
 
 
     useEffect(()=>{
@@ -508,6 +507,8 @@ function            SBP({ item, setPage, sbp }:{ item: any, setPage: any, sbp: a
             if(res.error){ 
 
                 setPage( 4 )
+
+                toast.error( res.message )
 
             } else {
                setInfo( res.data )

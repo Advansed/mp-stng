@@ -16,5 +16,13 @@ export const useFormState = (initialData: PageData) => {
     }
   };
 
-  return { data, updateField };
+  const updateAiStatus = (sectionIndex: number, fieldIndex: number, aiStatus: any) => {
+    const newData = [...data];
+    if (newData[sectionIndex]?.data[fieldIndex]) {
+      newData[sectionIndex].data[fieldIndex].ai_status = aiStatus;
+      setData(newData);
+    }
+  };
+
+  return { data, updateField, updateAiStatus };
 };

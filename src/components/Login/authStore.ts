@@ -18,14 +18,14 @@ export interface AuthUser {
   token: string;
   pincode?: string;
   code?: string; // код телефона для восстановления
-  
+
   // Дополнительные поля для работы с показаниями
   monthes?: number;
   borders?: {
     from: number;
     to: number;
   };
-  
+
   // Дополнительные поля профиля
   passport?: {
     serial: string;
@@ -34,7 +34,7 @@ export interface AuthUser {
     issuedBy: string;
     codePodr: string;
   };
-  
+
   // Настройки
   password?: string;
   consenttoemail?: boolean;
@@ -93,7 +93,7 @@ const credentialsStorage = {
  */
 const createInitialProfile = (): AuthUser => {
   const token = tokenStorage.get() || '';
-  
+
   return {
     id: '',
     email: '',
@@ -200,7 +200,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    */
   _updateProfileFromUser: (user: AuthUser) => {
     const currentProfile = get().profile;
-    
+
     // Объединяем данные из user с текущим профилем
     const profile: AuthUser = {
       id: user.id || currentProfile.id || '',
@@ -242,11 +242,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         mode: 'android',
       });
 
-      console.log('authorization', res.data )
+      console.log('authorization', res.data)
 
       if (!res.error && res.data) {
         const user = res.data as AuthUser;
-        
+
         // Сохраняем токен в localStorage
         get()._setToken(user.token);
 
@@ -297,24 +297,25 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
+      console.log('registration', { phone, name, terms })
       const res = await api('registration', {
         phone,
         name,
         terms,
       });
 
-      console.log('registration', res.data )
+      console.log('registration', res)
       if (!res.error && res.data) {
         const user = res.data as AuthUser;
-        
+
         // Сохраняем токен в localStorage
         get()._setToken(user.token);
 
         set({
           user,
-          token:      user.token,
-          auth:       false,
-          isLoading:  false,
+          token: user.token,
+          auth: false,
+          isLoading: false,
         });
 
         // Обновляем профиль из данных пользователя
@@ -345,10 +346,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       const res = await api('restore', { phone });
-      console.log('restore', res )
+      console.log('restore', res)
       if (!res.error && res.data?.data) {
         const user = res.data.data as AuthUser;
-        
+
         // Сохраняем токен в localStorage
         get()._setToken(user.token);
 
@@ -448,7 +449,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   getProfile: async () => {
     const { token } = get();
-    
+
     if (!token) {
       set({ error: 'Токен не найден' });
       return;
@@ -463,11 +464,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         // Объединяем загруженные данные с текущим профилем
         const currentProfile = get().profile;
         const updatedProfile = { ...currentProfile, ...res.data } as AuthUser;
-        
-        set({ 
+
+        set({
           profile: updatedProfile,
           user: updatedProfile, // Также обновляем user
-          isLoading: false 
+          isLoading: false
         });
       } else {
         set({
@@ -486,7 +487,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   updateProfile: async (data) => {
     const { token, profile } = get();
-    
+
     if (!token) {
       set({ error: 'Токен не найден' });
       return;
@@ -500,10 +501,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       if (!res.error) {
         const updatedProfile = { ...profile, ...data } as AuthUser;
-        set({ 
+        set({
           profile: updatedProfile,
           user: updatedProfile, // Также обновляем user
-          isLoading: false 
+          isLoading: false
         });
       } else {
         set({

@@ -34,12 +34,12 @@ const appPages: AppPage[] = [
     iosIcon: personOutline,
     mdIcon: personSharp
   },
-  // {
-  //   title: 'АГЗС бонусы',
-  //   url: '/page/bonuse',
-  //   iosIcon: ribbonOutline,
-  //   mdIcon: ribbonSharp
-  // },
+  {
+    title: 'Лицевые счета',
+    url: '/page/lics',
+    iosIcon: documentTextOutline,
+    mdIcon: documentSharp
+  },
   {
     title: 'Услуги',
     url: '/page/services',
@@ -51,6 +51,12 @@ const appPages: AppPage[] = [
     url: '/page/apps',
     iosIcon: pencilOutline,
     mdIcon: pencilSharp
+  },
+  {
+    title: 'Мониторинг эл. очередь',
+    url: '/page/queye',
+    iosIcon: notificationsCircleOutline,
+    mdIcon: notificationsCircleSharp
   },
   {
     title: 'Мониторинг АГЗС',
@@ -65,26 +71,14 @@ const appPages: AppPage[] = [
     mdIcon: notificationsSharp
   },
   {
-    title: 'Эл. очередь',
-    url: '/page/queye',
-    iosIcon: notificationsCircleOutline,
-    mdIcon: notificationsCircleSharp
-  },
-  {
-    title: 'Лицевые счета',
-    url: '/page/lics',
-    iosIcon: documentTextOutline,
-    mdIcon: documentSharp
-  },
-  {
-    title: 'Контакты',
-    url: '/page/contacts',
+    title: 'Видео инструкция',
+    url: '/page/video',
     iosIcon: callOutline,
     mdIcon: callSharp
   },
   {
-    title: 'Видео инструкция',
-    url: '/page/video',
+    title: 'Контакты',
+    url: '/page/contacts',
     iosIcon: callOutline,
     mdIcon: callSharp
   },

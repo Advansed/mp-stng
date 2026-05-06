@@ -8,12 +8,21 @@ export const useNavigation = () => {
 
   const ionRouter   = useIonRouter();
 
-  const { setCurrentPage, goBack: navigateBack, page, item, setItem, setPage } = useNavigateStore();
+  const {
+    setCurrentPage,
+    goBack: navigateBack,
+    currentPage,
+    page,
+    item,
+    setItem,
+    setPage
+  } = useNavigateStore();
 
   const goTo        = useCallback((path: string) => {
+    if (currentPage === path) return
     setCurrentPage( path );
     ionRouter.push( path );
-  }, [ionRouter, setCurrentPage]);
+  }, [ionRouter, setCurrentPage, currentPage]);
 
   const goBack      = useCallback((currentPage?: string) => {
     if ( page > LicsPage.MAIN) {

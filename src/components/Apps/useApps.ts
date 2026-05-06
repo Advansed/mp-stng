@@ -1,34 +1,46 @@
+import { useCallback, useMemo } from 'react'
 import { useToken } from '../Login/authStore'
 import useAppsStore from '../../Store/appStore'
 import { useToast } from '../Toast'
 import { api } from '../../Store/api'
 
+let refreshInFlight: Promise<any> | null = null
+
 export const useApps = () => {
-  const token = useToken()
-  const toast = useToast()
-  const {
-    apps,
-    loading,
-    fetchApps,
-    saveFiles,
-    setLoading
-  } = useAppsStore()
+  const token               = useToken()
+  const toast               = useToast()
+  const apps                = useAppsStore((state) => state.apps)
+  const loading             = useAppsStore((state) => state.loading)
+  const fetchApps           = useAppsStore((state) => state.fetchApps)
+  const saveFiles           = useAppsStore((state) => state.saveFiles)
+  const setLoading          = useAppsStore((state) => state.setLoading)
 
-  const handleRefresh = async () => {
-    const res = await fetchApps(token || '')
-    if (res?.error) toast.error("Ошибка загрузки заявок")
-    else toast.success("Данные загрузились")
-  }
+  const handleRefresh       = useCallback(async () => {
+    if (refreshInFlight) return refreshInFlight
 
-  const handleSaveFiles = async (id: string, files: any) => {
+    refreshInFlight = (async () => {
+      const res = await fetchApps(token || '')
+      if (res?.error) toast.error("Ошибка загрузки заявок")
+      else toast.success("Данные загрузились")
+      return res
+    })()
+
+    try {
+      return await refreshInFlight
+    } finally {
+      refreshInFlight = null
+    }
+  }, [token, fetchApps, toast])
+
+  const handleSaveFiles     = useCallback(async (id: string, files: any) => {
     if (token) {
       return await saveFiles(token, id, files)
     }
     return false
-  }
+  }, [token, saveFiles])
 
   /** Получение детальной информации о заявке для редактирования */
-  const get_details1 = async (id: string) => {
+  const get_details1        = useCallback(async (id: string) => {
     setLoading(true)
     try {
       const res = await api('get_details1', { token, id })
@@ -46,10 +58,10 @@ export const useApps = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token, setLoading, toast])
 
   /** Сохранение отредактированной заявки */
-  const saveApp = async (orderData: any): Promise<any> => {
+  const saveApp             = useCallback(async (orderData: any): Promise<any> => {
     orderData.token = token
     setLoading(true)
     try {
@@ -66,10 +78,10 @@ export const useApps = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token, setLoading, toast])
 
   /** Предпросмотр заявки */
-  const previewApp = async (orderData: any): Promise<any> => {
+  const previewApp          = useCallback(async (orderData: any): Promise<any> => {
     orderData.token = token
     try {
       const res = await api('preview', orderData)
@@ -78,15 +90,15 @@ export const useApps = () => {
       console.error('Error previewing app:', error)
       return { error: true, message: error.message }
     }
-  }
+  }, [token])
 
-  return {
+  return useMemo(() => ({
     apps,
     loading,
-    refreshApps:  handleRefresh,
-    saveFiles:    handleSaveFiles,
+    refreshApps: handleRefresh,
+    saveFiles: handleSaveFiles,
     get_details1,
     saveApp,
     previewApp
-  }
+  }), [apps, loading, handleRefresh, handleSaveFiles, get_details1, saveApp, previewApp])
 }

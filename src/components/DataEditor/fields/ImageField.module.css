@@ -48,6 +48,99 @@
   height: 100%;
   margin-bottom: 12px;
 }
+
+.aiCheckingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 70%;
+  min-height: 80px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.aiCheckingText {
+  font-size: 0.85rem;
+  color: #374151;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.aiCheckingInline {
+  margin-left: 8px;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.aiResultPanel {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.aiResultTitle {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.aiResultStatus {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.aiResultStatusWarn {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.aiResultGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 38%) 1fr;
+  gap: 6px 12px;
+  align-items: baseline;
+}
+
+.aiResultLabel {
+  color: #6b7280;
+}
+
+.aiResultValue {
+  word-break: break-word;
+}
+
+.aiResultError {
+  color: #b91c1c;
+  font-size: 0.85rem;
+}
+
+.aiResultRaw {
+  margin: 0;
+  padding: 10px;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  overflow: auto;
+  max-height: 220px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .imagePreview {
   width: 70%;
   height: 70%;
@@ -177,5 +270,32 @@
   
   .modalTitle {
     color: #f3f4f6;
+  }
+
+  .aiCheckingOverlay {
+    background: rgba(31, 41, 55, 0.9);
+  }
+
+  .aiCheckingText,
+  .aiCheckingInline {
+    color: #e5e7eb;
+  }
+
+  .aiResultPanel {
+    border-top-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .aiResultTitle {
+    color: #f9fafb;
+  }
+
+  .aiResultRaw {
+    background: #111827;
+    color: #e5e7eb;
+  }
+
+  .aiResultLabel {
+    color: #9ca3af;
   }
 }

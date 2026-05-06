@@ -47,6 +47,34 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
     setLoad(false);
   };
 
+  function Lines(item: any) {
+
+    let elem = <></>
+
+    for( let i = 0; i < item.debts.length; i++ ){
+        elem = <>
+            { elem }
+            <div className='flex fl-space ml-1 mr-1 mt-1 fs-09'>
+                <div><b>{ item.debts[i].label }</b></div>
+                <div className={ item.debts[i].sum === 0 ? 'cl-prim' : (item.debts[i].sum < 0 ? 'cl-green' : 'cl-red1') }>
+                    <b>
+                        { new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( 
+                            item.debts[i].sum  < 0 ? -item.debts[i].sum : item.debts[i].sum
+                        )}
+                    </b>
+                </div>
+            </div>
+        </>
+    }        
+
+    elem = <>
+            { elem }
+    </>
+
+    return elem
+}
+
+
   return (
     <>
       <IonLoading isOpen={load} message="Подождите..." />
@@ -92,7 +120,10 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
           
           <IonSegmentView>
             <IonSegmentContent id={"first" + info.id}>
-                <div className='flex fl-space mt-05'>
+    
+                { Lines( info ) }            
+
+                {/* <div className='flex fl-space mt-05'>
                     <div className='ml-2'>
                         {
                             info.sum < 0 ? "Аванс" : "К оплате" 
@@ -107,7 +138,8 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
                             }
                         </b>
                     </div>
-                </div>
+                </div> */}
+
                 <div className='flex fl-space'>
                             
                     <IonButton
@@ -191,13 +223,16 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
                     </div>
                   </div>
                 
-                <div className="ls-item1" onClick={quits}>
+                <div className="ls-item1" onClick={()=>{
+                    setItem( info )
+                    setPage(LicsPage.INDICES);
+                }}>
                   <div className="ml-05">
                     <IonIcon icon={documentAttachOutline} className="h-15 w-15" color="primary" />
                   </div>
                   <div className="ml-1">
-                    <div className="fs-09"><b>Квитанция </b></div>
-                    <div className="fs-08">Просмотр, скачивание квитанции</div>
+                    <div className="fs-09"><b>История показаний </b></div>
+                    <div className="fs-08">Просмотреть список предыдущих показаний</div>
                   </div>
                 </div>
               </div>

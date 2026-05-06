@@ -1,6 +1,7 @@
 import React, { useEffect, useState }        from 'react';
 import { IonAlert, IonButton, IonButtons, IonContent, IonIcon, IonImg, IonMenuButton, IonPage, IonRefresher, IonRefresherContent, IonTabBar, IonTabButton, isPlatform, useIonRouter } from '@ionic/react';
 import { useHistory, useParams, useLocation } from 'react-router';
+import { useRouteMatch } from 'react-router-dom';
 import './Page.css';
 import { Lics }           from '../components/Lics';
 import { arrowBackOutline, chatboxEllipsesOutline, contractOutline, documentTextOutline } 
@@ -23,6 +24,7 @@ const Page: React.FC = () => {
   const { goTo, goBack }  = useNavigation()
 
   const { name }          = useParams<{ name: string; }>();
+  const appStatusMatch    = useRouteMatch<{ appId: string }>( '/page/apps/status/:appId' );
 
   const getLics           = useLicsStore( state => state.getLics )
 
@@ -31,6 +33,14 @@ const Page: React.FC = () => {
   const lct = useLocation()
 
   function Main():JSX.Element {
+    if ( appStatusMatch?.params.appId ) {
+      return <>
+        <div className={ isPlatform("ios") ? 'p-content-ios': "p-content"}>
+          <Apps />
+        </div>
+      </>
+    }
+
     let elem = <></>
       switch ( name ) {
 
@@ -72,7 +82,7 @@ const Page: React.FC = () => {
           <IonButton
             fill = "clear"
             onClick = {()=>{ 
-                goBack( name )
+                goBack( name || ( appStatusMatch ? 'apps' : undefined ) )
             }}
           >
             <IonIcon icon = { arrowBackOutline } slot = "icon-only" color="light"/>

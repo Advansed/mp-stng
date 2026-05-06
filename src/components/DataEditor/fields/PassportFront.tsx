@@ -5,19 +5,11 @@ import { cameraOutline, trashOutline, closeOutline } from "ionicons/icons";
 import { takePicture } from "../../Files";
 import styles from './ImageField.module.css';
 import { useS3Upload } from "../hooks/useS3Upload";
-import { AiStatusResultPanel } from "./AiStatusResultPanel";
 
 interface ImageFieldProps {
-  name?: string;
   label: string;
   value: string | unknown;
-  ai_method?: string;
-  /** Срез `app.ai_status[ai_method]` с текущим методом ИИ. */
-  ai_status?: any;
   onChange: (value: any) => void;
-  /** checkAI из useCheckAI, через DataEditor */
-  onCheckAI?: (args: { method: string; objectKey: string; fileUrl: string }) => Promise<any>;
-  isAIChecking?: boolean;
   placeholder?: string;
   disabled?: boolean;
   error?: string;
@@ -29,45 +21,43 @@ function normalizeImageSrc(v: unknown): string {
   return '';
 }
 
-export function ImageField({
-  name,
+export function generateFileName( format: string ): string {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 10);
+  const extension = format || 'jpg';
+  const date = new Date().toISOString().split('T')[0];
+  
+  return `images/${date}/${timestamp}_${randomString}.${extension}`;
+}
+
+export const PassportFront: React.FC<ImageFieldProps> = ({
   label,
   value = '',
-  ai_method = '',
-  ai_status,
   onChange,
-  onCheckAI,
-  isAIChecking = false,
   placeholder = "Добавить изображение",
   disabled = false,
   error
-}: ImageFieldProps) {
+}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const imageSrc = normalizeImageSrc(value);
 
-  const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress, pruneAiByFileUrl } = useS3Upload({
+  const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress } = useS3Upload({
     onError: (error) => console.error("Upload error:", error),
   });
-  const isBusy = isUploading || isAIChecking;
 
   useEffect(() => {
     setLoadError(false);
   }, [imageSrc]);
 
   async function handleAddPhoto() {
-    if (disabled || isBusy) return;
+    if (disabled || isUploading) return;
     
     try {
       const photo = await takePicture();
       if (photo?.dataUrl) {
-        const blob      = await dataUrlToBlob( photo.dataUrl );
-        const fileName  = name + '.' + photo.format; // generateFileName( photo.format );
-        const objectKey = `${name}/${fileName}`;
-        const fileUrl   = await uploadFile( blob, objectKey );
-        if (ai_method && onCheckAI) {
-          await onCheckAI({ method: ai_method, objectKey, fileUrl });
-        }
+        const blob      = await dataUrlToBlob(photo.dataUrl);
+        const fileUrl   = await uploadFile(blob, generateFileName( photo.format) );
         onChange(fileUrl);
       }
     } catch (error) {
@@ -76,14 +66,12 @@ export function ImageField({
   }
 
   async function removeImage() {
-    if (disabled || isBusy) return;
+    if (disabled || isUploading) return;
     
     try {
-        const prevUrl = value as string;
-        const response   = await delFileS3( prevUrl );
-        if (ai_method) {
-          pruneAiByFileUrl(ai_method, prevUrl);
-        }
+
+        const response   = await delFileS3( value as string );
+
         onChange( response );
 
     } catch (error) {
@@ -105,7 +93,7 @@ export function ImageField({
                 src={imageSrc}
                 alt={label}
                 className={styles.imagePreview}
-                onClick={() => !disabled && !isBusy && setModalOpen(true)}
+                onClick={() => !disabled && !isUploading && setModalOpen(true)}
                 onError={() => {
                   console.error('Failed to load image:', imageSrc);
                   setLoadError(true);
@@ -116,13 +104,7 @@ export function ImageField({
                 Не удалось загрузить превью — URL может быть без прав на чтение из браузера.
               </span>
             )}
-            {isAIChecking && (
-              <div className={styles.aiCheckingOverlay} aria-live="polite">
-                <IonSpinner name="crescent" />
-                <span className={styles.aiCheckingText}>Проверка изображения на ИИ…</span>
-              </div>
-            )}
-            {!disabled && !isBusy && (
+            {!disabled && !isUploading && (
               <IonButton
                 size="small"
                 fill="clear"
@@ -140,17 +122,12 @@ export function ImageField({
             fill="outline"
             className={styles.addButton}
             onClick={handleAddPhoto}
-            disabled={isBusy}
+            disabled={isUploading}
           >
             {isUploading ? (
               <>
                 <IonSpinner name="crescent" />
                 {progress > 0 && ` ${Math.round(progress)}%`}
-              </>
-            ) : isAIChecking ? (
-              <>
-                <IonSpinner name="crescent" />
-                <span className={styles.aiCheckingInline}>Проверка изображения ИИ…</span>
               </>
             ) : (
               <>
@@ -161,26 +138,18 @@ export function ImageField({
           </IonButton>
         )}
 
-        {(!disabled && imageSrc && !isBusy) && (
+        {(!disabled && imageSrc && !isUploading) && (
           <IonButton
             fill="clear"
             size="small"
             className={styles.replaceButton}
             onClick={handleAddPhoto}
-            disabled={isBusy}
+            disabled={isUploading}
           >
             <IonIcon icon={cameraOutline} className={styles.buttonIcon} />
             Заменить
           </IonButton>
         )}
-
-        {ai_method ? (
-          <AiStatusResultPanel
-            ai_method={ai_method}
-            ai_status={ai_status}
-            imageSrcForSingle={imageSrc}
-          />
-        ) : null}
       </div>
       
       {error && <span className={styles.errorMessage}>{error}</span>}
@@ -207,4 +176,4 @@ export function ImageField({
       </IonModal>
     </div>
   );
-}
+};

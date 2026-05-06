@@ -85,6 +85,13 @@ const App: React.FC = () => {
                     <Route path="/" exact={true}>
                       <Redirect to="/page/lics" />
                     </Route>
+                    <Route
+                      path="/page/apps/status/:appId"
+                      exact={true}
+                      render={({ match }) => (
+                        <Page key={`app-status-${match.params.appId}`} />
+                      )}
+                    />
                     <Route 
                       path="/page/:name" 
                       exact={true}

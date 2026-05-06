@@ -1,110 +1,210 @@
-// src/components/DataEditor/fields/ImageField.tsx
-import React, { useState }                            from "react";
-import { IonButton, IonIcon, IonModal }               from "@ionic/react";
-import { cameraOutline, trashOutline, closeOutline }  from "ionicons/icons";
-import { takePicture }                                from "../../Files";
-import styles                                         from './ImageField.module.css';
-
-// TODO: Добавить функцию toTIFF позже
+import React, { useEffect, useState } from "react";
+import { IonButton, IonIcon, IonModal, IonSpinner } from "@ionic/react";
+import { cameraOutline, trashOutline, closeOutline } from "ionicons/icons";
+import { takePicture } from "../../Files";
+import styles from "./ImageField.module.css";
+import { useS3Upload } from "../hooks/useS3Upload";
+import { AiStatusResultPanel } from "./AiStatusResultPanel";
+import { normalizeAiResultsArray, pickAiResultForImagesFieldDisplay } from "../../../utils/aiRequisites";
 
 interface ImagesFieldProps {
-  label:        string;
-  value:        string[];
-  onChange:     (value: any) => void;
+  doc?: string;
+  name?: string;
+  label: string;
+  value: string[];
+  ai_method?: string;
+  ai_status?: any;
+  onChange: (value: any) => void;
+  /** checkAI из useCheckAI; DataEditor кладёт снимок в `ai_status`. */
+  onCheckAI?: (args: { method: string; objectKey: string; fileUrl: string }) => Promise<any>;
+  isAIChecking?: boolean;
   placeholder?: string;
-  disabled?:    boolean;
-  error?:       string;
-  maxImages?:   number;
-  validate?:    boolean;
+  disabled?: boolean;
+  error?: string;
+  maxImages?: number;
+  validate?: boolean;
 }
 
-export const ImagesField: React.FC<ImagesFieldProps> = ({
+function normalizeList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.filter((x): x is string => typeof x === "string");
+  return [];
+}
+
+export function ImagesField({
+  doc,
+  name,
   label,
-  value = [],
+  value: valueProp,
+  ai_method = "",
+  ai_status = null,
   onChange,
+  onCheckAI,
+  isAIChecking = false,
   placeholder = "Добавьте изображения",
   disabled = false,
   error,
-  maxImages = 10
-}) => {
-  const [loading, setLoading] = useState(false);
+  maxImages = 10,
+}: ImagesFieldProps) {
+  const value = normalizeList(valueProp);
   const [modalImage, setModalImage] = useState<string | undefined>(undefined);
+  const [aiFocusedUrl, setAiFocusedUrl] = useState<string | null>(null);
 
-  async function handleAddPhoto() {
-    if (disabled || value.length >= maxImages) return;
-    
-    setLoading(true);
+  // Сводный результат: берём последний "чистый" снимок (без ошибок), иначе последнее непустое.
+  const aiSummary =
+    ai_method && Array.isArray(ai_status)
+      ? pickAiResultForImagesFieldDisplay(normalizeAiResultsArray(ai_status))
+      : ai_method
+        ? ai_status
+        : null;
+
+  const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress } = useS3Upload({
+    onError: (err) => console.error("ImagesField S3:", err),
+  });
+  
+  const isBusy = isUploading || isAIChecking;
+
+  useEffect(() => {
+    setAiFocusedUrl((f) => {
+      if (value.length === 0) return null;
+      if (f && value.includes(f)) return f;
+      return value[value.length - 1];
+    });
+  }, [value]);
+
+  const s3KeyForUpload  = (fileName: string) => [doc || "", name || "", fileName].filter(Boolean).join("/");
+
+
+  const handleAddPhoto  = async (): Promise<void> => {
+    if (disabled || isBusy || value.length >= maxImages) return;
+
     try {
       const photo = await takePicture();
-      if (photo?.dataUrl) {
-        onChange([...value, photo.dataUrl ]);
-      }
-    } catch (error) {
-      console.error("Ошибка добавления фото:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+      if (!photo?.dataUrl) return;
 
-  function removeImage(index: number) {
-    if (disabled) return;
-    const newImages = value.filter((_, i) => i !== index);
-    onChange(newImages);
-  }
+      const randomDigits = () => Math.floor(1000 + Math.random() * 9000).toString();
+
+      const pref = value.length > 0 ? value.length.toString() + "_" : "";
+
+      const blob = await dataUrlToBlob(photo.dataUrl);
+      const fileName = pref + (name || "") + "_" + randomDigits() + "." + photo.format;
+      const objectKey = s3KeyForUpload(fileName);
+
+      const fileUrl = await uploadFile(blob, objectKey);
+
+      if (ai_method && onCheckAI) {
+        await onCheckAI({ method: ai_method, objectKey, fileUrl });
+      }
+
+      await onChange([...value, fileUrl]);
+
+      setAiFocusedUrl(fileUrl);
+    } catch (e) {
+      console.error("Ошибка добавления фото:", e);
+    }
+  };
+
+  const removeImage     = async (index: number) => {
+    if (disabled || isBusy) return;
+    const url = value[index];
+    if (!url) return;
+
+    try {
+      await delFileS3(url);
+      const next = value.filter((_, i) => i !== index);
+      onChange(next);
+      setAiFocusedUrl((f) => {
+        if (f !== url) return f;
+        return next.length ? next[next.length - 1] : null;
+      });
+    } catch (e) {
+      console.error("Ошибка удаления фото:", e);
+    }
+  };
 
   return (
     <div className={styles.field}>
       <label className={styles.label}>{label}</label>
-      <div className={`${styles.imageWrapper} ${error ? styles.wrapperError : ''}`}>
-        
-        {/* Превью изображений */}
-        <div className={styles.imageGrid}>
-          {value.map((image, index) => (
-            <div key={index} className={styles.imageItem}>
-              <img 
-                src={ image } 
-                alt={`${label} ${index + 1}`}
-                className={styles.imageItem}
-                onClick={() => !disabled && setModalImage(image)}
-              />
-              {!disabled && (
-                <IonButton
-                  size="small"
-                  fill="clear"
-                  className={styles.removeButton}
-                  onClick={() => removeImage(index)}
-                >
-                  <IonIcon icon={trashOutline} />
-                </IonButton>
-              )}
+      <div className={`${styles.imageWrapper} ${error ? styles.wrapperError : ""}`}>
+        <div style={{ position: "relative" }}>
+          <div className={styles.imageGrid}>
+            {value.map((image, index) => (
+              <div key={`${image}-${index}`} className={styles.imageItem}>
+                <img
+                  src={image}
+                  alt={`${label} ${index + 1}`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: 6,
+                    cursor: disabled ? "default" : "pointer",
+                    outline:
+                      aiFocusedUrl === image ? "2px solid var(--ion-color-primary, #3880ff)" : undefined,
+                  }}
+                  onClick={() => {
+                    if (disabled || isBusy) return;
+                    setModalImage(image);
+                    setAiFocusedUrl(image);
+                  }}
+                />
+                {!disabled && !isBusy && (
+                  <IonButton
+                    size="small"
+                    fill="clear"
+                    className={styles.removeButton}
+                    onClick={() => void removeImage(index)}
+                  >
+                    <IonIcon icon={trashOutline} />
+                  </IonButton>
+                )}
+              </div>
+            ))}
+          </div>
+          {isAIChecking && (
+            <div className={styles.aiCheckingOverlay} aria-live="polite" style={{ maxWidth: "100%" }}>
+              <IonSpinner name="crescent" />
+              <span className={styles.aiCheckingText}>Проверка изображения на ИИ…</span>
             </div>
-          ))}
+          )}
         </div>
 
-        {/* Кнопка добавления */}
-        {(!disabled && value.length < maxImages) && (
+        {!disabled && value.length < maxImages && (
           <IonButton
             fill="outline"
             className={styles.addButton}
-            onClick={handleAddPhoto}
-            disabled={loading}
+            onClick={() => void handleAddPhoto()}
+            disabled={isBusy}
           >
-            <IonIcon icon={cameraOutline} className={styles.buttonIcon} />
-            {loading ? "Загрузка..." : placeholder}
+            {isUploading ? (
+              <>
+                <IonSpinner name="crescent" />
+                {progress > 0 && ` ${Math.round(progress)}%`}
+              </>
+            ) : isAIChecking ? (
+              <>
+                <IonSpinner name="crescent" />
+                <span className={styles.aiCheckingInline}>Проверка изображения ИИ…</span>
+              </>
+            ) : (
+              <>
+                <IonIcon icon={cameraOutline} className={styles.buttonIcon} />
+                {placeholder}
+              </>
+            )}
           </IonButton>
         )}
 
-        {/* Счетчик изображений */}
         {value.length > 0 && (
           <div className={styles.counter}>
             {value.length} из {maxImages}
           </div>
         )}
+
+        {ai_method ? <AiStatusResultPanel ai_method={ai_method} ai_status={aiSummary} /> : null}
       </div>
-      
+
       {error && <span className={styles.errorMessage}>{error}</span>}
-      
-      {/* Модальное окно просмотра */}
+
       <IonModal
         className={styles.modal}
         isOpen={modalImage !== undefined}
@@ -113,24 +213,15 @@ export const ImagesField: React.FC<ImagesFieldProps> = ({
         <div className={styles.modalContent}>
           <div className={styles.modalHeader}>
             <div className={styles.modalTitle}>{label}</div>
-            <IonButton
-              fill="clear"
-              onClick={() => setModalImage(undefined)}
-            >
+            <IonButton fill="clear" onClick={() => setModalImage(undefined)}>
               <IonIcon icon={closeOutline} />
             </IonButton>
           </div>
           <div className={styles.modalBody}>
-            {modalImage && (
-              <img 
-                src={modalImage} 
-                alt={label}
-                className={styles.modalImage}
-              />
-            )}
+            {modalImage && <img src={modalImage} alt={label} className={styles.modalImage} />}
           </div>
         </div>
       </IonModal>
     </div>
   );
-};
+}

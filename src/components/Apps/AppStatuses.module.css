@@ -1,0 +1,312 @@
+.wrap {
+    padding: 12px 16px 24px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.title {
+    margin: 0 0 8px 4px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    letter-spacing: -0.02em;
+}
+
+.contentCard {
+    margin: 0 4px 0;
+    --background: #ffffff;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 18px 16px 20px;
+}
+
+.subtitle {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    line-height: 1.4;
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 4px;
+}
+
+.row {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    position: relative;
+}
+
+.row:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 36px;
+    bottom: -4px;
+    width: 2px;
+    background: linear-gradient(
+        180deg,
+        rgba(var(--ion-color-primary-rgb), 0.35) 0%,
+        rgba(var(--ion-color-primary-rgb), 0.08) 100%
+    );
+    border-radius: 1px;
+}
+
+.dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--ion-color-primary-tint);
+    border: 3px solid var(--ion-color-primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.25);
+}
+
+.body {
+    flex: 1;
+    min-width: 0;
+    background: var(--ion-background-color);
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.12);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.periodRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--ion-color-medium);
+}
+
+.periodIcon {
+    font-size: 16px;
+    opacity: 0.85;
+}
+
+.periodText {
+    font-variant-numeric: tabular-nums;
+}
+
+.badge {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: none;
+}
+
+.aiBox {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(var(--ion-color-primary-rgb), 0.25);
+}
+
+.aiResultRow {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.aiResultLabel {
+    color: var(--ion-color-medium);
+}
+
+.aiOk {
+    color: var(--ion-color-success);
+    font-weight: 600;
+}
+
+.aiFail {
+    color: var(--ion-color-danger);
+    font-weight: 600;
+}
+
+.aiUnknown {
+    color: var(--ion-color-medium-shade);
+    font-weight: 600;
+}
+
+.aiFlags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.flagOk,
+.flagFail {
+    font-size: 12px;
+    line-height: 1.2;
+    border-radius: 16px;
+    padding: 4px 10px;
+    border: 1px solid transparent;
+}
+
+.flagOk {
+    color: var(--ion-color-success-shade);
+    border-color: rgba(var(--ion-color-success-rgb), 0.35);
+    background: rgba(var(--ion-color-success-rgb), 0.12);
+}
+
+.flagFail {
+    color: var(--ion-color-danger-shade);
+    border-color: rgba(var(--ion-color-danger-rgb), 0.35);
+    background: rgba(var(--ion-color-danger-rgb), 0.12);
+}
+
+/* Распознавание типа документа (is_*), не общий итог проверки */
+.flagTypeLabel {
+    font-weight: 600;
+}
+
+.flagTypeMatch,
+.flagTypeOther {
+    font-size: 12px;
+    line-height: 1.25;
+    border-radius: 16px;
+    padding: 4px 10px;
+    border: 1px solid transparent;
+}
+
+.flagTypeMatch {
+    color: var(--ion-color-primary-shade);
+    border-color: rgba(var(--ion-color-primary-rgb), 0.3);
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+}
+
+.flagTypeOther {
+    color: var(--ion-color-medium-shade);
+    border-color: rgba(var(--ion-color-medium-rgb), 0.35);
+    background: rgba(var(--ion-color-medium-rgb), 0.1);
+}
+
+.diffBox {
+    border-left: 3px solid rgba(var(--ion-color-danger-rgb), 0.45);
+    padding-left: 8px;
+}
+
+.diffTitle {
+    font-size: 12px;
+    color: var(--ion-color-danger-shade);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.diffRow {
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--ion-color-dark);
+    margin-bottom: 4px;
+}
+
+.noDiff {
+    font-size: 12px;
+    color: var(--ion-color-success-shade);
+}
+
+.aiMissing {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--ion-color-warning-shade);
+}
+
+.editActionButton {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
+    --border-radius: 10px;
+    --box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.35);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+    margin: 0;
+}
+
+.contractSigningRow {
+    padding-top: 4px;
+}
+
+.contractSigningDot {
+    border-color: var(--ion-color-warning);
+    background: rgba(var(--ion-color-warning-rgb), 0.22);
+}
+
+.contractSigningBody {
+    border-style: dashed;
+    border-color: rgba(var(--ion-color-warning-rgb), 0.5);
+}
+
+.contractSigningTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ion-color-warning-shade);
+    line-height: 1.4;
+}
+
+.contractCreatingRow {
+    padding-top: 4px;
+}
+
+.contractCreatingDot {
+    border-color: var(--ion-color-success);
+    background: rgba(var(--ion-color-success-rgb), 0.2);
+}
+
+.contractCreatingBody {
+    border-style: dashed;
+    border-color: rgba(var(--ion-color-success-rgb), 0.45);
+}
+
+.contractCreatingTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ion-color-success-shade);
+}
+
+.nextActionRow {
+    padding-top: 4px;
+}
+
+.nextActionDot {
+    border-color: var(--ion-color-warning);
+    background: rgba(var(--ion-color-warning-rgb), 0.22);
+}
+
+.nextActionBody {
+    border-style: dashed;
+    border-color: rgba(var(--ion-color-warning-rgb), 0.5);
+}
+
+.nextActionHeader {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ion-color-warning-shade);
+    margin-bottom: 6px;
+}
+
+.nextActionHint {
+    font-size: 12px;
+    color: var(--ion-color-medium);
+    margin-bottom: 10px;
+}
+
+.empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--ion-color-medium);
+    font-size: 15px;
+    line-height: 1.5;
+}

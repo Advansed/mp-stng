@@ -32,51 +32,51 @@ export const useLics    = () => {
   }, [token ]);
 
   // Методы
-  const refreshLics = () => {
+  const refreshLics   = () => {
     if (token) {
       getLics(token);
     }
   };
 
-  const selectLic = (licCode: string) => {
+  const selectLic     = (licCode: string) => {
     const lic = lics.find(l => l.code === licCode);
     setSelectedLic(lic || null);
   };
 
-  const addLic = async( lic: string ) => {
+  const addLic        = async( lic: string ) => {
       return await add_Lic( token || '', lic ) 
   }
 
-  const delLic = async( lic: string ) => {
+  const delLic        = async( lic: string ) => {
       return await del_Lic( token || '', lic )
   }
 
-  const setIndice = async( counters: LicCounter[] ) => {
+  const setIndice     = async( counters: LicCounter[] ) => {
       return await set_indice( token || '', counters )
   }
 
-  const sberPAY    = async( order: any ) => {
+  const sberPAY       = async( order: any ) => {
       order.token   = token || ''
       order.phone   = phone
       order.email   = email
       return await api('SBOL',  order )
   }
   
-  const equaring    = async( order: any ) => {
+  const equaring      = async( order: any ) => {
       order.token   = token || ''
       order.phone   = phone
       order.email   = email
-      return await api('SBOL', order )
+      return await api('VTB', order )
   }
 
-  const sbp         = async( order: any ) => {
+  const sbp           = async( order: any ) => {
       order.token   = token || ''
       order.phone   = phone
       order.email   = email
       return await api('SBP', order )
   }
   
-  const getpayments    = async(LC : string ) => {
+  const getpayments   = async(LC : string ) => {
       return await api('getPayments1', { token: token || '', LC: LC })
   }
 
