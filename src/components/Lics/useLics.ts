@@ -66,7 +66,7 @@ export const useLics    = () => {
       order.token   = token || ''
       order.phone   = phone
       order.email   = email
-      return await api('VTB', order )
+      return await api('SBOL', order )
   }
 
   const sbp         = async( order: any ) => {

@@ -1,9 +1,38 @@
-// src/components/Lics/FindLic.tsx
 import React, { useEffect, useState } from 'react';
-import { IonButton, IonCard, IonInput, IonItem, IonLoading } from '@ionic/react';
-import { useFindLic, type Ulus, type Settlement, type Street, type House, type Apartment, type Lic } from './useFindLic';
-import { AddAccountParams } from '../types';
-import { useToast } from '../../../Toast';
+import { 
+    IonButton, 
+    IonCard, 
+    IonInput, 
+    IonItem, 
+    IonLoading, 
+    IonIcon, 
+    IonLabel,
+    IonText
+} from '@ionic/react';
+import { 
+    closeCircleOutline, 
+    searchOutline, 
+    arrowForwardOutline,
+    chevronDownOutline 
+} from 'ionicons/icons';
+import { 
+    MapPin, 
+    Home, 
+    Building2, 
+    Hash, 
+    Navigation 
+} from 'lucide-react';
+import { 
+    useFindLic, 
+    type Ulus, 
+    type Settlement, 
+    type Street, 
+    type House, 
+    type Apartment, 
+    type Lic 
+} from './useFindLic';
+import { AddAccountParams, LicsPage } from '../types';
+import styles from './FindLic.module.css';
 
 interface FindLicProps {
   setPage: (page: number) => void;
@@ -13,438 +42,198 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
   const { state, loadSettlements, loadStreets, loadHouses, addAccount, setState } = useFindLic();
 
   useEffect(() => {
-    if(state.info.length === 0)
-      loadSettlements();
+    if (state.info.length === 0) {
+        loadSettlements();
+    }
   }, []);
 
-  // Обработчики для компонентов списков
-  const handleUlusSelect = (ulus: Ulus) => {
-    setState({ ulus });
-  };
-
-  const handleSettlementSelect = async (settlement: Settlement) => {
-    await loadStreets(settlement);
-  };
-
-  const handleStreetSelect = async (street: Street) => {
-    await loadHouses(street);
-  };
-
-  const handleHouseSelect = (house: House) => {
-    setState({ house });
-  };
-
-  const handleApartmentSelect = (apartment: Apartment) => {
-    setState({ kv: apartment });
-  };
-
-  const handleLicSelect = (lic: Lic) => {
-    setState({ lc: lic.code || '' });
-  };
-
   const handleSubmit = async () => {
-    if ( state.lc ) {
-      const res = await addAccount({ LC: state.lc } as AddAccountParams);
-      setPage(0);
+    if (state.lc) {
+      await addAccount({ LC: state.lc } as AddAccountParams);
+      setPage(LicsPage.MAIN);
     } else {
-      setPage(0);
+      setPage(LicsPage.MAIN);
     }
   };
 
-  const handleUlusClear = () => {
-    setState({ ulus: undefined, naspunkt: undefined, street: undefined, house: undefined, kv : undefined, lc : undefined });
-  };
-
-  const handleSettlementClear = () => {
-    setState({ naspunkt: undefined, street: undefined, house: undefined, kv : undefined, lc : undefined });
-  };
-
-    const handleStreetClear = () => {
-    setState({ street: undefined, house: undefined, kv : undefined, lc : undefined });
-  };
-
-  const handleHouseClear = () => {
-    setState({ house: undefined, kv : undefined, lc : undefined });
-  };
-
-  const handleKvClear = () => {
-    setState({ kv : undefined, lc : undefined });
-  };
-
-  const handlelcClear = () => {
-    setState({lc : undefined });
-  };
-
-
   return (
     <>
-      <IonLoading isOpen={state.load} message="Подождите..." />
-      <IonCard className="pb-1">
-        <div className="flex fl-space mt-1 ml-1">
-          <div className="cl-black">
-            <h4><b>Узнать лицевой счет</b></h4>
+      <IonLoading isOpen={state.load} message="Поиск данных..." spinner="crescent" />
+      
+      <IonCard className={`${styles.card} pb-1`}>
+        {/* Заголовок в стиле LicItem */}
+        <div className="flex fl-space mt-1 ml-1 mr-1">
+          <div className="cl-black fs-12">
+            <b>Узнать лицевой счет</b>
           </div>
+          <IonButton fill="clear" onClick={() => setPage(LicsPage.MAIN)}>
+            <IonIcon icon={closeCircleOutline} color="medium" slot="icon-only" />
+          </IonButton>
         </div>
 
-        {/* Выбор улуса */}
-        {state.info && (
-          <UlusList uluses = { state.info } onSelect={handleUlusSelect}  onClear={ handleUlusClear }/>
-        )}
+        {/* Инфо-строка разделитель */}
+        <div className="ml-1 mr-1 t-underline pb-05 fs-09 flex">
+          <Navigation size={16} className="w-15 h-15 cl-prim" />
+          <div className="ml-1 cl-prim"><b>Поиск по адресу</b></div>
+        </div>
 
-        {/* Выбор населенного пункта */}
-        {state.ulus && (
-          <SettlementList settlements={state.ulus.settlements} onSelect={handleSettlementSelect}   onClear={ handleSettlementClear } />
-        )}
-
-        {/* Выбор улицы */}
-        {state.naspunkt && (
-          <StreetList streets={state.naspunkt.streets} onSelect={handleStreetSelect}  onClear = { handleStreetClear }/>
-        )}
-
-        {/* Выбор дома */}
-        {state.street && (
-          <HouseList houses={state.street.houses} onSelect={handleHouseSelect} onClear = { handleHouseClear } />
-        )}
-
-        {/* Выбор квартиры */}
-        {( state.house && state.house.apartments ) && (
-          <ApartmentList apartments={state.house.apartments || []} onSelect={handleApartmentSelect}  onClear = { handleKvClear }/>
-        )}
-
-        {/* Выбор лицевого счета из дома */}
-        {state.house && state.house.lics && (
-          <LicList lics = { state.house.lics } onSelect = { handleLicSelect } onClear = { handlelcClear } />
-        )}
-
-        {/* Выбор лицевого счета из квартиры */}
-        {( state.kv && state.kv?.lics ) && (
-          <LicList 
-            lics = { state.kv.lics || [] }  
-            onSelect={handleLicSelect} onClear = { handlelcClear }
+        <div className="mt-1">
+          {/* 1. Выбор улуса */}
+          <SearchInput
+            label="Улус (Район)"
+            placeholder="Выберите район"
+            icon={<MapPin size={18} className="cl-prim mr-1" />}
+            items={state.info.map(u => ({ id: u.ulus, label: u.ulus, data: u }))}
+            selectedItem={state.ulus?.ulus}
+            onSelect={(item: any) => setState({ ulus: item.data })}
+            onClear={() => setState({ ulus: undefined, naspunkt: undefined, street: undefined, house: undefined, kv: undefined, lc: undefined })}
           />
-        )}
 
+          {/* 2. Выбор населенного пункта */}
+          {state.ulus && (
+            <SearchInput
+              label="Населенный пункт"
+              placeholder="Город / Село"
+              icon={<Building2 size={18} className="cl-prim mr-1" />}
+              items={state.ulus.settlements.map(s => ({ id: s.settlement, label: s.settlement, data: s }))}
+              selectedItem={state.naspunkt?.settlement}
+              onSelect={(item: any) => loadStreets(item.data)}
+              onClear={() => setState({ naspunkt: undefined, street: undefined, house: undefined, kv: undefined, lc: undefined })}
+            />
+          )}
+
+          {/* 3. Выбор улицы */}
+          {state.naspunkt && (
+            <SearchInput
+              label="Улица"
+              placeholder="Название улицы"
+              icon={<Navigation size={18} className="cl-prim mr-1" />}
+              items={state.naspunkt.streets.map(s => ({ id: s.street, label: s.street, data: s }))}
+              selectedItem={state.street?.street}
+              onSelect={(item: any) => loadHouses(item.data)}
+              onClear={() => setState({ street: undefined, house: undefined, kv: undefined, lc: undefined })}
+            />
+          )}
+
+          {/* 4. Выбор дома */}
+          {state.street && (
+            <SearchInput
+              label="Дом"
+              placeholder="Номер дома"
+              icon={<Home size={18} className="cl-prim mr-1" />}
+              items={state.street.houses.map(h => ({ id: h.house, label: h.house, data: h }))}
+              selectedItem={state.house?.house}
+              onSelect={(item: any) => setState({ house: item.data })}
+              onClear={() => setState({ house: undefined, kv: undefined, lc: undefined })}
+            />
+          )}
+
+          {/* 5. Выбор квартиры */}
+          {state.house?.apartments && state.house.apartments.length > 0 && (
+            <SearchInput
+              label="Квартира"
+              placeholder="№ Кв."
+              icon={<Hash size={18} className="cl-prim mr-1" />}
+              items={state.house.apartments.map(a => ({ id: a.apartment, label: `Кв. ${a.apartment}`, data: a }))}
+              selectedItem={state.kv?.apartment}
+              onSelect={(item: any) => setState({ kv: item.data })}
+              onClear={() => setState({ kv: undefined, lc: undefined })}
+            />
+          )}
+
+          {/* 6. Выбор Л/С */}
+          {(state.house?.lics || state.kv?.lics) && (
+            <SearchInput
+              label="Лицевой счет"
+              placeholder="Выберите Л/С"
+              icon={<Hash size={18} className="cl-prim mr-1" />}
+              items={(state.kv?.lics || state.house?.lics || []).map(l => ({ id: l.code, label: `Л/С ${l.code}`, data: l }))}
+              selectedItem={state.lc}
+              onSelect={(item: any) => setState({ lc: item.data.code })}
+              onClear={() => setState({ lc: undefined })}
+            />
+          )}
+        </div>
 
         {/* Кнопка действия */}
-        <div className="mt-1 ml-1 mr-1">
+        <div className={styles.buttonContainer}>
           <IonButton
             color="tertiary"
             expand="block"
             mode="ios"
+            className={styles.submitButton}
             onClick={handleSubmit}
           >
-            {state.lc ? "Добавить л/с" : "Закрыть"}
+            <IonIcon slot="start" icon={state.lc ? arrowForwardOutline : searchOutline} />
+            {state.lc ? "Добавить этот счет" : "Закрыть"}
           </IonButton>
         </div>
       </IonCard>
     </>
   );
-}
-
-// Компоненты Input с выпадающими списками
-
-interface UlusInputProps {
-  uluses: Ulus[];
-  selectedUlus?: Ulus;
-  onSelect: (ulus: Ulus) => void;
-  onClear: () => void;
-}
-
-const UlusList = ({ uluses, selectedUlus, onSelect, onClear }: UlusInputProps) => {
-  const [value, setValue] = useState(selectedUlus?.ulus || "");
-  const [focus, setFocus] = useState(false);
-
-  return (
-    <>
-      <div className="s-input mr-1 pl-1 pr-1 ml-2">
-        <IonInput
-          className="s-input-1"
-          placeholder="Улус (Район)"
-          value={value}
-          onIonInput={(e) => {
-            setValue(e.detail.value as string);
-            onClear();
-          }}
-          onIonFocus={() => setFocus(true)}
-          onIonBlur={() => setTimeout(() => setFocus(false), 200)}
-        />
-      </div>
-      {focus && (
-        <div className="ml-1 mr-1">
-          {uluses.map((ulus, ind) => {
-            if (ulus.ulus.toUpperCase().includes(value.toUpperCase())) {
-              return (
-                <IonItem
-                  key={ind}
-                  onClick={() => {
-                    setValue(ulus.ulus);
-                    onSelect(ulus);
-                    setFocus(false);
-                  }}
-                >
-                  {ulus.ulus}
-                </IonItem>
-              );
-            }
-            return null;
-          })}
-        </div>
-      )}
-    </>
-  );
 };
 
-interface SettlementInputProps {
-  settlements: Settlement[];
-  selectedSettlement?: Settlement;
-  onSelect: (settlement: Settlement) => void;
-  onClear: () => void;
-}
+/**
+ * Вспомогательный компонент для инпута с выпадающим списком
+ */
+const SearchInput = ({ label, placeholder, icon, items, onSelect, onClear, selectedItem }: any) => {
+  const [value, setValue] = useState(selectedItem || "");
+  const [isFocused, setIsFocused] = useState(false);
 
-const SettlementList = ({ settlements, selectedSettlement, onSelect, onClear }: SettlementInputProps) => {
-  const [value, setValue] = useState(selectedSettlement?.settlement || "");
-  const [focus, setFocus] = useState(false);
+  // Синхронизация внутреннего значения при выборе из списка или очистке сверху
+  useEffect(() => {
+    setValue(selectedItem || "");
+  }, [selectedItem]);
 
-  return (
-    <>
-      <div className="s-input mr-1 pl-1 pr-1 ml-2 mt-1">
-        <IonInput
-          className="s-input-1"
-          placeholder="Населенный пункт"
-          value={value}
-          onIonInput={(e) => {
-            setValue(e.detail.value as string);
-            onClear();
-          }}
-          onIonFocus={() => setFocus(true)}
-          onIonBlur={() => setTimeout(() => setFocus(false), 200)}
-        />
-      </div>
-      {focus && (
-        <div className="ml-1 mr-1">
-          {settlements.map((settlement, ind) => {
-            if (settlement.settlement.toUpperCase().includes(value.toUpperCase())) {
-              return (
-                <IonItem
-                  key={ind}
-                  onClick={() => {
-                    setValue(settlement.settlement);
-                    onSelect(settlement);
-                    setFocus(false);
-                  }}
-                >
-                  {settlement.settlement}
-                </IonItem>
-              );
-            }
-            return null;
-          })}
-        </div>
-      )}
-    </>
+  const filtered = items.filter((i: any) => 
+    value === "" || i.label.toLowerCase().includes(value.toLowerCase())
   );
-};
-
-interface StreetInputProps {
-  streets: Street[];
-  selectedStreet?: Street;
-  onSelect: (street: Street) => void;
-  onClear: () => void;
-}
-
-const StreetList = ({ streets, selectedStreet, onSelect, onClear }: StreetInputProps) => {
-  const [value, setValue] = useState(selectedStreet?.street || "");
-  const [focus, setFocus] = useState(false);
 
   return (
-    <>
-      <div className="s-input mr-1 pl-1 pr-1 ml-2 mt-1">
-        <IonInput
-          className="s-input-1"
-          placeholder="Улица"
-          value={value}
-          onIonInput={(e) => {
-            setValue(e.detail.value as string);
-            onClear();
-          }}
-          onIonFocus={() => setFocus(true)}
-          onIonBlur={() => setTimeout(() => setFocus(false), 200)}
-        />
+    <div className="mb-05">
+      <label className={styles.inputLabel}>{label}</label>
+      <div className={`${styles.inputWrapper} ${isFocused ? styles.inputWrapperFocus : ''}`}>
+        <IonItem lines="none" className={styles.inputItem}>
+          {icon}
+          <IonInput
+            value={value}
+            placeholder={placeholder}
+            onIonInput={(e) => {
+              setValue(e.detail.value!);
+              onClear();
+            }}
+            onIonFocus={() => setIsFocused(true)}
+            onIonBlur={() => setTimeout(() => setIsFocused(false), 250)}
+          />
+          <IonIcon 
+            icon={chevronDownOutline} 
+            color="medium" 
+            style={{ fontSize: '14px', transition: 'transform 0.2s', transform: isFocused ? 'rotate(180deg)' : 'none' }} 
+          />
+        </IonItem>
       </div>
-      {focus && (
-        <div className="ml-1 mr-1">
-          {streets.map((street, ind) => {
-            if (street.street.toUpperCase().includes(value.toUpperCase())) {
-              return (
-                <IonItem
-                  key={ind}
-                  onClick={() => {
-                    setValue(street.street);
-                    onSelect(street);
-                    setFocus(false);
-                  }}
-                >
-                  {street.street}
-                </IonItem>
-              );
-            }
-            return null;
-          })}
+      
+      {isFocused && filtered.length > 0 && (
+        <div className={styles.dropdownList}>
+          {filtered.map((item: any) => (
+            <IonItem 
+              button 
+              detail={false}
+              key={item.id} 
+              className={styles.dropdownItem}
+              onMouseDown={(e) => {
+                // Предотвращаем потерю фокуса до выбора
+                e.preventDefault();
+                setValue(item.label);
+                onSelect(item);
+                setIsFocused(false);
+              }}
+            >
+              <IonLabel>{item.label}</IonLabel>
+            </IonItem>
+          ))}
         </div>
       )}
-    </>
-  );
-};
-
-interface HouseInputProps {
-  houses: House[];
-  selectedHouse?: House;
-  onSelect: (house: House) => void;
-  onClear: () => void;
-}
-
-const HouseList = ({ houses, selectedHouse, onSelect, onClear }: HouseInputProps) => {
-  const [value, setValue] = useState(selectedHouse?.house || "");
-  const [focus, setFocus] = useState(false);
-
-  return (
-    <>
-      <div className="s-input mr-1 pl-1 pr-1 ml-2 mt-1">
-        <IonInput
-          className="s-input-1"
-          placeholder="Дом"
-          value={value}
-          onIonInput={(e) => {
-            setValue(e.detail.value as string);
-            onClear();
-          }}
-          onIonFocus={() => setFocus(true)}
-          onIonBlur={() => setTimeout(() => setFocus(false), 200)}
-        />
-      </div>
-      {focus && (
-        <div className="ml-1 mr-1">
-          {houses.map((house, ind) => {
-            if (house.house.toUpperCase().includes(value.toUpperCase())) {
-              return (
-                <IonItem
-                  key={ind}
-                  onClick={() => {
-                    setValue(house.house);
-                    onSelect(house);
-                    setFocus(false);
-                  }}
-                >
-                  {house.house}
-                </IonItem>
-              );
-            }
-            return null;
-          })}
-        </div>
-      )}
-    </>
-  );
-};
-
-interface ApartmentInputProps {
-  apartments: Apartment[];
-  selectedApartment?: string;
-  onSelect: (apartment: Apartment) => void;
-  onClear: () => void;
-}
-
-const ApartmentList = ({ apartments, selectedApartment, onSelect, onClear }: ApartmentInputProps) => {
-  const [value, setValue] = useState(selectedApartment || "");
-  const [focus, setFocus] = useState(false);
-
-  return (
-    <>
-      <div className="s-input mr-1 pl-1 pr-1 ml-2 mt-1">
-        <IonInput
-          className="s-input-1"
-          placeholder="Квартира"
-          value={value}
-          onIonInput={(e) => {
-            setValue(e.detail.value as string);
-            onClear();
-          }}
-          onIonFocus={() => setFocus(true)}
-          onIonBlur={() => setTimeout(() => setFocus(false), 200)}
-        />
-      </div>
-      {focus && (
-        <div className="ml-1 mr-1">
-          {apartments.map((apartment, ind) => {
-            if (apartment.apartment.toUpperCase().includes(value.toUpperCase())) {
-              return (
-                <IonItem
-                  key={ind}
-                  onClick={() => {
-                    setValue(apartment.apartment);
-                    onSelect(apartment);
-                    setFocus(false);
-                  }}
-                >
-                  Кв. {apartment.apartment}
-                </IonItem>
-              );
-            }
-            return null;
-          })}
-        </div>
-      )}
-    </>
-  );
-};
-
-interface LicInputProps {
-  lics: Lic[];
-  selectedLic?: string;
-  onSelect: (lic: Lic) => void;
-  onClear: () => void;
-}
-
-const LicList = ({ lics, selectedLic, onSelect, onClear }: LicInputProps) => {
-  const [value, setValue] = useState(selectedLic || "");
-  const [focus, setFocus] = useState(false);
-
-  return (
-    <>
-      <div className="s-input mr-1 pl-1 pr-1 ml-2 mt-1">
-        <IonInput
-          className="s-input-1"
-          placeholder="Лицевой счет"
-          value={value}
-          onIonInput={(e) => {
-            setValue(e.detail.value as string);
-            onClear();
-          }}
-          onIonFocus={() => setFocus(true)}
-          onIonBlur={() => setTimeout(() => setFocus(false), 200)}
-        />
-      </div>
-      {focus && (
-        <div className="ml-1 mr-1">
-          {lics.map((lic, ind) => {
-            if (lic.code.toUpperCase().includes(value.toUpperCase())) {
-              return (
-                <IonItem
-                  key={ind}
-                  onClick={() => {
-                    setValue(lic.code);
-                    onSelect(lic);
-                    setFocus(false);
-                  }}
-                >
-                  Л/С {lic.code}
-                </IonItem>
-              );
-            }
-            return null;
-          })}
-        </div>
-      )}
-    </>
+    </div>
   );
 };

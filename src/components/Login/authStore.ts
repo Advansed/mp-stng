@@ -345,7 +345,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       const res = await api('restore', { phone });
-
+      console.log('restore', res )
       if (!res.error && res.data?.data) {
         const user = res.data.data as AuthUser;
         

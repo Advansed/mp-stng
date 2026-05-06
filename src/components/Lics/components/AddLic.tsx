@@ -1,84 +1,116 @@
-import React, { useState } from 'react'
-import { IonCard, IonInput, IonButton, IonLoading } from '@ionic/react'
-import { LicsPage } from './types'
-import { useToast } from '../../Toast'
+import React, { useState } from 'react';
+import { 
+    IonCard, 
+    IonInput, 
+    IonButton, 
+    IonLoading, 
+    IonItem, 
+    IonIcon, 
+    IonLabel 
+} from '@ionic/react';
+import { closeCircleOutline, addOutline } from 'ionicons/icons';
+import { User, CreditCard } from 'lucide-react'; // Используем те же иконки
+import { LicsPage } from './types';
+import { useToast } from '../../Toast';
+
+import styles from './AddLic.module.css';
 
 interface Props {
-    setPage:    ( page: number ) => void,
-    addLic:     ( lic: string ) => Promise<any>
+    setPage: (page: number) => void;
+    addLic: (lic: string) => Promise<any>;
 }
 
 export function AddLic({ setPage, addLic }: Props) {
-    
-    const [form,    setForm]    = useState({ LC: "" })
-    const [message, setMessage] = useState("")
-    const [loading, setLoading] = useState(false)
-    const toast = useToast()
+    const [form, setForm] = useState({ LC: "" });
+    const [isFocused, setIsFocused] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const toast = useToast();
 
     async function handleAdd() {
-        setLoading(true)
-        const res = await addLic( form.LC )
-        if(res.error) toast.error(res.message)
-        else toast.success("Лицевой счет добавлен")
-        setLoading(false)       
+        if (!form.LC.trim()) {
+            toast.error("Введите номер лицевого счета");
+            return;
+        }
 
-        setPage( LicsPage.MAIN )
+        setLoading(true);
+        const res = await addLic(form.LC);
+        setLoading(false);
 
-    }   
+        if (res.error) {
+            toast.error(res.message);
+        } else {
+            toast.success("Лицевой счет добавлен");
+            setPage(LicsPage.MAIN);
+        }
+    }
 
-    return <>
+    return (
+        <>
+            <IonLoading isOpen={loading} message="Подождите..." />
 
-        <IonLoading isOpen={ loading } message="Подождите..." />
+            <IonCard className={`${styles.card} pb-1`}>
+                {/* Заголовок в стиле LicItem */}
+                <div className="flex fl-space mt-1 ml-1 mr-1">
+                    <div className="cl-black fs-12">
+                        <b>Новый лицевой счет</b>
+                    </div>
+                    <IonButton fill="clear" onClick={() => setPage(LicsPage.MAIN)}>
+                        <IonIcon icon={closeCircleOutline} color="medium" slot="icon-only" />
+                    </IonButton>
+                </div>
 
-        <IonCard className='pb-1'>
-            
-            <div className='flex fl-space mt-1 ml-1'>
-                <h4><b>Новый лицевой счет</b></h4>
-            </div>
-            
-            <div className='ml-1 mr-1 t-underline s-input'>
-                <IonInput
-                    className='s-input-1 ml-1'
-                    placeholder='Номер л/с'
-                    value={form.LC}
-                    mode="ios"
-                    onIonInput={(e) => {
-                        setForm(prev => ({ ...prev, LC: e.detail.value as string }))
-                        setMessage("")
-                    }}
-                />
-            </div>
-            
-            {/* <div className='ml-1 mr-1 mt-1 t-underline s-input'>
-                <IonInput
-                    className='s-input-1 ml-1'
-                    placeholder='Первые три буквы фамилии'
-                    value={form.fio}
-                    maxlength={3}
-                    mode="ios"
-                    onIonInput={(e) => {
-                        setForm(prev => ({ ...prev, fio: e.detail.value as string }))
-                        setMessage("")
-                    }}
-                />
-            </div> */}
-            
-            { message && <div className='ml-1 mr-1'><p>{message}</p></div> }
-            
-            <div className='ml-1 mr-1'>
-                <IonButton
-                    color="tertiary"
-                    expand="block"
-                    mode="ios"
-                    onClick={() => {
-                        setMessage("")
-                        form.LC  ? handleAdd() : setPage(0)
-                    }}
-                >
-                    {form.LC  ? "Добавить" : "Закрыть"}
-                </IonButton>
-            </div>
+                {/* Инфо-строка как в LicItem */}
+                <div className="ml-1 mr-1 t-underline pb-05 fs-09 flex">
+                    <div>
+                        <User size={16} className="w-15 h-15 cl-prim" />
+                    </div>
+                    <div className="ml-1 cl-prim"><b>Добавить л/с</b></div>
+                </div>
 
-        </IonCard>
-    </>
+                {/* Поле ввода с видимыми краями */}
+                <div className="mt-1 ml-1 mr-1">
+                    <div className="fs-08 cl-gray ml-05 mb-05">Введите номер л/с:</div>
+                    <div className={`
+                        ${styles.inputWrapper} 
+                        ${isFocused ? styles.inputWrapperFocus : ''}
+                    `}>
+                        <IonItem lines="none" className={styles.inputItem}>
+                            <CreditCard size={18} className="cl-prim mr-1" />
+                            <IonInput
+                                value={form.LC}
+                                placeholder="000000000"
+                                mode="md"
+                                onIonFocus={() => setIsFocused(true)}
+                                onIonBlur={() => setIsFocused(false)}
+                                onIonInput={(e) => setForm({ ...form, LC: e.detail.value! })}
+                            />
+                        </IonItem>
+                    </div>
+                </div>
+
+                {/* Кнопки действий в стиле сегментов/кнопок LicItem */}
+                <div className={styles.buttonGroup}>
+                    <IonButton
+                        mode="ios"
+                        color="tertiary"
+                        className={`${styles.actionButton} fs-09`}
+                        onClick={handleAdd}
+                    >
+                        <IonIcon icon={addOutline} slot="start" />
+                        <IonLabel>Добавить</IonLabel>
+                    </IonButton>
+                    
+                    <IonButton
+                        mode="ios"
+                        fill="outline"
+                        color="medium"
+                        className={`${styles.actionButton} fs-09`}
+                        onClick={() => setPage(LicsPage.MAIN)}
+                    >
+                        <IonLabel>Отмена</IonLabel>
+                    </IonButton>
+                </div>
+            </IonCard>
+        </>
+    );
 }

@@ -1,0 +1,50 @@
+.card {
+    margin: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .headerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .inputWrapper {
+    margin: 15px 10px;
+    padding: 8px 12px;
+    border: 1px solid #c0c0c0;
+    border-radius: 8px;
+    background: #fdfdfd;
+    transition: border-color 0.2s;
+  }
+  
+  .inputWrapperFocus {
+    border-color: var(--ion-color-primary);
+    background: #fff;
+  }
+  
+  .inputWrapperError {
+    border-color: var(--ion-color-danger);
+  }
+  
+  .inputItem {
+    --background: transparent;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --highlight-height: 0;
+    font-size: 1.1em;
+  }
+  
+  .buttonGroup {
+    padding: 0 10px 10px 10px;
+    display: flex;
+    gap: 8px;
+  }
+  
+  .actionButton {
+    --border-radius: 8px;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+  }

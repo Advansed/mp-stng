@@ -15,6 +15,7 @@ export function RestoreForm({ onNavigate, onRestore }: RestoreFormProps) {
 
     const handleRestore = async() => {
         const res = await  onRestore ( info.phone )  
+        console.log('restre', res)
         if(res)    
             onNavigate('SMS')
     
