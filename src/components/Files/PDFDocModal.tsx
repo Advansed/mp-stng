@@ -12,7 +12,7 @@ import {
     IonItem,
     IonLabel
 } from '@ionic/react';
-import { closeOutline, shareOutline, downloadOutline, printOutline, mailOutline } from 'ionicons/icons';
+import { closeOutline, downloadOutline, printOutline, mailOutline } from 'ionicons/icons';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { 
     RenderCurrentScaleProps, 

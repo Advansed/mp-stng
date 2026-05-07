@@ -55,12 +55,16 @@ export const LicItem: FC<LicItemProps> = ({ info, setItem, setPage, delAccount }
         elem = <>
             { elem }
             <div className='flex fl-space ml-1 mr-1 mt-1 fs-09'>
-                <div><b>{ item.debts[i].label }</b></div>
+                <div><b>{ 
+                  (item.debts[i].label === 'Газоснабжение природным газом' ? 'Газоснабжение' 
+                    : item.debts[i].label === 'Техническое обслуживание' ? 'Тех. обслуживание' 
+                    : item.debts[i].label)
+                }</b></div>
                 <div className={ item.debts[i].sum === 0 ? 'cl-prim' : (item.debts[i].sum < 0 ? 'cl-green' : 'cl-red1') }>
                     <b>
                         { new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( 
                             item.debts[i].sum  < 0 ? -item.debts[i].sum : item.debts[i].sum
-                        )}
+                        ) + (item.debts[i].sum < 0 ? ' (аванс)' : item.debts[i].sum === 0 ? '' : ' (долг)')}
                     </b>
                 </div>
             </div>

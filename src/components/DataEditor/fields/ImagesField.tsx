@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IonButton, IonIcon, IonModal, IonSpinner } from "@ionic/react";
-import { cameraOutline, trashOutline, closeOutline } from "ionicons/icons";
-import { takePicture } from "../../Files";
+import { cameraOutline, trashOutline, closeOutline, documentTextOutline } from "ionicons/icons";
+import { PickSource } from "../../Files";
 import styles from "./ImageField.module.css";
 import { useS3Upload } from "../hooks/useS3Upload";
 import { AiStatusResultPanel } from "./AiStatusResultPanel";
@@ -30,6 +30,12 @@ function normalizeList(v: unknown): string[] {
   return [];
 }
 
+function isPdfSrc(src: string): boolean {
+  if (!src) return false;
+  if (src.startsWith("data:application/pdf")) return true;
+  return /\.pdf($|[?#])/i.test(src);
+}
+
 export function ImagesField({
   doc,
   name,
@@ -46,7 +52,7 @@ export function ImagesField({
   maxImages = 10,
 }: ImagesFieldProps) {
   const value = normalizeList(valueProp);
-  const [modalImage, setModalImage] = useState<string | undefined>(undefined);
+  const [modalFile, setModalFile] = useState<{ url: string; isPdf: boolean } | undefined>(undefined);
   const [aiFocusedUrl, setAiFocusedUrl] = useState<string | null>(null);
 
   // Сводный результат: берём последний "чистый" снимок (без ошибок), иначе последнее непустое.
@@ -78,7 +84,7 @@ export function ImagesField({
     if (disabled || isBusy || value.length >= maxImages) return;
 
     try {
-      const photo = await takePicture();
+      const photo = await PickSource();
       if (!photo?.dataUrl) return;
 
       const randomDigits = () => Math.floor(1000 + Math.random() * 9000).toString();
@@ -129,24 +135,53 @@ export function ImagesField({
           <div className={styles.imageGrid}>
             {value.map((image, index) => (
               <div key={`${image}-${index}`} className={styles.imageItem}>
-                <img
-                  src={image}
-                  alt={`${label} ${index + 1}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    borderRadius: 6,
-                    cursor: disabled ? "default" : "pointer",
-                    outline:
-                      aiFocusedUrl === image ? "2px solid var(--ion-color-primary, #3880ff)" : undefined,
-                  }}
-                  onClick={() => {
-                    if (disabled || isBusy) return;
-                    setModalImage(image);
-                    setAiFocusedUrl(image);
-                  }}
-                />
+                {isPdfSrc(image) ? (
+                  <div
+                    className={styles.pdfThumb}
+                    style={{
+                      cursor: disabled ? "default" : "pointer",
+                      outline:
+                        aiFocusedUrl === image ? "2px solid var(--ion-color-primary, #3880ff)" : undefined,
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      if (disabled || isBusy) return;
+                      setModalFile({ url: image, isPdf: true });
+                      setAiFocusedUrl(image);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        if (disabled || isBusy) return;
+                        setModalFile({ url: image, isPdf: true });
+                        setAiFocusedUrl(image);
+                      }
+                    }}
+                  >
+                    <IonIcon icon={documentTextOutline} className={styles.pdfIcon} />
+                    <span className={styles.pdfThumbLabel}>PDF</span>
+                  </div>
+                ) : (
+                  <img
+                    src={image}
+                    alt={`${label} ${index + 1}`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: 6,
+                      cursor: disabled ? "default" : "pointer",
+                      outline:
+                        aiFocusedUrl === image ? "2px solid var(--ion-color-primary, #3880ff)" : undefined,
+                    }}
+                    onClick={() => {
+                      if (disabled || isBusy) return;
+                      setModalFile({ url: image, isPdf: false });
+                      setAiFocusedUrl(image);
+                    }}
+                  />
+                )}
                 {!disabled && !isBusy && (
                   <IonButton
                     size="small"
@@ -207,18 +242,22 @@ export function ImagesField({
 
       <IonModal
         className={styles.modal}
-        isOpen={modalImage !== undefined}
-        onDidDismiss={() => setModalImage(undefined)}
+        isOpen={modalFile !== undefined}
+        onDidDismiss={() => setModalFile(undefined)}
       >
         <div className={styles.modalContent}>
           <div className={styles.modalHeader}>
             <div className={styles.modalTitle}>{label}</div>
-            <IonButton fill="clear" onClick={() => setModalImage(undefined)}>
+            <IonButton fill="clear" onClick={() => setModalFile(undefined)}>
               <IonIcon icon={closeOutline} />
             </IonButton>
           </div>
           <div className={styles.modalBody}>
-            {modalImage && <img src={modalImage} alt={label} className={styles.modalImage} />}
+            {modalFile?.isPdf ? (
+              <iframe src={modalFile.url} title={label} className={styles.modalPdf} />
+            ) : (
+              modalFile?.url && <img src={modalFile.url} alt={label} className={styles.modalImage} />
+            )}
           </div>
         </div>
       </IonModal>

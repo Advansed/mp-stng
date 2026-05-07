@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { IonButton, IonIcon, IonModal, IonSpinner } from "@ionic/react";
 import { cameraOutline, trashOutline, closeOutline } from "ionicons/icons";
-import { takePicture } from "../../Files";
+import { PickSource } from "../../Files";
 import styles from './ImageField.module.css';
 import { useS3Upload } from "../hooks/useS3Upload";
 
@@ -54,7 +54,7 @@ export const PassportFront: React.FC<ImageFieldProps> = ({
     if (disabled || isUploading) return;
     
     try {
-      const photo = await takePicture();
+      const photo = await PickSource();
       if (photo?.dataUrl) {
         const blob      = await dataUrlToBlob(photo.dataUrl);
         const fileUrl   = await uploadFile(blob, generateFileName( photo.format) );

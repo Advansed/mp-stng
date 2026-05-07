@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import "./Appeals.css"
 import { cameraOutline, imageOutline, syncCircleOutline } from "ionicons/icons"
 import { useAppeals } from "./useAppeals"
-import { takePicture } from "../Files"
+import { PickSource } from "../Files"
 import { useNavigateStore } from "../../Store/navigateStore"
 
 export function Appeals() {
@@ -102,7 +102,7 @@ function Messages({ appeal }: { appeal: any }) {
     }
 
     const handleSendPhoto = async () => {
-        const img = await takePicture()
+        const img = await PickSource()
         await resizeImage(img) // TODO: Перенести функцию Size сюда
         await sendAppealMessage("", img)
     }

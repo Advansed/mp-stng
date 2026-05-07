@@ -9,7 +9,7 @@ import styles from './AppStatuses.module.css'
 
 const STATUS_LABELS: Record<string, string> = {
   new: 'Новая',
-  ai_checked: 'Проверено ИИ',
+  ai_checked: 'Проверка документов',
   created: 'Договор создан',
 }
 
@@ -312,7 +312,7 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
                     {ai && (
                       <div className={styles.aiBox}>
                         <div className={styles.aiResultRow}>
-                          <span className={styles.aiResultLabel}>Результат ИИ:</span>
+                          <span className={styles.aiResultLabel}>Результат проверки:</span>
                           <span
                             className={
                               verdict === 'passed'
@@ -338,7 +338,7 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
                                 className={line.matchesType ? styles.flagTypeMatch : styles.flagTypeOther}
                                 title={
                                   line.hasError
-                                    ? 'ИИ отметил замечание по этому файлу (не равно «проверка не пройдена» целиком)'
+                                    ? 'Проверка отметила замечание по этому файлу (не равно «проверка не пройдена» целиком)'
                                     : undefined
                                 }
                               >
@@ -354,7 +354,7 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
 
                     {!ai && isAIStatusRow(row.status) && (
                       <div className={styles.aiMissing}>
-                        Данные проверки ИИ не найдены в этом статусе (ожидался объект `ai_status` с `checks`).
+                        Данные проверки не найдены в этом статусе (ожидался объект `ai_status` с `checks`).
                       </div>
                     )}
 

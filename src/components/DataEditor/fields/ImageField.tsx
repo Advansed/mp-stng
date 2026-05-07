@@ -1,8 +1,8 @@
 // src/components/DataEditor/fields/ImageFieldV2.tsx
 import React, { useEffect, useState } from "react";
 import { IonButton, IonIcon, IonModal, IonSpinner } from "@ionic/react";
-import { cameraOutline, trashOutline, closeOutline } from "ionicons/icons";
-import { takePicture } from "../../Files";
+import { cameraOutline, trashOutline, closeOutline, documentTextOutline } from "ionicons/icons";
+import { PickSource } from "../../Files";
 import styles from './ImageField.module.css';
 import { useS3Upload } from "../hooks/useS3Upload";
 import { AiStatusResultPanel } from "./AiStatusResultPanel";
@@ -29,6 +29,12 @@ function normalizeImageSrc(v: unknown): string {
   return '';
 }
 
+function isPdfSrc(src: string): boolean {
+  if (!src) return false;
+  if (src.startsWith("data:application/pdf")) return true;
+  return /\.pdf($|[?#])/i.test(src);
+}
+
 export function ImageField({
   name,
   label,
@@ -45,6 +51,7 @@ export function ImageField({
   const [modalOpen, setModalOpen] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const imageSrc = normalizeImageSrc(value);
+  const isPdf = isPdfSrc(imageSrc);
 
   const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress, pruneAiByFileUrl } = useS3Upload({
     onError: (error) => console.error("Upload error:", error),
@@ -59,7 +66,7 @@ export function ImageField({
     if (disabled || isBusy) return;
     
     try {
-      const photo = await takePicture();
+      const photo = await PickSource();
       if (photo?.dataUrl) {
         const blob      = await dataUrlToBlob( photo.dataUrl );
         const fileName  = name + '.' + photo.format; // generateFileName( photo.format );
@@ -99,7 +106,23 @@ export function ImageField({
         
         {imageSrc && (
           <div className={styles.imageContainer}>
-            {!loadError ? (
+            {isPdf ? (
+              <div
+                className={styles.pdfPreview}
+                role="button"
+                tabIndex={0}
+                onClick={() => !disabled && !isBusy && setModalOpen(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    if (!disabled && !isBusy) setModalOpen(true);
+                  }
+                }}
+              >
+                <IonIcon icon={documentTextOutline} className={styles.pdfIcon} />
+                <span className={styles.pdfLabel}>PDF документ</span>
+              </div>
+            ) : !loadError ? (
               <img
                 key={imageSrc}
                 src={imageSrc}
@@ -194,7 +217,7 @@ export function ImageField({
             </IonButton>
           </div>
           <div className={styles.modalBody}>
-            {imageSrc && (
+            {imageSrc && !isPdf && (
               <img
                 key={`modal-${imageSrc}`}
                 src={imageSrc}
@@ -202,6 +225,7 @@ export function ImageField({
                 className={styles.modalImage}
               />
             )}
+            {imageSrc && isPdf && <iframe src={imageSrc} title={label} className={styles.modalPdf} />}
           </div>
         </div>
       </IonModal>

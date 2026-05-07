@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { actionSheetController } from '@ionic/core/components';
 import { cameraOutline, sendOutline } from "ionicons/icons";
 import { jsPDF } from "jspdf";
 import { FilePicker } from '@capawesome/capacitor-file-picker';
@@ -13,25 +14,73 @@ import '@react-pdf-viewer/zoom/lib/styles/index.css';
 
 defineCustomElements(window)
 
-export async function    takePicture() {
-    const image = await Camera.getPhoto({
-      quality: 90,
-      allowEditing: false,
-      resultType: CameraResultType.DataUrl,
-      source: CameraSource.Prompt
+type PickSource = 'camera' | 'gallery' | 'pdf'
+
+async function pickSource(): Promise<PickSource | null> {
+    const actionSheet = await actionSheetController.create({
+        header: "Выберите источник",
+        buttons: [
+            { text: "Сделать фото", data: { source: "camera" } },
+            { text: "Выбрать из галереи", data: { source: "gallery" } },
+            { text: "Выбрать PDF", data: { source: "pdf" } },
+            { text: "Отмена", role: "cancel" },
+        ],
     });
-    //const imageUrl = "data:image/jpeg;base64," + image.base64String;
-    let arr = image.dataUrl?.split(";")
-    if(arr !== undefined) {
-        arr = arr[0].split("/")
-        image.format = arr[1]
-    }
-    return image
-  
+
+    await actionSheet.present();
+    const result = await actionSheet.onDidDismiss<{ source?: PickSource }>();
+    return result.data?.source ?? null;
 }
 
+async function getPhotoFromSource(source: CameraSource) {
+    const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source,
+    });
 
-export async function toPDF( pages, name ) {
+    const dataUrl = image.dataUrl || "";
+    const mimePrefix = dataUrl.split(";")[0] || "";
+    const format = mimePrefix.includes("/") ? mimePrefix.split("/")[1] : image.format || "jpeg";
+
+    return {
+        ...image,
+        format,
+    };
+}
+
+export async function       PickSource() {
+    const source = await pickSource();
+    if (!source) throw new Error("Файл не выбран");
+
+    if (source === "pdf") {
+        const pdf = await pickPdfFile();
+        if (!pdf) throw new Error("PDF не выбран");
+        return pdf;
+    }
+
+    if (source === "gallery") {
+        return getPhotoFromSource(CameraSource.Photos);
+    }
+
+    return getPhotoFromSource(CameraSource.Camera);
+}
+
+export const takePicture = PickSource;
+
+export async function       pickPdfFile() {
+    const res = await FilePicker.pickFiles({ types: ['application/pdf'], readData: true });
+    const fileData = res.files[0]?.data;
+    if (!fileData) return null;
+
+    return {
+        dataUrl: "data:application/pdf;base64," + fileData,
+        format: "pdf",
+    };
+}
+
+export async function       toPDF( pages, name ) {
     const doc = new jsPDF('p', 'mm', 'a4');
     
     for(let i = 0; i < pages.length; i++){
@@ -73,6 +122,8 @@ export async function toPDF( pages, name ) {
     return doc.output("datauristring",{ filename: name})
 }
 
+
+/*
 
 export function Files(props: { info, name, check, title }) {
     const [ upd,    setUpd] = useState( 0 )
@@ -475,6 +526,8 @@ export function Agree(props: { info, name, check, title }) {
     return elem
 }
 
+*/
+
 export function PDFDoc( props ){
     const [ pages ] = useState<any>(1)
     const [ page, setPage ] = useState(1)
@@ -502,6 +555,7 @@ export function PDFDoc( props ){
     };
 
     const blob = base64toBlob( props.url );
+    
     const url = URL.createObjectURL(blob);
 
     return <>
@@ -643,6 +697,8 @@ export function PDFDocument( props ){
     </>
 }
 
+/*
+
 export function Filess(props: { info }){
     const [ info ] = useState( props.info )
     const [ index, setIndex ] = useState( 0 )
@@ -719,3 +775,5 @@ export function Agrees(props: { info }){
 
     return elem
 }
+
+*/
