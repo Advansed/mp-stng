@@ -44,7 +44,7 @@ export function ImageField({
   onChange,
   onCheckAI,
   isAIChecking = false,
-  placeholder = "Добавить изображение",
+  placeholder = "Доба вить изображение",
   disabled = false,
   error
 }: ImageFieldProps) {
