@@ -213,6 +213,33 @@
   margin-bottom: 8px;
 }
 
+/* Нативная кнопка «добавить» (ImagesField): надёжные тапы в iOS + scroll, минимум 44pt по HIG */
+.addImageNativeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  margin-bottom: 8px;
+  padding: 10px 16px;
+  gap: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08);
+}
+
+.addImageNativeButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .buttonIcon {
   margin-right: 8px;
 }

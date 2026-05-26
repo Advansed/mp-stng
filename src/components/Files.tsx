@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { actionSheetController } from '@ionic/core/components';
+import { defineCustomElement as defineIonActionSheet } from '@ionic/core/components/ion-action-sheet.js';
 import { cameraOutline, sendOutline } from "ionicons/icons";
 import { jsPDF } from "jspdf";
 import { FilePicker } from '@capawesome/capacitor-file-picker';
@@ -12,24 +14,62 @@ import { RenderCurrentScaleProps, RenderZoomInProps, RenderZoomOutProps, zoomPlu
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/zoom/lib/styles/index.css';
 
-defineCustomElements(window)
+defineCustomElements(window);
+
+/**
+ * Controller-only usage: без рендера <IonActionSheet /> бандлер может выкинуть регистрацию
+ * веб-компонента — тогда create() зависает на customElements.whenDefined('ion-action-sheet').
+ */
+defineIonActionSheet();
 
 type PickSource = 'camera' | 'gallery' | 'pdf'
 
-async function pickSource(): Promise<PickSource | null> {
-    const actionSheet = await actionSheetController.create({
-        header: "Выберите источник",
-        buttons: [
-            { text: "Сделать фото", data: { source: "camera" } },
-            { text: "Выбрать из галереи", data: { source: "gallery" } },
-            { text: "Выбрать PDF", data: { source: "pdf" } },
-            { text: "Отмена", role: "cancel" },
-        ],
+/** iOS WKWebView: оверлей из обработчика тапа + вложенный scroll (DataEditor) часто не рисуется без сдвига на следующий тик. */
+function deferForIosOverlay(): Promise<void> {
+    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'ios') {
+        return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                setTimeout(resolve, 0);
+            });
+        });
     });
+}
 
-    await actionSheet.present();
-    const result = await actionSheet.onDidDismiss<{ source?: PickSource }>();
-    return result.data?.source ?? null;
+async function pickSource(): Promise<PickSource | null> {
+    console.log('[PickSource] pickSource: start');
+    let actionSheet: HTMLIonActionSheetElement;
+    try {
+        console.log('[PickSource] pickSource: create() …');
+        actionSheet = await actionSheetController.create({
+            header: "Выберите источник",
+            buttons: [
+                { text: "Сделать фото", data: { source: "camera" } },
+                { text: "Выбрать из галереи", data: { source: "gallery" } },
+                { text: "Выбрать PDF", data: { source: "pdf" } },
+                { text: "Отмена", role: "cancel" },
+            ],
+        });
+        console.log('[PickSource] pickSource: create() done', actionSheet);
+    } catch (e) {
+        console.error('[PickSource] pickSource: create() failed', e);
+        throw e;
+    }
+
+    try {
+        await deferForIosOverlay();
+        console.log('[PickSource] pickSource: deferForIosOverlay done');
+        await actionSheet.present();
+        console.log('[PickSource] pickSource: present() done');
+        const result = await actionSheet.onDidDismiss<{ source?: PickSource }>();
+        console.log('[PickSource] pickSource: onDidDismiss', result);
+        return result.data?.source ?? null;
+    } catch (e) {
+        console.error('[PickSource] pickSource: present/dismiss failed', e);
+        throw e;
+    }
 }
 
 async function getPhotoFromSource(source: CameraSource) {
@@ -51,20 +91,30 @@ async function getPhotoFromSource(source: CameraSource) {
 }
 
 export async function       PickSource() {
-    const source = await pickSource();
-    if (!source) throw new Error("Файл не выбран");
+    console.log('[PickSource] PickSource: start');
+    try {
+        const source = await pickSource();
+        console.log('[PickSource] PickSource: source chosen', source);
+        if (!source) throw new Error("Файл не выбран");
 
-    if (source === "pdf") {
-        const pdf = await pickPdfFile();
-        if (!pdf) throw new Error("PDF не выбран");
-        return pdf;
+        if (source === "pdf") {
+            console.log('[PickSource] PickSource: branch pdf');
+            const pdf = await pickPdfFile();
+            if (!pdf) throw new Error("PDF не выбран");
+            return pdf;
+        }
+
+        if (source === "gallery") {
+            console.log('[PickSource] PickSource: branch gallery');
+            return getPhotoFromSource(CameraSource.Photos);
+        }
+
+        console.log('[PickSource] PickSource: branch camera');
+        return getPhotoFromSource(CameraSource.Camera);
+    } catch (e) {
+        console.error('[PickSource] PickSource: error', e);
+        throw e;
     }
-
-    if (source === "gallery") {
-        return getPhotoFromSource(CameraSource.Photos);
-    }
-
-    return getPhotoFromSource(CameraSource.Camera);
 }
 
 export const takePicture = PickSource;

@@ -84,7 +84,9 @@ export function ImagesField({
     if (disabled || isBusy || value.length >= maxImages) return;
 
     try {
+      console.log('handleAddPhoto');
       const photo = await PickSource();
+      console.log('photo', photo);
       if (!photo?.dataUrl) return;
 
       const randomDigits = () => Math.floor(1000 + Math.random() * 9000).toString();
@@ -198,15 +200,15 @@ export function ImagesField({
           {isAIChecking && (
             <div className={styles.aiCheckingOverlay} aria-live="polite" style={{ maxWidth: "100%" }}>
               <IonSpinner name="crescent" />
-              <span className={styles.aiCheckingText}>Проверка изображения на ИИ…</span>
+              <span className={styles.aiCheckingText}>Проверка изображения…</span>
             </div>
           )}
         </div>
 
         {!disabled && value.length < maxImages && (
-          <IonButton
-            fill="outline"
-            className={styles.addButton}
+          <button
+            type="button"
+            className={styles.addImageNativeButton}
             onClick={() => void handleAddPhoto()}
             disabled={isBusy}
           >
@@ -218,7 +220,7 @@ export function ImagesField({
             ) : isAIChecking ? (
               <>
                 <IonSpinner name="crescent" />
-                <span className={styles.aiCheckingInline}>Проверка изображения ИИ…</span>
+                <span className={styles.aiCheckingInline}>Проверка изображения…</span>
               </>
             ) : (
               <>
@@ -226,7 +228,7 @@ export function ImagesField({
                 {placeholder}
               </>
             )}
-          </IonButton>
+          </button>
         )}
 
         {value.length > 0 && (

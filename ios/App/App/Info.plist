@@ -23,13 +23,17 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>use camera</string>
+	<string>Для сканирования документов</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Для получения файлов</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>use location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>для записи звука</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>use gallery</string>
+	<string>Для сохранения сканов в альбом</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>use gallery</string>
+	<string>Для получения сканированных документов с галереи</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
