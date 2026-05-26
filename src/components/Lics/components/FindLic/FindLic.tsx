@@ -31,7 +31,8 @@ import {
     type Apartment, 
     type Lic 
 } from './useFindLic';
-import { AddAccountParams, LicsPage } from '../types';
+import { LicsPage } from '../types';
+import { useLicsStore } from '../../../../Store/licsStore';
 import styles from './FindLic.module.css';
 
 interface FindLicProps {
@@ -39,7 +40,8 @@ interface FindLicProps {
 }
 
 export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
-  const { state, loadSettlements, loadStreets, loadHouses, addAccount, setState } = useFindLic();
+  const { state, loadSettlements, loadStreets, loadHouses, setState } = useFindLic();
+  const setPendingAddLicLc = useLicsStore((s) => s.setPendingAddLicLc);
 
   useEffect(() => {
     if (state.info.length === 0) {
@@ -47,10 +49,10 @@ export const FindLic = ({ setPage }: FindLicProps): JSX.Element => {
     }
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (state.lc) {
-      await addAccount({ LC: state.lc } as AddAccountParams);
-      setPage(LicsPage.MAIN);
+      setPendingAddLicLc(state.lc);
+      setPage(LicsPage.ADD_LIC_1);
     } else {
       setPage(LicsPage.MAIN);
     }

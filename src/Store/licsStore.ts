@@ -68,18 +68,20 @@ interface           LicsState {
   hist_indices:         any;
   loading:              boolean;
   selectedLic:          Lic | null;
+  pendingAddLicLc:      string | null;
 }
 
 interface           LicsActions {
   
   getLics:              ( token: string) => Promise<any>;
-  addLic:               ( token: string, lic: string ) => Promise<any>;
+  addLic:               ( token: string, lic: string, fio: string ) => Promise<any>;
   delLic:               ( token: string, lic: string ) => Promise<any>;
   get_payment:          ( token: string, LC: string ) => Promise<any>
   get_indices:          ( token: string, counterId: string ) => Promise<any>
   setIndice:            ( token: string, counters: LicCounter[] ) => Promise<boolean>;
   setLoading:           ( loading: boolean ) => void;
   setSelectedLic:       ( lic: Lic | null ) => void;
+  setPendingAddLicLc:   ( lc: string | null ) => void;
 
 }
 
@@ -95,6 +97,7 @@ export const useLicsStore = create<LicsStore>()(
       hist_indices:     [],
       loading:          false,
       selectedLic:      null,
+      pendingAddLicLc:  null,
 
       // Actions
       getLics:         async (token: string) => {
@@ -120,10 +123,10 @@ export const useLicsStore = create<LicsStore>()(
         }
       },
 
-      addLic:         async ( token: string, lic: string ) => {
+      addLic:         async ( token: string, lic: string, fio: string ) => {
         set({ loading: true })
         
-        const res = await api('addAccount', { token: token, LC: lic });
+        const res = await api('addAccount1', { token: token, LC: lic, fio: fio });
           
         if (res.error) {
           set({ loading: false })
@@ -249,6 +252,8 @@ export const useLicsStore = create<LicsStore>()(
       setLoading:     async ( loading: boolean ) => set({ loading }),
 
       setSelectedLic:   (lic) => set({ selectedLic: lic }),
+
+      setPendingAddLicLc: (lc) => set({ pendingAddLicLc: lc }),
 
     }),
     { name: 'lics-store' }

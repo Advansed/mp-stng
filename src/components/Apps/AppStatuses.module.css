@@ -224,6 +224,36 @@
     color: var(--ion-color-warning-shade);
 }
 
+.statusHint {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ion-color-medium-shade);
+}
+
+.commentsBox {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(var(--ion-color-danger-rgb), 0.08);
+    border: 1px solid rgba(var(--ion-color-danger-rgb), 0.25);
+}
+
+.commentsTitle {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ion-color-danger-shade);
+    margin-bottom: 6px;
+}
+
+.commentsList {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ion-color-dark);
+}
+
 .editActionButton {
     --background: var(--ion-color-primary);
     --color: var(--ion-color-primary-contrast);
@@ -301,6 +331,37 @@
     font-size: 12px;
     color: var(--ion-color-medium);
     margin-bottom: 10px;
+}
+
+.signedContractRow {
+    padding-top: 4px;
+}
+
+.signedContractDot {
+    border-color: var(--ion-color-success);
+    background: rgba(var(--ion-color-success-rgb), 0.2);
+}
+
+.signedContractBody {
+    border-style: dashed;
+    border-color: rgba(var(--ion-color-success-rgb), 0.45);
+}
+
+.signedContractHeader {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ion-color-success-shade);
+    margin-bottom: 10px;
+}
+
+.contractLinkButton {
+    --background: var(--ion-color-success);
+    --color: var(--ion-color-success-contrast);
+    --border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+    margin: 0;
 }
 
 .empty {

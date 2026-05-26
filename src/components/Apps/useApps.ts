@@ -3,6 +3,7 @@ import { useToken } from '../Login/authStore'
 import useAppsStore from '../../Store/appStore'
 import { useToast } from '../Toast'
 import { api } from '../../Store/api'
+import { agreementContractPath, parseSignedUrlResponse } from './agreementContract'
 
 let refreshInFlight: Promise<any> | null = null
 
@@ -80,6 +81,24 @@ export const useApps = () => {
     }
   }, [token, setLoading, toast])
 
+  /** Подписанный договор по пути `{doc_id}\\AgreementTO\\AgreementTO.pdf`. */
+  const getSignedAgreementUrl = useCallback(async (docId: string): Promise<string | null> => {
+    if (!token || !docId) return null
+    try {
+      const res = await api('getsignedurl', {
+        token,
+        fileUrl: agreementContractPath(docId),
+      })
+
+      console.log('getsignedurl res:', agreementContractPath(docId), res)
+
+      return parseSignedUrlResponse(res)
+    } catch (error) {
+      console.error('getsignedurl error:', error)
+      return null
+    }
+  }, [token])
+
   /** Предпросмотр заявки */
   const previewApp          = useCallback(async (orderData: any): Promise<any> => {
     orderData.token = token
@@ -99,6 +118,7 @@ export const useApps = () => {
     saveFiles: handleSaveFiles,
     get_details1,
     saveApp,
-    previewApp
-  }), [apps, loading, handleRefresh, handleSaveFiles, get_details1, saveApp, previewApp])
+    previewApp,
+    getSignedAgreementUrl,
+  }), [apps, loading, handleRefresh, handleSaveFiles, get_details1, saveApp, previewApp, getSignedAgreementUrl])
 }

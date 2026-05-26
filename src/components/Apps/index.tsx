@@ -10,25 +10,11 @@ import useAppsStore from "../../Store/appStore"
 import { AppOrder } from "./AppOrder"
 import { AppStatuses } from "./AppStatuses"
 import type { AppStatusEntry, EditingApp } from "../../Store/appStore"
+import { badgeColor, statusLabel } from "./appStatusUtils"
 
 type AppsLocationState = {
   statuses?: AppStatusEntry[]
   editAppId?: string
-}
-
-/** Определяет цвет бейджа статуса на основе текста */
-function getStatusColor(status: string): "success" | "warning" | "danger" | "medium" | "primary" {
-  const statusLower = (status || "").toLowerCase()
-  if (statusLower.includes("требуются") || statusLower.includes("выполн") || statusLower.includes("готов")) {
-    return "primary"
-  }
-  if (statusLower.includes("ожидан") || statusLower.includes("обработке") || statusLower.includes("в процессе")) {
-    return "warning"
-  }
-  if (statusLower.includes("отказ") || statusLower.includes("отмен") || statusLower.includes("проблем")) {
-    return "danger"
-  }
-  return "medium"
 }
 
 export function Apps(): JSX.Element {
@@ -162,8 +148,8 @@ const AppCard = memo(function AppCard({ info, onOpenStatuses }: AppCardProps): J
         <div className={styles.infoRow}>
           <div className={styles.infoItem}>
             <div className={styles.infoContent}>
-              <IonBadge color={getStatusColor(info.status)} className={styles.statusBadge}>
-                {info.status}
+              <IonBadge color={badgeColor(info.status)} className={styles.statusBadge}>
+                {statusLabel(info.status)}
               </IonBadge>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
     IonCard, 
     IonInput, 
@@ -13,27 +13,50 @@ import { User, CreditCard } from 'lucide-react'; // Используем те ж
 import { LicsPage } from './types';
 import { useToast } from '../../Toast';
 
+import { useLicsStore } from '../../../Store/licsStore';
 import styles from './AddLic.module.css';
 
 interface Props {
     setPage: (page: number) => void;
-    addLic: (lic: string) => Promise<any>;
+    addLic: (lic: string, surname: string) => Promise<any>;
 }
 
 export function AddLic({ setPage, addLic }: Props) {
-    const [form, setForm] = useState({ LC: "" });
-    const [isFocused, setIsFocused] = useState(false);
+    const pendingAddLicLc = useLicsStore((s) => s.pendingAddLicLc);
+    const setPendingAddLicLc = useLicsStore((s) => s.setPendingAddLicLc);
+    const surnameInputRef = useRef<HTMLIonInputElement>(null);
+    const [form, setForm] = useState({ LC: "", surname: "" });
+    const [lcFromFind, setLcFromFind] = useState(false);
+    const [isLcFocused, setIsLcFocused] = useState(false);
+    const [isSurnameFocused, setIsSurnameFocused] = useState(false);
     const [loading, setLoading] = useState(false);
     const toast = useToast();
+
+    useEffect(() => {
+        if (!pendingAddLicLc) return;
+        setForm({ LC: pendingAddLicLc, surname: "" });
+        setLcFromFind(true);
+        setPendingAddLicLc(null);
+        setTimeout(() => surnameInputRef.current?.setFocus(), 300);
+    }, [pendingAddLicLc, setPendingAddLicLc]);
 
     async function handleAdd() {
         if (!form.LC.trim()) {
             toast.error("Введите номер лицевого счета");
             return;
         }
+        const surname = form.surname.trim();
+        if (!surname) {
+            toast.error("Введите фамилию владельца лицевого счета");
+            return;
+        }
+        if (/\s/.test(surname)) {
+            toast.error("Укажите только фамилию, без имени и отчества");
+            return;
+        }
 
         setLoading(true);
-        const res = await addLic(form.LC);
+        const res = await addLic(form.LC, surname);
         setLoading(false);
 
         if (res.error) {
@@ -72,7 +95,7 @@ export function AddLic({ setPage, addLic }: Props) {
                     <div className="fs-08 cl-gray ml-05 mb-05">Введите номер л/с:</div>
                     <div className={`
                         ${styles.inputWrapper} 
-                        ${isFocused ? styles.inputWrapperFocus : ''}
+                        ${isLcFocused ? styles.inputWrapperFocus : ''}
                     `}>
                         <IonItem lines="none" className={styles.inputItem}>
                             <CreditCard size={18} className="cl-prim mr-1" />
@@ -80,9 +103,31 @@ export function AddLic({ setPage, addLic }: Props) {
                                 value={form.LC}
                                 placeholder="000000000"
                                 mode="md"
-                                onIonFocus={() => setIsFocused(true)}
-                                onIonBlur={() => setIsFocused(false)}
+                                readonly={lcFromFind}
+                                onIonFocus={() => setIsLcFocused(true)}
+                                onIonBlur={() => setIsLcFocused(false)}
                                 onIonInput={(e) => setForm({ ...form, LC: e.detail.value! })}
+                            />
+                        </IonItem>
+                    </div>
+                </div>
+
+                <div className="mt-1 ml-1 mr-1">
+                    <div className="fs-08 cl-gray ml-05 mb-05">Фамилия владельца:</div>
+                    <div className={`
+                        ${styles.inputWrapper} 
+                        ${isSurnameFocused ? styles.inputWrapperFocus : ''}
+                    `}>
+                        <IonItem lines="none" className={styles.inputItem}>
+                            <User size={18} className="cl-prim mr-1" />
+                            <IonInput
+                                ref={surnameInputRef}
+                                value={form.surname}
+                                placeholder="Иванов"
+                                mode="md"
+                                onIonFocus={() => setIsSurnameFocused(true)}
+                                onIonBlur={() => setIsSurnameFocused(false)}
+                                onIonInput={(e) => setForm({ ...form, surname: e.detail.value! })}
                             />
                         </IonItem>
                     </div>

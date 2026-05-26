@@ -51,6 +51,9 @@ interface AppFile {
 export interface AppStatusEntry {
   period:               string
   status:               string
+  /** Причина (статусы `edit`, `denied`). */
+  comment?:             string | string[]
+  comments?:            string | string[]
   id?:                  string
   checks?: {
     passport_front?:    { is_passport?: boolean; data?: Record<string, any> }
@@ -66,6 +69,8 @@ export interface AppStatusEntry {
 
 interface AppItem {
   id:                   string
+  /** Идентификатор документа для пути к договору (`doc_id\\AgreementTO\\AgreementTO.pdf`). */
+  doc_id?:              string
   service:              string
   date:                 string
   number:               string

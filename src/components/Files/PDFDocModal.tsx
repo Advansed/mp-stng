@@ -119,10 +119,48 @@ export function PDFDocModal({
      * Конвертация base64 в Blob для PDF viewer
      */
     const base64toBlob = (data: string): Blob => {
-        const jarr = data.split(',');
-        const base64WithoutPrefix = jarr[1]; // Удаляем префикс data:application/pdf;base64,
+        // Проверка входных данных
+        if (!data || typeof data !== 'string') {
+            return new Blob([], { type: 'application/pdf' });
+        }
         
-        const bytes = atob(base64WithoutPrefix);
+        // Проверка наличия запятой
+        if (!data.includes(',')) {
+            return new Blob([], { type: 'application/pdf' });
+        }
+        
+        const jarr = data.split(',');
+        
+        // Проверка структуры
+        if (jarr.length !== 2) {
+            return new Blob([], { type: 'application/pdf' });
+        }
+        
+        const base64WithoutPrefix = jarr[1];
+        
+        // Проверка на пустые данные
+        if (!base64WithoutPrefix || base64WithoutPrefix.trim() === '') {
+            return new Blob([], { type: 'application/pdf' });
+        }
+        
+        // Проверка на валидные символы Base64
+        const validBase64Regex = /^[A-Za-z0-9+/]*=*$/;
+        if (!validBase64Regex.test(base64WithoutPrefix)) {
+            return new Blob([], { type: 'application/pdf' });
+        }
+        
+        let bytes: string;
+        try {
+            bytes = atob(base64WithoutPrefix);
+        } catch {
+            return new Blob([], { type: 'application/pdf' });
+        }
+        
+        // Проверка, что декодированные данные не пустые
+        if (!bytes || bytes.length === 0) {
+            return new Blob([], { type: 'application/pdf' });
+        }
+        
         let length = bytes.length;
         const out = new Uint8Array(length);
         

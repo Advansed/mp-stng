@@ -144,7 +144,7 @@ export const useFindLic = (): UseFindLicReturn => {
     
     updateState({ load: true });
     try{
-      const res = await addLic( token || '',  params.LC || '' )    
+      const res = await addLic( token || '', params.LC || '', params.fio || '' )    
     
       if(res.error) toast.error(res.message)
       else toast.success("Лицевой счет добавлен")

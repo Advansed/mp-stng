@@ -43,8 +43,8 @@ export const useLics    = () => {
     setSelectedLic(lic || null);
   };
 
-  const addLic        = async( lic: string ) => {
-      return await add_Lic( token || '', lic ) 
+  const addLic        = async( lic: string, surname: string ) => {
+      return await add_Lic( token || '', lic, surname ) 
   }
 
   const delLic        = async( lic: string ) => {
