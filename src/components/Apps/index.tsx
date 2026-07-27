@@ -127,7 +127,13 @@ interface AppCardProps {
 
 const AppCard = memo(function AppCard({ info, onOpenStatuses }: AppCardProps): JSX.Element {
   const address = typeof info.address === "object" ? info.address?.address : info.address
-  const dateStr = info.date ? String(info.date).substring(0, 10) : "—"
+  const dateStr = (() => {
+    if (!info.date) return "—"
+    const raw = String(info.date)
+    const d = new Date(raw.includes("T") ? raw : raw.replace(" ", "T"))
+    if (Number.isNaN(d.getTime())) return raw.substring(0, 10)
+    return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "short", year: "numeric" })
+  })()
 
   return (
     <IonCard
@@ -137,45 +143,35 @@ const AppCard = memo(function AppCard({ info, onOpenStatuses }: AppCardProps): J
         if (info.id) onOpenStatuses(info.id, info.statuses)
       }}
     >
-      <div className={styles.appHeader}>
-        <div className={styles.appService}>
-          <IonIcon icon={documentTextOutline} className={styles.serviceIcon} />
-          <span className={styles.serviceText}>{info.service}</span>
+      <div className={styles.appCardInner}>
+        <div className={styles.appTop}>
+          <div className={styles.appService}>
+            <IonIcon icon={documentTextOutline} className={styles.serviceIcon} aria-hidden />
+            <h2 className={styles.serviceText}>{info.service || "Заявка"}</h2>
+          </div>
+          <IonBadge color={badgeColor(info.status)} className={styles.statusBadge}>
+            {statusLabel(info.status)}
+          </IonBadge>
         </div>
-      </div>
 
-      <div className={styles.appContent}>
-        <div className={styles.infoRow}>
-          <div className={styles.infoItem}>
-            <div className={styles.infoContent}>
-              <IonBadge color={badgeColor(info.status)} className={styles.statusBadge}>
-                {statusLabel(info.status)}
-              </IonBadge>
-            </div>
+        <div className={styles.appMeta}>
+          <div className={styles.metaItem}>
+            <IonIcon icon={codeOutline} className={styles.metaIcon} aria-hidden />
+            <span className={styles.metaLabel}>№</span>
+            <span className={styles.metaNumber}>{info.number || "—"}</span>
           </div>
-
-          <div className={styles.infoItem}>
-            <IonIcon icon={calendarOutline} className={styles.infoIcon} />
-            <div className={styles.infoContent}>
-              <div className={styles.infoLabel}>Дата</div>
-              <div className={styles.infoValue}>{dateStr}</div>
-            </div>
-          </div>
-
-          <div className={styles.infoItem}>
-            <IonIcon icon={codeOutline} className={styles.infoIcon} />
-            <div className={styles.infoContent}>
-              <div className={styles.infoLabel}>Номер</div>
-              <div className={`${styles.infoValue} ${styles.numberValue}`}>{info.number}</div>
-            </div>
+          <span className={styles.metaDot} aria-hidden />
+          <div className={styles.metaItem}>
+            <IonIcon icon={calendarOutline} className={styles.metaIcon} aria-hidden />
+            <span className={styles.metaDate}>{dateStr}</span>
           </div>
         </div>
 
-        <div className={`${styles.infoItem} ${styles.fullWidth}`}>
-          <IonIcon icon={locationOutline} className={styles.infoIcon} />
-          <div className={styles.infoContent}>
-            <div className={styles.infoLabel}>Адрес</div>
-            <div className={`${styles.infoValue} ${styles.addressValue}`}>{address || "—"}</div>
+        <div className={styles.appAddress}>
+          <IonIcon icon={locationOutline} className={styles.addressIcon} aria-hidden />
+          <div className={styles.addressBody}>
+            <div className={styles.addressLabel}>Адрес</div>
+            <div className={styles.addressValue}>{address || "—"}</div>
           </div>
         </div>
       </div>

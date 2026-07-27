@@ -11,6 +11,7 @@ import { useApps } from './useApps'
 import { resolveAppDocId } from './agreementContract'
 import {
   badgeColor,
+  extractAiCheckErrorGroups,
   extractStatusComments,
   hasStatusComments,
   isDeniedStatus,
@@ -51,12 +52,12 @@ function collapseConsecutiveSameStatus(rows: AppStatusEntry[]): AppStatusEntry[]
 }
 
 export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element {
-  const location = useLocation()
-  const apps = useAppsStore((s) => s.apps)
-  const fetchApps = useAppsStore((s) => s.fetchApps)
-  const token = useToken()
-  const toast = useToast()
-  const { getSignedAgreementUrl } = useApps()
+  const location                     = useLocation()
+  const apps                         = useAppsStore((s) => s.apps)
+  const fetchApps                    = useAppsStore((s) => s.fetchApps)
+  const token                        = useToken()
+  const toast                        = useToast()
+  const { getSignedAgreementUrl }    = useApps()
   const { isOpen: pdfOpen, pdfData, openModal: openPdf, closeModal: closePdf } = usePDFDocModal()
   const [contractLoading, setContractLoading] = useState(false)
 
@@ -104,6 +105,14 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
   const nextActionCommentsTitle = lastStatus && isDeniedStatus(lastStatus.status)
     ? 'Причина отказа'
     : 'Комментарий'
+
+  const editCheckErrorGroups = useMemo(() => {
+    if (!lastStatus || !isEditStatus(lastStatus.status)) return []
+    return extractAiCheckErrorGroups(
+      lastStatus as unknown as Record<string, unknown>,
+      (app || {}) as unknown as Record<string, unknown>
+    )
+  }, [lastStatus, app])
 
   const openSignedContract = useCallback(async () => {
     setContractLoading(true)
@@ -172,6 +181,37 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
                   )}
                   {lastStatus && isEditStatus(lastStatus.status) && (
                     <>
+                      {editCheckErrorGroups.length > 0 && (
+                        <div className={styles.editReasonsBox}>
+                          <div className={styles.editReasonsTitle}>Причина возврата</div>
+                          <div className={styles.editReasonsList}>
+                            {editCheckErrorGroups.map((group) => (
+                              <details key={group.key} className={styles.editReasonItem}>
+                                <summary className={styles.editReasonSummary}>
+                                  <span className={styles.editReasonLabel}>{group.label}</span>
+                                  <span className={styles.editReasonCount}>
+                                    {group.errors.length}
+                                  </span>
+                                </summary>
+                                <ul className={styles.editReasonErrors}>
+                                  {group.errors.map((err, j) => (
+                                    <li key={`${group.key}-${j}`}>
+                                      {err.field ? (
+                                        <>
+                                          <span className={styles.editReasonField}>{err.field}: </span>
+                                          {err.error || 'Ошибка проверки'}
+                                        </>
+                                      ) : (
+                                        err.error || 'Ошибка проверки'
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </details>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <div className={styles.nextActionHint}>
                         Исправьте данные и отправьте заявку повторно
                       </div>
@@ -211,14 +251,15 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
       </IonCard>
 
       <IonLoading isOpen={contractLoading} message="Загрузка договора..." />
+      
       {pdfData && (
         <PDFDocModal
-          isOpen={pdfOpen}
-          onClose={closePdf}
-          pdfUrl={pdfData.url}
-          fileName={pdfData.fileName}
-          title={pdfData.title}
-          showActions={false}
+          isOpen          = { pdfOpen }
+          onClose         = { closePdf }
+          pdfUrl          = { pdfData.url }
+          fileName        = { pdfData.fileName }
+          title           = { pdfData.title }
+          showActions     = { false }
         />
       )}
     </div>

@@ -122,12 +122,13 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
 
           if (originalFile) {
             if (orderData.Файлы === undefined) orderData.Файлы = [] as any;
-            
-            const jarr:any = []
-            
-            field.data.forEach(elem => {
-              const filename = elem.match(/\/stng\/([^?]+)/)[1];
-              jarr.push( filename );
+
+            const jarr: any[] = [];
+            const filesArr = Array.isArray(field.data) ? field.data : [];
+            filesArr.forEach((elem: any) => {
+              if (typeof elem !== 'string') return;
+              const match = elem.match(/\/stng\/([^?]+)/);
+              if (match?.[1]) jarr.push(match[1]);
             });
 
             orderData.Файлы.push({ name: originalFile.name, label: originalFile.label, files: jarr });

@@ -9,20 +9,21 @@ import { useCheckAI } from './useCheckAI';
 import { useLicsStore } from '../../Store/licsStore';
 
 interface OrderProps {
-  service:      TService;
-  onSave:       (orderData: any) => Promise<void>;
-  onBack:       () => void;
-  onPreview:    (order: any) => Promise<any>
+  service:                                            TService;
+  onSave:                                             (orderData: any) => Promise<void>;
+  onBack:                                             () => void;
+  onPreview:                                          (order: any) => Promise<any>
 }
 
 export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview }) => {
-  const toast = useToast();
-  const profile = useProfileData();
-  const lics = useLicsStore();
-  const [orderData, setOrderData] = useState<PageData>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [normalizedService, setNormalizedService] = useState<TService | null>(null);
-  const { checkAI, isAIChecking } = useCheckAI({ service: normalizedService });
+
+  const toast                                         = useToast();
+  const profile                                       = useProfileData();
+  const lics                                          = useLicsStore();
+  const [orderData, setOrderData]                     = useState<PageData>([]);
+  const [isLoading, setIsLoading]                     = useState(true);
+  const [normalizedService, setNormalizedService]     = useState<TService | null>(null);
+  const { checkAI, isAIChecking }                     = useCheckAI({ service: normalizedService });
 
   /**
    * Получает значение из профиля по имени поля формы
@@ -137,33 +138,33 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
         if (!originalFile) return;
 
         if (next.Файлы === undefined) next.Файлы = [] as any[];
-        const filesArr = Array.isArray(field.data) ? field.data : [];
 
-        const jarr:any = []
-            
-        filesArr.forEach(elem => {
-          const filename = elem.match(/\/stng\/([^?]+)/)[1];
-          jarr.push( filename );
+        const jarr: any[] = [];
+        const filesArr = Array.isArray(field.data) ? field.data : [];
+        filesArr.forEach((elem: any) => {
+          if (typeof elem !== 'string') return;
+          const match = elem.match(/\/stng\/([^?]+)/);
+          if (match?.[1]) jarr.push(match[1]);
         });
 
         next.Файлы.push({ name: originalFile.name, label: originalFile.label, files: jarr });
 
         switch (originalFile.name) {
           case 'Passport1':
-            next.ai_status.checks.passport_front    = field.ai_status;
-            if(field.ai_status.errors.length > 0) ii_pass = true;
+            next.ai_status.checks.passport_front = field.ai_status;
+            if ((field.ai_status?.errors || []).length > 0) ii_pass = true;
             break;
           case 'Passport2':
-            next.ai_status.checks.passport_reg      = field.ai_status;
-            if(field.ai_status.errors.length > 0) ii_pass = true;
+            next.ai_status.checks.passport_reg = field.ai_status;
+            if ((field.ai_status?.errors || []).length > 0) ii_pass = true;
             break;
           case 'EGRN':
-            next.ai_status.checks.egrn              = field.ai_status;
-            if(field.ai_status.errors.length > 0) ii_pass = true;
+            next.ai_status.checks.egrn = field.ai_status;
+            if ((field.ai_status?.errors || []).length > 0) ii_pass = true;
             break;
           case 'ActVentCanal':
-            next.ai_status.checks.akt               = field.ai_status;
-            if(field.ai_status.errors.length > 0) ii_pass = true;
+            next.ai_status.checks.akt = field.ai_status;
+            if ((field.ai_status?.errors || []).length > 0) ii_pass = true;
             break;
           default:
             break;
@@ -197,7 +198,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       onBack();
 
     } catch (error) {
-      console.error('Error saving order:', error);
+      console.log('Error saving order:', error);
       toast.error('Ошибка при отправке заявки');
     }
   };
@@ -306,4 +307,5 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       title           = { normalizedService.text }
     />
   );
+
 };

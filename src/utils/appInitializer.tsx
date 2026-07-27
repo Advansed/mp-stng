@@ -20,7 +20,7 @@ export function AppInitializer() {
       const checkVersion = async () => {
         try {
           const res = await getVersion();
-          if (res.message !== version) {
+          if (res.message > version) {
             setShowUpdateAlert(true);
           }
         } catch (error) {
