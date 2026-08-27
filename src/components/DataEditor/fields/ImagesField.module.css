@@ -149,27 +149,3 @@
   }
 }
 
-/* Темная тема */
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: #f3f4f6;
-  }
-  
-  .imageWrapper {
-    background: #1f2937;
-    border-color: #374151;
-  }
-  
-  .modalContent {
-    background: #1f2937;
-  }
-  
-  .modalHeader {
-    background: #111827;
-    border-bottom-color: #374151;
-  }
-  
-  .modalTitle {
-    color: #f3f4f6;
-  }
-}

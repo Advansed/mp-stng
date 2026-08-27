@@ -28,18 +28,22 @@ const useNotificationsStore = create<NotificationsStore>((set, get) => ({
     setLoading: (loading) => set({ loading }),
 
     fetchNext: async ( token: string ) => {
+        const { pages, loading } = get()
+        if (loading) return
         set({ loading: true })
-        const { pages } = get()
         const page = pages + 1;
         try {
             const data = await api('GetNotifications', { token, page })
       
             if (!data.error) {
-                set({ pages: page})
-                set({ notifications: data.data })
+                set({ pages: page, notifications: data.data || [] })
+            } else {
+                // Чтобы не крутить запрос бесконечно при ошибке API
+                set({ pages: Math.max(page, 0) })
             }
         } catch (error) {
             console.error('Ошибка загрузки уведомлений:', error)
+            set({ pages: Math.max(page, 0) })
         } finally {
             set({ loading: false })
         }

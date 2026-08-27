@@ -101,29 +101,6 @@
   }
 }
 
-/* Темная тема */
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: #e0e0e0;
-  }
-  
-  .starIcon.outline {
-    color: #555;
-  }
-  
-  .starIcon.filled {
-    color: #ffc107;
-  }
-  
-  .starIcon.hovered:not(.filled) {
-    color: #ffecb3;
-  }
-  
-  .ratingText {
-    color: #ccc;
-  }
-}
-
 /* Мобильная адаптация */
 @media (max-width: 480px) {
   .field {

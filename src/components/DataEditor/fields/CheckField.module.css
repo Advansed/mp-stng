@@ -108,26 +108,6 @@
   }
 }
 
-/* Темная тема */
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: #e0e0e0;
-  }
-  
-  .checkboxLabel {
-    color: #e0e0e0;
-  }
-  
-  .customCheckbox {
-    background: #2a2a2a;
-    border-color: #444;
-  }
-  
-  .checkboxContainer.disabled .checkboxLabel {
-    color: #888;
-  }
-}
-
 /* Мобильная адаптация */
 @media (max-width: 480px) {
   .field {

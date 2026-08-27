@@ -1,30 +1,24 @@
-import { useToken }             from '../Login/authStore'
-import useNotificationsStore    from '../../Store/notificationStore'
+import { useCallback } from 'react'
+import { useToken } from '../Login/authStore'
+import useNotificationsStore from '../../Store/notificationStore'
 
 export const useNotifications = () => {
+  const token = useToken()
 
-    const token = useToken()
-    
-    const {
-        notifications,
-        pages,
-        loading,
-        fetchNext: fetchNotifications
-    } = useNotificationsStore()
+  const notifications = useNotificationsStore((s) => s.notifications)
+  const pages = useNotificationsStore((s) => s.pages)
+  const loading = useNotificationsStore((s) => s.loading)
+  const fetchNotifications = useNotificationsStore((s) => s.fetchNext)
 
+  const refreshNotifications = useCallback(() => {
+    if (!token) return
+    void fetchNotifications(token)
+  }, [token, fetchNotifications])
 
-
-    const refreshNotifications = () => {
-        if (token) {
-            fetchNotifications(token)
-        }
-    }
-    
-    return {
-        pages,
-        notifications,
-        loading,
-        refreshNotifications
-    }
-    
+  return {
+    pages,
+    notifications,
+    loading,
+    refreshNotifications,
+  }
 }

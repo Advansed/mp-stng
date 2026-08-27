@@ -269,7 +269,7 @@
 }
 
 .cl-green {
-    color: yellowgreen
+    color: #1b7a3d;
 }
 
 .cl-red {
@@ -306,13 +306,21 @@
 }
 
 
-/* Отключаем CSS переменные темной темы */
-:root {
-    color-scheme:                   light !important;
-    --ion-color-primary:            #086CA2 !important;
-    --ion-color-secondary:          #ffba00 !important;
-    --main-color:                   #0F3C79; /* Основной цвет */
-    --background-color:             #f0f0f0; /* Фоновый цвет */
-    --dop-color:                    #ffba00;
+/* Принудительно светлая тема даже при системном dark mode */
+html {
+    color-scheme: light only !important;
+}
 
+html,
+body,
+ion-app,
+:root {
+    color-scheme: light only !important;
+    --ion-color-primary: #086CA2 !important;
+    --ion-color-secondary: #ffba00 !important;
+    --main-color: #0F3C79;
+    --background-color: #f0f0f0;
+    --dop-color: #ffba00;
+    --ion-background-color: #ffffff;
+    --ion-text-color: #000000;
 }

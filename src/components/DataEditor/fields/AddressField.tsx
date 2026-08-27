@@ -1,16 +1,17 @@
 import React from 'react';
 import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
+
 import styles from './AddressField.module.css';
 
 interface AddressFieldProps {
-  label: string;
-  value: { address: string; fias: string; lat: string; lon: string };
-  onChange: (value: { address: string; fias: string; lat: string; lon: string }) => void;
-  cityFias?: string; // фиас код города для фильтрации
-  disabled?: boolean;
-  error?: string;
-  validate?: string;
+  label:       string;
+  value:       { address: string; fias: string; lat: string; lon: string };
+  onChange:    (value: { address: string; fias: string; lat: string; lon: string }) => void;
+  cityFias?:   string; // фиас код города для фильтрации
+  disabled?:   boolean;
+  error?:      string;
+  validate?:   string;
 }
 
 

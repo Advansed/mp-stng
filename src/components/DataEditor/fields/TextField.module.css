@@ -80,28 +80,6 @@
   }
 }
 
-/* Темная тема */
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: #e0e0e0;
-  }
-  
-  .input {
-    background: #2a2a2a;
-    color: #e0e0e0;
-    border-color: #444;
-  }
-  
-  .input:hover:not(:disabled) {
-    border-color: #666;
-    background: #333;
-  }
-  
-  .input::placeholder {
-    color: #888;
-  }
-}
-
 /* Мобильная адаптация */
 @media (max-width: 480px) {
   .field {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './Lics.css'
-import { IonCard, IonIcon, IonImg, IonInput, IonLabel, IonLoading }     from '@ionic/react'
+import { IonCard, IonIcon, IonImg, IonInput, IonLoading }     from '@ionic/react'
 import { documentTextOutline, pencilOutline }                           from 'ionicons/icons'
 import { createWidget }                                                 from '@sber-ecom-core/sberpay-widget';
 import { Browser }                                                      from '@capacitor/browser'
@@ -134,264 +134,164 @@ function            AddLics(props:{ setPage, addLic }) {
 function            Payments(props:{ item, setPage }){
     const item  = props.item
     const [ upd, setUpd ] = useState( 0 )
+    const totalPay = item.debts.reduce((total, d) => total + (d.pay || 0), 0)
+    const money = (n: number) =>
+        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(n)
 
-    function Lines() {
-
-        let elem = <>
-            <div className='mt-1 ml-1 cl-black fs-09'> <b>Начисления</b></div>
-        </>
-        for( let i = 0; i < item.debts.length; i++ ){
-            elem = <>
-                { elem }
-                <div className='flex fl-space ml-2 mt-1 mr-1 fs-09'>
-                    <div><b>{ item.debts[i].label }</b></div>
-                    <div className='cl-black'>
-                        <b>
-                            { new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts[i].sum ) }
-                        </b>
-                    </div>
-                </div>
-            </>
-        }        
-
-        elem = <>
-            <IonCard className='pb-1'>
-                { elem }
-            </IonCard>
-        </>
-
-        return elem
+    const openPay = (page: number) => {
+        item.order = new Object()
+        item.order.LC = item.code
+        item.order.sum = item.debts
+        item.order.sumto = []
+        item.order.ios = false
+        props.setPage(page)
     }
 
-    let items = <>
-        <div className='ml-1 mt-1 fs-09 cl-black'>
-            <b>
-                {
-                    item.sum > 0
-                        ? "Оплатить"
-                        : "Внести аванс"
-                }
-            </b>
-        </div>
-    </>
-    
-    for( let i = 0; i < item.debts.length; i++ ){
-        if( item.debts[i].pay === undefined ) item.debts[i].pay = item.debts[i].sum > 0 ? item.debts[i].sum : 0
-        if( (item.debts[i].pay > 0) || ( item.debts[i].label === 'Газоснабжение природным газом') || ( item.debts[i].label === 'Техническое обслуживание')) {
-            items = <>
-                { items }
-                <div className='flex fl-space ml-2 fs-09 mr-1 mt-05'>
-                    <div className='w-50'><b>{ item.debts[i].label }</b></div>      
-                    <div className='w-50 ls-input a-right'>
-                        <IonInput
-                            className       = 'custom-input'
-                            value           = { item.debts[i].pay }
-                            placeholder     = { '0.00' }
-                            inputMode       = "numeric"
-                            debounce        = { 1000 }
-                            onIonInput      = {(e)=>{
-
-                                let val = (e.detail.value as string)
-                                if( val === '') val = '0'
-                                item.debts[i].pay = parseFloat( val )
-                                setUpd( upd + 1)
-
-                            }}
-                            
-                        >
-
-                        </IonInput>
-                    </div>
-                </div>
-            </>
-        } 
-    }
-
-    items = <>
-        { items }
-        <div className='ml-1 mr-1 t-upperline mt-05 pt-05 flex fl-space' >
-            <div className='fs-09 cl-black'><b>Итого к оплате</b></div>
-            <div className='mr-1 cl-black'><b>{ 
-                new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts.reduce((total, item) => total + item.pay, 0) ) 
-           }</b></div>
-        </div>
-    </>
-
-    
-    const elem = <>
-
-        <Lines />
-        
-        <IonCard className='pb-1'>
-            
-            { items }
-
-            <div className='mt-2 ml-1 fs-09'>Способы оплаты (без комиссии)</div>
-            <div className='flex fl-space ml-1 mr-1'>
-
-               <div className='ls-item3 ml-05 w-50'>
-                    <div
-                        className=''
-                        onClick={()=>{
-                            item.order = new Object()
-                            item.order.LC       = item.code,
-                            item.order.sum      = item.debts,
-                            item.order.sumto    = [],
-                            item.order.ios      = false
-                            props.setPage( 7 )
-                    }}
-                    >   
-                        <IonImg alt = "" src="assets/cards1.webp" className='h-3' />
-                        {/* <IonLabel className = "">СберМобайл</IonLabel> */}
-                    </div>               
-                </div>
-
-               <div className='ls-item3 ml-05 w-50'>
-                    <div
-                        className=''
-                        onClick={()=>{
-                            item.order = new Object()
-                            item.order.LC       = item.code,
-                            item.order.sum      = item.debts,
-                            item.order.sumto    = [],
-                            item.order.ios      = false
-                            props.setPage( 8 )
-                    }}
-                    >   
-                        <IonImg alt = "" src="assets/sberpay.png" className='h-2' />
-                        {/* <IonLabel className = "">СберМобайл</IonLabel> */}
-                    </div>               
-                </div>
-                
-                {/* НОВАЯ КНОПКА АЛЬФА-БАНКА */}
-                <div className='ls-item3 ml-05 w-30'>
-                    <div className=''
-                        onClick={() => {
-                            item.order          = new Object()
-                            item.order.LC       = item.code,
-                            item.order.sum      = item.debts,
-                            item.order.sumto    = [],
-                            item.order.ios      = false
-                            props.setPage(11) // НОВАЯ СТРАНИЦА ДЛЯ АЛЬФА-БАНКА
-                        }}
-                    >   
-                        <img src="assets/sbp.webp" alt="ГазПромБанк" />
-                    </div>               
-                </div>
- 
+    return (
+        <div className="pay-page">
+            <div className="pay-hero">
+                <div className="pay-hero-kicker">Оплата</div>
+                <div className="pay-hero-title">л/с № {item.code}</div>
+                {item.address ? (
+                    <div className="pay-hero-sub">{item.address}</div>
+                ) : null}
             </div>
 
-        </IonCard>
-    </>
-    
-    return elem
+            <IonCard className="pay-card">
+                <div className="pay-card-title">Начисления</div>
+                <div className="pay-rows">
+                    {item.debts.map((d, i) => (
+                        <div className="pay-row" key={`debt-${i}`}>
+                            <span className="pay-row-label">{d.label}</span>
+                            <span className="pay-row-value">{money(d.sum)}</span>
+                        </div>
+                    ))}
+                </div>
+            </IonCard>
+
+            <IonCard className="pay-card">
+                <div className="pay-card-title">
+                    {item.sum > 0 ? 'Сумма к оплате' : 'Внести аванс'}
+                </div>
+                <div className="pay-rows">
+                    {item.debts.map((d, i) => {
+                        if (d.pay === undefined) d.pay = d.sum > 0 ? d.sum : 0
+                        const show =
+                            d.pay > 0 ||
+                            d.label === 'Газоснабжение природным газом' ||
+                            d.label === 'Техническое обслуживание'
+                        if (!show) return null
+                        return (
+                            <div className="pay-row pay-row-input" key={`pay-${i}`}>
+                                <span className="pay-row-label">{d.label}</span>
+                                <div className="pay-input-wrap">
+                                    <IonInput
+                                        className="pay-input"
+                                        value={d.pay}
+                                        placeholder="0.00"
+                                        inputMode="numeric"
+                                        debounce={1000}
+                                        onIonInput={(e) => {
+                                            let val = e.detail.value as string
+                                            if (val === '') val = '0'
+                                            d.pay = parseFloat(val)
+                                            setUpd(upd + 1)
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+
+                <div className="pay-total">
+                    <span>Итого к оплате</span>
+                    <strong>{money(totalPay)}</strong>
+                </div>
+
+                <div className="pay-methods-title">Способы оплаты · без комиссии</div>
+                <div className="pay-methods">
+                    <button type="button" className="pay-method" onClick={() => openPay(7)}>
+                        <IonImg alt="Банковская карта" src="assets/cards1.webp" className="pay-method-img" />
+                        <span className="pay-method-caption">Карта</span>
+                    </button>
+                    <button type="button" className="pay-method" onClick={() => openPay(8)}>
+                        <IonImg alt="SberPay" src="assets/sberpay.png" className="pay-method-img pay-method-img--sber" />
+                        <span className="pay-method-caption">SberPay</span>
+                    </button>
+                    <button type="button" className="pay-method" onClick={() => openPay(11)}>
+                        <img src="assets/sbp.webp" alt="СБП" className="pay-method-img" />
+                        <span className="pay-method-caption">СБП</span>
+                    </button>
+                </div>
+            </IonCard>
+        </div>
+    )
 }
 
 function            PaymentsTO(props:{ item, setPage }){
     const item  = props.item
-    const [ upd, setUpd ] = useState( 0 )
+    item.debts.forEach((d) => {
+        if (d.pay === undefined) d.pay = d.sum > 0 ? d.sum : 0
+    })
+    const totalPay = item.debts.reduce((total, d) => total + (d.pay || 0), 0)
+    const money = (n: number) =>
+        new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(n)
 
-
-    function Lines() {
-
-        let elem = <>
-            <div className='mt-1 ml-1 cl-black fs-09'> <b>Начис ления</b></div>
-        </>
-        for( let i = 0; i < item.debts.length; i++ ){
-            elem = <>
-                { elem }
-                <div className='flex fl-space ml-2 mt-1 mr-1 fs-09'>
-                    <div><b>{ item.debts[i].label }</b></div>
-                    <div className='cl-black'>
-                        <b>
-                            { new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts[i].sum ) }
-                        </b>
-                    </div>
-                </div>
-            </>
-        }        
-
-        elem = <>
-            <IonCard className='pb-1'>
-                { elem }
-            </IonCard>
-        </>
-
-        return elem
+    const openPay = (page: number) => {
+        item.order = new Object()
+        item.order.LC = item.code
+        item.order.sum = item.debts
+        item.order.ios = false
+        props.setPage(page)
     }
 
-    let items = <>
-        <div className='ml-1 mt-1 fs-09 cl-black'>
-            <b>
-                {
-                    item.sum > 0
-                        ? "Оплатить"
-                        : "Внести аванс"
-                }
-            </b>
-        </div>
-    </>
-    
-    for( let i = 0; i < item.debts.length; i++ ){
-        if( item.debts[i].pay === undefined ) item.debts[i].pay = item.debts[i].sum > 0 ? item.debts[i].sum : 0
-    }
-
-
-    items = <>
-        { items }
-        <div className='ml-1 mr-1 t-upperline mt-05 pt-05 flex fl-space' >
-            <div className='fs-09 cl-black'><b>К оплате</b></div>
-            <div className='mr-1 cl-black'><b>{ 
-                new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format( item.debts.reduce((total, item) => total + item.pay, 0) ) 
-            }</b></div>
-        </div>
-    </>
-
-    
-    const elem = <>
-        <Lines />
-        <IonCard className='pb-1'>
-            
-            { items }
-
-            <div className='mt-2 ml-1 fs-09'>Спос обы оплаты</div>
-            <div className='flex fl-space ml-1 mr-1'>
-                <div className='ls-item3 w-50'>
-                    <div className=''
-                        onClick={()=>{
-                            item.order = new Object()
-                            item.order.LC       = item.code,
-                            item.order.sum      = item.debts,
-                            item.order.ios      = false
-                            props.setPage( 7 )
-                           
-                        }}
-                    >   
-                        <img src="assets/cards1.webp" alt="sberEQ"  className='w-3'/>
-                        <IonLabel className = " ml-05"></IonLabel>
-                    </div>        
-                </div>
-                <div className='ls-item3 ml-05 w-50'>
-                    <div
-                        className=''
-                        onClick={()=>{
-                            item.order = new Object()
-                            item.order.LC       = item.code,
-                            item.order.sum    = item.debts,
-                            item.order.ios      = false
-                            props.setPage( 8 )
-                    }}
-                    >   
-                        <IonImg alt = "" src="assets/sberpay.png" className='h-2' />
-                        {/* <IonLabel className = "">СберМобайл</IonLabel> */}
-                    </div>               
-                </div>
+    return (
+        <div className="pay-page">
+            <div className="pay-hero">
+                <div className="pay-hero-kicker">Оплата ТО</div>
+                <div className="pay-hero-title">л/с № {item.code}</div>
+                {item.address ? (
+                    <div className="pay-hero-sub">{item.address}</div>
+                ) : null}
             </div>
 
-        </IonCard>
-    </>
-    
-    return elem
+            <IonCard className="pay-card">
+                <div className="pay-card-title">Начисления</div>
+                <div className="pay-rows">
+                    {item.debts.map((d, i) => (
+                        <div className="pay-row" key={`debt-to-${i}`}>
+                            <span className="pay-row-label">{d.label}</span>
+                            <span className="pay-row-value">{money(d.sum)}</span>
+                        </div>
+                    ))}
+                </div>
+            </IonCard>
+
+            <IonCard className="pay-card">
+                <div className="pay-card-title">
+                    {item.sum > 0 ? 'Сумма к оплате' : 'Внести аванс'}
+                </div>
+
+                <div className="pay-total">
+                    <span>К оплате</span>
+                    <strong>{money(totalPay)}</strong>
+                </div>
+
+                <div className="pay-methods-title">Способы оплаты</div>
+                <div className="pay-methods">
+                    <button type="button" className="pay-method" onClick={() => openPay(7)}>
+                        <img src="assets/cards1.webp" alt="Банковская карта" className="pay-method-img" />
+                        <span className="pay-method-caption">Карта</span>
+                    </button>
+                    <button type="button" className="pay-method" onClick={() => openPay(8)}>
+                        <IonImg alt="SberPay" src="assets/sberpay.png" className="pay-method-img pay-method-img--sber" />
+                        <span className="pay-method-caption">SberPay</span>
+                    </button>
+                </div>
+            </IonCard>
+        </div>
+    )
 }
 
 function            SberPay({ item, setPage, SBOL }:{ item: any, setPage: any, SBOL: any }){

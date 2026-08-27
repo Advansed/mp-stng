@@ -250,62 +250,6 @@
   }
 }
 
-/* Темная тема */
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: #e0e0e0;
-  }
-  
-  .selectTrigger {
-    background: #2a2a2a;
-    color: #e0e0e0;
-    border-color: #444;
-  }
-  
-  .selectTrigger:hover:not(.disabled) {
-    border-color: #666;
-    background: #333;
-  }
-  
-  .selectTrigger.placeholder .selectValue {
-    color: #888;
-  }
-  
-  .icon {
-    color: #999;
-  }
-  
-  .selectTrigger:hover:not(.disabled) .icon {
-    color: #e0e0e0;
-  }
-  
-  .dropdown {
-    background: #2a2a2a;
-    border-color: #666;
-  }
-  
-  .dropdownItem {
-    color: #e0e0e0;
-  }
-  
-  .dropdownItem:hover {
-    background: #333;
-  }
-  
-  .dropdownItem.highlighted {
-    background: #3a3a3a;
-  }
-  
-  .dropdownItem.selected {
-    background: #3a3a3a;
-    color: #4fc3f7;
-  }
-  
-  .checkIcon {
-    color: #4fc3f7;
-  }
-}
-
 /* Мобильная адаптация */
 @media (max-width: 480px) {
   .field {

@@ -34,6 +34,13 @@ import { AppInitializer } from './utils/appInitializer';
 setupIonicReact();
 
 const App: React.FC = () => {
+  useEffect(() => {
+    // Всегда светлая тема, даже если в ОС включён dark mode
+    document.documentElement.style.colorScheme = 'light'
+    document.documentElement.setAttribute('data-theme', 'light')
+    document.body.classList.remove('dark')
+  }, [])
+
   const  auth     = useAuthStore( state => state.auth )
   const  reg      = useAuthStore( state => state.reg )
   const  user     = useAuthUser()

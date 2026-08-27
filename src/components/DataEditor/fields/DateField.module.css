@@ -198,52 +198,6 @@
   }
 }
 
-/* Темная тема */
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: #e0e0e0;
-  }
-  
-  .dateInput {
-    background: #2a2a2a;
-    color: #e0e0e0;
-    border-color: #444;
-    color-scheme: dark;
-  }
-  
-  .dateInput::-webkit-datetime-edit-text {
-    color: #888;
-  }
-  
-  .dateInput::-webkit-datetime-edit-month-field,
-  .dateInput::-webkit-datetime-edit-day-field,
-  .dateInput::-webkit-datetime-edit-year-field {
-    color: #e0e0e0;
-  }
-  
-  .dateInput:hover:not(:disabled) {
-    border-color: #666;
-    background: #333;
-  }
-  
-  .dateInput.placeholder {
-    color: #888;
-  }
-  
-  .icon {
-    color: #999;
-  }
-  
-  .dateInput:hover:not(:disabled) ~ .iconWrapper .icon {
-    color: #e0e0e0;
-  }
-  
-  .displayValue {
-    background: #2a2a2a;
-    color: #e0e0e0;
-  }
-}
-
 /* Мобильная адаптация */
 @media (max-width: 480px) {
   .field {

@@ -8,7 +8,8 @@ export function Contacts(){
 
     useEffect(()=>{
         async function load() {
-            const res = await api("Contacts",{})
+            const res = await api("contacts",{})
+            console.log('contacts', res)
             if(!res.error)
             setInfo( res.data )
         }

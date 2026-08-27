@@ -1,1 +1,9 @@
 /// <reference types="react-scripts" />
+
+declare module '*.css'
+declare module '*.module.css' {
+  const classes: { readonly [key: string]: string }
+  export default classes
+}
+
+declare module 'react-dadata/dist/react-dadata.css'

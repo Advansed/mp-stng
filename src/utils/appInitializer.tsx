@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { isPlatform } from '@ionic/react';
 import { IonAlert } from '@ionic/react';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { getVersion, version } from '../Store/api';
 
 /**
@@ -12,6 +14,21 @@ export function AppInitializer() {
   const hasCheckedRef = useRef(false); // Флаг для отслеживания, что проверка уже была выполнена
 
   useEffect(() => {
+    const setupStatusBar = async () => {
+      if (!Capacitor.isNativePlatform()) return;
+      try {
+        // WebView начинается под статус-баром; IonHeader сам добавит safe-area.
+        // Цвет панели ОС совпадает с шапкой приложения.
+        await StatusBar.setOverlaysWebView({ overlay: true });
+        await StatusBar.setBackgroundColor({ color: '#1F3766' });
+        await StatusBar.setStyle({ style: Style.Dark });
+      } catch (error) {
+        console.error('StatusBar setup error:', error);
+      }
+    };
+
+    void setupStatusBar();
+
     // Выполняем проверку только один раз при монтировании компонента
     // и только на мобильной платформе
     if (!hasCheckedRef.current && isPlatform('mobile')) {
