@@ -8,7 +8,7 @@
   margin-bottom: 0.5em;
   font-size: 0.9em;
   font-weight: 600;
-  color: #333;
+  color: var(--ion-text-color);
   letter-spacing: 0.02em;
 }
 
@@ -41,9 +41,9 @@
   position: relative;
   width: 20px;
   height: 20px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--app-border);
   border-radius: 6px;
-  background: white;
+  background: var(--app-surface);
   margin-right: 0.75em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -53,16 +53,16 @@
 }
 
 .customCheckbox.checked {
-  border-color: var(--main-color, #086CA2);
-  background: var(--main-color, #086CA2);
+  border-color: var(--main-color);
+  background: var(--main-color);
 }
 
 .customCheckbox.error {
-  border-color: #ff4444;
+  border-color: var(--ion-color-danger);
 }
 
 .checkIcon {
-  color: white;
+  color: var(--ion-color-primary-contrast);
   font-size: 14px;
   opacity: 0;
   transform: scale(0);
@@ -76,19 +76,19 @@
 
 .checkboxLabel {
   font-size: 1em;
-  color: #333;
+  color: var(--ion-text-color);
   line-height: 1.4;
 }
 
 .checkboxContainer.disabled .checkboxLabel {
-  color: #999;
+  color: var(--app-muted);
 }
 
 .errorMessage {
   display: block;
   margin-top: 0.3em;
   font-size: 0.85em;
-  color: #ff4444;
+  color: var(--ion-color-danger);
   font-weight: 500;
 }
 

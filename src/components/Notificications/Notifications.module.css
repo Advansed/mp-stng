@@ -21,7 +21,7 @@
   margin: 0;
   font-size: 22px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--ion-color-primary-contrast);
   letter-spacing: -0.02em;
   line-height: 1.25;
 }
@@ -36,7 +36,7 @@
   margin: 0;
   padding: 16px;
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--app-surface);
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -59,7 +59,7 @@
 .titleIcon {
   flex-shrink: 0;
   font-size: 20px;
-  color: var(--ion-color-primary, #086ca2);
+  color: var(--ion-color-primary);
   margin-top: 2px;
 }
 
@@ -68,7 +68,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 1.35;
-  color: #1f3766;
+  color: var(--app-header);
   letter-spacing: -0.015em;
 }
 
@@ -79,24 +79,24 @@
   align-self: flex-start;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(8, 108, 162, 0.08);
-  border: 1px solid rgba(8, 108, 162, 0.12);
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.12);
   font-size: 12px;
   font-weight: 600;
-  color: #0f3c79;
+  color: var(--main-color);
   line-height: 1.2;
 }
 
 .periodIcon {
   font-size: 14px;
-  color: var(--ion-color-primary, #086ca2);
+  color: var(--ion-color-primary);
 }
 
 .body {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
-  color: #2a2f3a;
+  color: var(--ion-text-color);
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -107,7 +107,7 @@
   text-align: center;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
-  color: #5a6472;
+  color: var(--app-muted);
   font-size: 15px;
   font-weight: 500;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);

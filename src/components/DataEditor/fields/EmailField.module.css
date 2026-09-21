@@ -8,7 +8,7 @@
   margin-bottom: 0.5em;
   font-size: 0.9em;
   font-weight: 600;
-  color: #333;
+  color: var(--ion-text-color);
   letter-spacing: 0.02em;
 }
 
@@ -17,9 +17,9 @@
   padding: 0.85em 1em;
   font-size: 1em;
   font-family: inherit;
-  color: #333;
-  background: white;
-  border: 2px solid #e0e0e0;
+  color: var(--ion-text-color);
+  background: var(--app-surface);
+  border: 2px solid var(--app-border);
   border-radius: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
@@ -27,40 +27,40 @@
 }
 
 .input::placeholder {
-  color: #999;
+  color: var(--app-muted);
   opacity: 1;
 }
 
 .input:hover:not(:disabled) {
-  border-color: #b0b0b0;
+  border-color: var(--ion-color-medium-tint);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .input:focus {
-  border-color: var(--main-color, #086CA2);
-  box-shadow: 0 0 0 3px rgba(8, 108, 162, 0.1), 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--main-color);
+  box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.1), 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .input:disabled {
-  background: #f5f5f5;
-  color: #999;
+  background: var(--ion-color-light);
+  color: var(--app-muted);
   cursor: not-allowed;
   opacity: 0.7;
 }
 
 .inputError {
-  border-color: #ff4444 !important;
+  border-color: var(--ion-color-danger) !important;
 }
 
 .inputError:focus {
-  box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(var(--ion-color-danger-rgb), 0.1) !important;
 }
 
 .errorMessage {
   display: block;
   margin-top: 0.3em;
   font-size: 0.85em;
-  color: #ff4444;
+  color: var(--ion-color-danger);
   font-weight: 500;
 }
 

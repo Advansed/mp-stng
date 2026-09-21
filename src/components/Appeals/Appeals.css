@@ -1,16 +1,16 @@
 
   .bg-4 {
     border-radius: 15px;
-    background-color: #0e78cf;
-    color: white;
+    background-color: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
   }
   .apl-input {
-    background-color: white;
+    background-color: var(--app-surface);
     padding-left: 1em;
     padding-right: 1em;
     width: auto;
     border-radius: 5px;
-    color: rgb(32, 31, 31)!important;;
+    color: var(--ion-text-color)!important;;
   }
 
   .apl-string {
@@ -23,20 +23,20 @@
     display: grid;
     width: 2em;
     height: 2em;
-    color: white;
+    color: var(--ion-color-primary-contrast);
     text-align: center;
     align-items: center;
-    background-color: green;
+    background-color: var(--ion-color-success);
     border-radius: 50%;
   }
   .apl-cnt-1 {
     display: grid;
     width: 2em;
     height: 2em;
-    color: white;
+    color: var(--ion-color-primary-contrast);
     text-align: center;
     align-items: center;
-    background-color: gray;
+    background-color: var(--ion-color-medium);
     border-radius: 50%;
   }
 
@@ -45,8 +45,8 @@
     margin-top: 0.5em;
     padding: 1em;
     border-radius: 15px;
-    background-color: white;
-    color: #3f64a9;
+    background-color: var(--app-surface);
+    color: var(--ion-color-tertiary);
   }
 
   .apl-bg1 {
@@ -54,8 +54,8 @@
     margin-top: 0.5em;
     padding: 1em;
     border-radius: 15px;
-    background-color: #3f64a9;
-    color: white;
+    background-color: var(--ion-color-tertiary);
+    color: var(--ion-color-tertiary-contrast);
   }
 
   .apl-date {
@@ -65,7 +65,7 @@
   }
 
   .apl-borders {
-    border: 1px solid silver;
+    border: 1px solid var(--app-border);
     border-radius: 5px;
   }
 

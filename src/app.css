@@ -154,18 +154,18 @@
 }
 
 .a-link{
-    color: blue;
+    color: var(--ion-color-primary);
     text-decoration: underline;
 }
 .cl-gray{
-    color: gray;
+    color: var(--app-muted);
 }
 .cl-blue{
-    color: blue;
+    color: var(--ion-color-primary);
 }
 
 .cl-whie{
-    color: white
+    color: var(--ion-color-primary-contrast)
 }
 .w-10 { width: 10% }
 .w-20 { width: 20% }
@@ -229,43 +229,43 @@
 
 .borders {
     border-radius: 0.5em;
-    border: 1px solid silver;
+    border: 1px solid var(--app-border);
     padding: 1em;
     position: relative;
 }
 
 .borders1 {
     border-radius: 0.5em;
-    border: 1px solid silver;
+    border: 1px solid var(--app-border);
     padding: 1em;
     position: relative;
 }
 .borders-wp {
     border-radius: 0.5em;
-    border: 1px solid silver;
+    border: 1px solid var(--app-border);
     position: relative;
 }
 
 .t-underline {
-    border-bottom: 1px solid silver;
+    border-bottom: 1px solid var(--app-border);
 }
 
 .t-upperline {
-    border-top: 1px solid silver;
+    border-top: 1px solid var(--app-border);
 }
 
 .bg-1 {
-    background: #3f64a9;    
-    color: white
+    background: var(--ion-color-tertiary);
+    color: var(--ion-color-tertiary-contrast);
 }
 
 .bg-2 {
-    background: linear-gradient(164.84deg, #1B7DB6 8.63%, #0F3C79 89.24%); /**var(--ion-item-background, var(--ion-background-color, #fff));**/
-    color: white; 
+    background: var(--app-gradient);
+    color: var(--ion-color-primary-contrast);
 }
 .bg-3 {
-    background: white;
-    color: #3f64a9;     
+    background: var(--app-surface);
+    color: var(--ion-color-tertiary);
 }
 
 .cl-green {
@@ -280,13 +280,13 @@
 }
 
 .cl-prim {
-    color: #3f64a9;    
+    color: var(--ion-color-tertiary);
 }
 .cl-black {
-    color: black
+    color: var(--ion-text-color);
 }
 .cl-white {
-    color: white
+    color: var(--ion-color-primary-contrast);
 }
 
 .scroll {
@@ -317,10 +317,22 @@ ion-app,
 :root {
     color-scheme: light only !important;
     --ion-color-primary: #086CA2 !important;
+    --ion-color-primary-rgb: 8, 108, 162 !important;
     --ion-color-secondary: #ffba00 !important;
+    --ion-color-tertiary: #3f64a9 !important;
     --main-color: #0F3C79;
     --background-color: #f0f0f0;
     --dop-color: #ffba00;
     --ion-background-color: #ffffff;
     --ion-text-color: #000000;
+    --app-surface: #ffffff;
+    --app-muted: #666666;
+    --app-border: #e0e0e0;
+    --app-header: #1F3766;
+    --app-gradient: linear-gradient(164.84deg, #1B7DB6 8.63%, #0F3C79 89.24%);
+    --app-page-gradient: linear-gradient(156.39deg, #1b80b9 7.75%, #0e3977 100.99%);
+    --app-on-gradient: #71C4F4;
+    --app-on-gradient-link: #7AE6E4;
+    --app-cta-gradient: linear-gradient(89.74deg, #75E2E4 -0.72%, #2AA0DC 49.53%, #75E2E4 99.77%);
+    --app-brand-gradient: linear-gradient(135deg, #0f3c79 0%, #086ca2 100%);
 }

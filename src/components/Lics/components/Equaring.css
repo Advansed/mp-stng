@@ -8,18 +8,18 @@
   align-items: flex-start;
   min-height: 100vh;
   box-sizing: border-box;
-  background: linear-gradient(156.39deg, #1B80B9 7.75%, #0E3977 100.99%);
+  background: var(--app-page-gradient);
 }
 
 /* Карточка формы */
 .vtb-payment-card {
   width: 100%;
   max-width: 420px;
-  background: #ffffff;
+  background: var(--app-surface);
   border-radius: 14px;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--app-border);
 }
 
 /* Шапка */
@@ -27,22 +27,22 @@
   display: flex;
   align-items: center;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #0a2973, #009fdf);
-  color: #ffffff;
+  background: var(--app-brand-gradient);
+  color: var(--ion-color-primary-contrast);
 }
 
 .vtb-logo {
   width: 32px;
   height: 32px;
   border-radius: 7px;
-  background: #ffffff;
+  background: var(--app-surface);
   margin-right: 10px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: #0a2973;
+  color: var(--main-color);
   font-size: 12px;
 }
 
@@ -68,7 +68,7 @@
 /* Тело формы */
 .vtb-card-body {
   padding: 14px 14px 10px;
-  background: #fafbfc;
+  background: var(--ion-color-light);
 }
 
 .vtb-row {
@@ -95,13 +95,13 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #374151;
+  color: var(--ion-text-color);
   margin-bottom: 4px;
 }
 
 .vtb-label::after {
   content: ' *';
-  color: #dc2626;
+  color: var(--ion-color-danger);
   font-weight: 700;
 }
 
@@ -111,8 +111,8 @@
   min-height: 3em;      /* На всякий случай */
   max-height: 3em;
   border-radius: 6px;
-  background-color: #ffffff;
-  border: 1px solid #d1d5db;
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
   padding: 0 8px;       /* Без вертикальных паддингов, чтобы не раздувать высоту */
   box-sizing: border-box;
   display: flex;
@@ -123,9 +123,9 @@
 
 /* Фокус: подсвечиваем контейнер, когда iframe внутри активен */
 .vtb-input:focus-within {
-  border-color: #009fdf;
-  box-shadow: 0 0 0 2px rgba(0, 159, 223, 0.18);
-  background-color: #ffffff;
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb), 0.18);
+  background-color: var(--app-surface);
 }
 
 /* Можно чуть уменьшить иконку, чтобы поместилась в 2em */
@@ -142,14 +142,14 @@
 .vtb-select {
   width: 100%;
   border-radius: 9px;
-  border: 1.5px solid #d1d5db;
+  border: 1.5px solid var(--app-border);
   padding: 10px 12px;
   font-size: 13px;
   font-weight: 500;
-  color: #0a2973;
-  background-color: #ffffff;
+  color: var(--main-color);
+  background-color: var(--app-surface);
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%230a2973' d='M4.427 6.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 6H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%230F3C79' d='M4.427 6.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 6H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 14px;
@@ -159,8 +159,8 @@
 
 .vtb-select:focus {
   outline: none;
-  border-color: #009fdf;
-  box-shadow: 0 0 0 2px rgba(0,159,223,0.18);
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb), 0.18);
 }
 
 /* "Сохранить карту" — достаточно крупный тап-таргет */
@@ -170,27 +170,27 @@
   gap: 8px;
   font-size: 13px;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--app-muted);
   margin-top: 6px;
   padding: 10px 10px;
-  background: #ffffff;
+  background: var(--app-surface);
   border-radius: 9px;
   cursor: pointer;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--app-border);
 }
 
 .vtb-save-card input[type="checkbox"] {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  accent-color: #009fdf;
+  accent-color: var(--ion-color-primary);
 }
 
 /* Футер с кнопкой — БЕЗ fixed, чтобы не драться с клавиатурой [web:28] */
 .vtb-card-footer {
   padding: 10px 14px 14px;
-  background: #ffffff;
-  border-top: 1px solid #e5e7eb;
+  background: var(--app-surface);
+  border-top: 1px solid var(--app-border);
 }
 
 /* Кнопка оплаты — большая, удобная для тапа */
@@ -203,16 +203,16 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: linear-gradient(135deg, #009fdf, #0a2973);
-  color: #ffffff;
+  background: var(--app-brand-gradient);
+  color: var(--ion-color-primary-contrast);
   cursor: pointer;
   transition: opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 159, 223, 0.35);
+  box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.35);
 }
 
 .vtb-pay-button:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 6px rgba(0, 159, 223, 0.3);
+  box-shadow: 0 2px 6px rgba(var(--ion-color-primary-rgb), 0.3);
 }
 
 .vtb-pay-button:disabled {
@@ -225,16 +225,16 @@
 .vtb-error {
   margin-top: 8px;
   padding: 10px 12px;
-  background: #fef2f2;
+  background: rgba(var(--ion-color-danger-rgb), 0.12);
   border-radius: 8px;
-  color: #991b1b;
+  color: var(--ion-color-danger-shade);
   font-size: 13px;
-  border: 1px solid #fecaca;
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.35);
 }
 
 .vtb-error-text {
   font-size: 12px;
-  color: #dc2626;
+  color: var(--ion-color-danger);
   padding: 0 14px 10px;
 }
 
@@ -246,7 +246,7 @@
 /* Маленькая подпись/хинт под полем (если захочешь добавить) */
 .vtb-field-hint {
   font-size: 11px;
-  color: #6b7280;
+  color: var(--app-muted);
   margin-top: 3px;
 }
 

@@ -7,7 +7,7 @@
 }
 
 .fone {
-    background: linear-gradient(156.39deg, #1B80B9 7.75%, #0E3977 100.99%);
+    background: var(--app-page-gradient);
     position: relative;
 }
 
@@ -16,8 +16,8 @@
     width: auto !important;
     border-radius: 4px;
     border: 1px solid;
-    background-color: white;
-    color: #3f64a9;
+    background-color: var(--app-surface);
+    color: var(--ion-color-tertiary);
     font-weight: 600;
     font-size: 12px;
     padding-right: 1em;
@@ -26,8 +26,8 @@
 .s-input-2 {
     border-radius: 4px;
     border: 1px solid;
-    background-color: white;
-    color: #3f64a9;
+    background-color: var(--app-surface);
+    color: var(--ion-color-tertiary);
     font-weight: 600;
     font-size: 12px;
     padding-right: 1em;
@@ -54,14 +54,14 @@
     padding: 15px;
     padding-top: 34px;
     padding-bottom: 56px;
-    background: #ffffff00;
+    background: transparent;
     position: relative;
 }
 
 .main-title {
     position: relative;
     z-index: 10000000;
-    color: white;
+    color: var(--ion-color-primary-contrast);
     font-weight: 700;
 }
 
@@ -71,7 +71,7 @@
 
 /* Базовые элементы списков (мобильные) */
 .ls-item {
-    color: #3f64a9;
+    color: var(--ion-color-tertiary);
     height: 4em;
     display: flex;
     align-items: center;
@@ -82,7 +82,7 @@
 
 .ls-item1 {
     margin-top: 0.5em;
-    background-color: #e5f1f8;
+    background-color: rgba(var(--ion-color-primary-rgb), 0.15);
     height: 4em;
     display: flex;
     align-items: center;
@@ -104,7 +104,7 @@
 
 .ls-item3 {
     height: 4em; 
-    border: 1px solid silver;
+    border: 1px solid var(--app-border);
     border-radius: 5px;
     display: flex;
     align-items: center;
@@ -127,7 +127,7 @@
     background-color: #b35550;
     height: 4em;
     display: flex;
-    color: white;
+    color: var(--ion-color-primary-contrast);
     align-items: center;
     padding-left: 0.5em;
     border-radius: 5px;
@@ -142,29 +142,29 @@
 }
 
 .ls-button1 {
-    background-color: #3f64a9;  
+    background-color: var(--ion-color-tertiary);  
     /* padding: 0.5em; */
     display: flex;
-    color: white;
+    color: var(--ion-color-primary-contrast);
     font-size: 1em;
     border-radius: 5px;
 }
 
 .ls-panel {
     width: 50%;
-    background-color: #e5f1f8;
+    background-color: rgba(var(--ion-color-primary-rgb), 0.15);
     border-radius: 5px;
     padding: 0.5em;
 }
 
 /* ИСПРАВЛЕНИЯ ДЛЯ ls-input */
 .ls-input {
-    border: 1px solid silver;
+    border: 1px solid var(--app-border);
     padding-right: 1em;
     border-radius: 5px;
     min-height: 3em;
     max-height: 3em; /* Ограничиваем максимальную высоту */
-    color: black;
+    color: var(--ion-text-color);
     width: auto; /* Убираем растягивание по ширине */
     max-width: 150px; /* Ограничиваем максимальную ширину */
     display: flex;
@@ -262,7 +262,7 @@ ion-card {
         width: 100% !important;
         min-width: 250px;
         border-radius: 8px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--app-border);
         font-size: 14px;
         /* padding: 12px 16px; */
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -270,13 +270,13 @@ ion-card {
     }
 
     .s-input:focus-within {
-        border-color: #3f64a9;
-        box-shadow: 0 0 0 3px rgba(63, 100, 169, 0.1);
+        border-color: var(--ion-color-tertiary);
+        box-shadow: 0 0 0 3px rgba(var(--ion-color-tertiary-rgb), 0.1);
         outline: none;
     }
 
     .s-input:hover {
-        border-color: #5a7bc8;
+        border-color: var(--ion-color-tertiary-tint);
     }
 
     .s-input-1 {
@@ -289,7 +289,7 @@ ion-card {
 
     .s-input-2 {
         border-radius: 8px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--app-border);
         font-size: 14px;
         padding: 12px 16px;
         transition: all 0.3s ease;
@@ -303,15 +303,15 @@ ion-card {
         margin-bottom: 12px;
         transition: all 0.3s ease;
         cursor: pointer;
-        background: white;
-        border: 1px solid #e0e0e0;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
     }
 
     .ls-item:hover {
-        background-color: #f8fafe;
-        border-color: #3f64a9;
+        background-color: rgba(var(--ion-color-primary-rgb), 0.06);
+        border-color: var(--ion-color-tertiary);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(63, 100, 169, 0.15);
+        box-shadow: 0 4px 12px rgba(var(--ion-color-tertiary-rgb), 0.15);
     }
 
     .ls-item1 {
@@ -326,10 +326,10 @@ ion-card {
     }
 
     .ls-item1:hover {
-        background-color: #d1e9f5;
+        background-color: rgba(var(--ion-color-primary-rgb), 0.22);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(63, 100, 169, 0.15);
-        border-color: #3f64a9;
+        box-shadow: 0 4px 12px rgba(var(--ion-color-tertiary-rgb), 0.15);
+        border-color: var(--ion-color-tertiary);
     }
 
     .ls-item2 {
@@ -351,20 +351,20 @@ ion-card {
 
     .ls-item3 {
         min-height: 60px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--app-border);
         border-radius: 12px;
         margin-bottom: 12px;
         transition: all 0.3s ease;
         cursor: pointer;
-        background: white;
+        background: var(--app-surface);
         padding: 16px;
     }
 
     .ls-item3:hover {
-        border-color: #3f64a9;
-        background-color: #f8fafe;
+        border-color: var(--ion-color-tertiary);
+        background-color: rgba(var(--ion-color-primary-rgb), 0.06);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(63, 100, 169, 0.15);
+        box-shadow: 0 4px 12px rgba(var(--ion-color-tertiary-rgb), 0.15);
     }
 
     /* Кнопки для веба */
@@ -397,14 +397,14 @@ ion-card {
     }
 
     .ls-button1:hover {
-        background-color: #2d4a8a;
+        background-color: var(--ion-color-tertiary-shade);
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(63, 100, 169, 0.3);
+        box-shadow: 0 4px 8px rgba(var(--ion-color-tertiary-rgb), 0.3);
     }
 
     .ls-button1:active {
         transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(63, 100, 169, 0.3);
+        box-shadow: 0 2px 4px rgba(var(--ion-color-tertiary-rgb), 0.3);
     }
 
     /* Панели для веба */
@@ -420,23 +420,23 @@ ion-card {
     }
 
     .ls-panel:hover {
-        background-color: #d1e9f5;
+        background-color: rgba(var(--ion-color-primary-rgb), 0.22);
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(63, 100, 169, 0.15);
-        border-color: #3f64a9;
+        box-shadow: 0 6px 16px rgba(var(--ion-color-tertiary-rgb), 0.15);
+        border-color: var(--ion-color-tertiary);
     }
 
     /* ИСПРАВЛЕНИЯ ДЛЯ ВЕБ ВЕРСИИ ls-input */
     .ls-input {
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--app-border);
         padding: 12px 16px;
         border-radius: 8px;
         min-height: 48px;
         max-height: 48px; /* Ограничиваем высоту для веба */
-        color: #333;
+        color: var(--ion-text-color);
         font-size: 14px;
         transition: all 0.3s ease;
-        background: white;
+        background: var(--app-surface);
         width: auto; /* Убираем растягивание */
         max-width: 180px; /* Увеличиваем для веба */
         box-sizing: border-box;
@@ -445,13 +445,13 @@ ion-card {
     }
 
     .ls-input:focus {
-        border-color: #3f64a9;
+        border-color: var(--ion-color-tertiary);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(63, 100, 169, 0.1);
+        box-shadow: 0 0 0 3px rgba(var(--ion-color-tertiary-rgb), 0.1);
     }
 
     .ls-input:hover {
-        border-color: #5a7bc8;
+        border-color: var(--ion-color-tertiary-tint);
     }
 
     /* ИСПРАВЛЕНИЯ ДЛЯ ВЕБ ВЕРСИИ custom-input */
@@ -497,7 +497,7 @@ ion-card {
         margin: 20px auto;
         border-radius: 16px;
         box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        background: white;
+        background: var(--app-surface);
         overflow: hidden;
         transition: all 0.3s ease;
     }
@@ -514,7 +514,7 @@ ion-card {
     .ls-item3:focus,
     .ls-panel:focus,
     .ls-button1:focus {
-        outline: 2px solid #3f64a9;
+        outline: 2px solid var(--ion-color-tertiary);
         outline-offset: 2px;
     }
 }
@@ -726,7 +726,7 @@ ion-card {
 .pay-hero-title {
     font-size: 22px;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--ion-color-primary-contrast);
     letter-spacing: -0.02em;
     line-height: 1.25;
 }
@@ -743,15 +743,15 @@ ion-card {
     border-radius: 16px;
     border: 1px solid rgba(0, 0, 0, 0.06);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.05);
-    --background: #ffffff;
-    background: #ffffff;
+    --background: var(--app-surface);
+    background: var(--app-surface);
     padding: 16px;
 }
 
 .pay-card-title {
     font-size: 15px;
     font-weight: 700;
-    color: #1f3766;
+    color: var(--app-header);
     margin-bottom: 12px;
     letter-spacing: -0.01em;
 }
@@ -769,12 +769,12 @@ ion-card {
     gap: 12px;
     padding: 10px 12px;
     border-radius: 12px;
-    background: rgba(8, 108, 162, 0.05);
-    border: 1px solid rgba(8, 108, 162, 0.08);
+    background: rgba(var(--ion-color-primary-rgb), 0.05);
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.08);
 }
 
 .pay-row-input {
-    background: #f7fafc;
+    background: var(--ion-color-light);
 }
 
 .pay-row-label {
@@ -782,7 +782,7 @@ ion-card {
     min-width: 0;
     font-size: 13px;
     font-weight: 600;
-    color: #2a2f3a;
+    color: var(--ion-text-color);
     line-height: 1.35;
 }
 
@@ -790,7 +790,7 @@ ion-card {
     flex-shrink: 0;
     font-size: 14px;
     font-weight: 700;
-    color: #0f3c79;
+    color: var(--main-color);
     font-variant-numeric: tabular-nums;
 }
 
@@ -800,13 +800,13 @@ ion-card {
 }
 
 .pay-input {
-    --background: #ffffff;
+    --background: var(--app-surface);
     --padding-start: 10px;
     --padding-end: 10px;
     --padding-top: 8px;
     --padding-bottom: 8px;
-    --color: #0f3c79;
-    border: 1px solid rgba(15, 60, 121, 0.18);
+    --color: var(--main-color);
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.18);
     border-radius: 10px;
     font-weight: 700;
     text-align: right;
@@ -821,9 +821,9 @@ ion-card {
     margin-top: 14px;
     padding: 14px 16px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #0f3c79 0%, #086ca2 100%);
-    color: #ffffff;
-    box-shadow: 0 6px 16px rgba(15, 60, 121, 0.28);
+    background: var(--app-brand-gradient);
+    color: var(--ion-color-primary-contrast);
+    box-shadow: 0 6px 16px rgba(var(--ion-color-primary-rgb), 0.28);
 }
 
 .pay-total span {
@@ -843,7 +843,7 @@ ion-card {
     margin: 18px 0 10px;
     font-size: 13px;
     font-weight: 700;
-    color: #5a6472;
+    color: var(--app-muted);
 }
 
 .pay-methods {
@@ -854,8 +854,8 @@ ion-card {
 
 .pay-method {
     appearance: none;
-    border: 1px solid rgba(15, 60, 121, 0.12);
-    background: #ffffff;
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.12);
+    background: var(--app-surface);
     border-radius: 14px;
     min-height: 88px;
     padding: 12px 8px;
@@ -872,8 +872,8 @@ ion-card {
 .pay-method:hover,
 .pay-method:focus-visible {
     transform: translateY(-2px);
-    border-color: rgba(8, 108, 162, 0.35);
-    box-shadow: 0 8px 18px rgba(8, 108, 162, 0.14);
+    border-color: rgba(var(--ion-color-primary-rgb), 0.35);
+    box-shadow: 0 8px 18px rgba(var(--ion-color-primary-rgb), 0.14);
     outline: none;
 }
 
@@ -895,7 +895,7 @@ ion-card {
 .pay-method-caption {
     font-size: 12px;
     font-weight: 700;
-    color: #1f3766;
+    color: var(--app-header);
 }
 
 @media (max-width: 420px) {

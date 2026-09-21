@@ -1,7 +1,7 @@
 /* Цвета toolbar = цвет статус-бара; safe-area даёт сам IonHeader/IonToolbar */
 .p-toolbar {
-  --background: #1f3766;
-  --color: #ffffff;
+  --background: var(--app-header);
+  --color: var(--ion-color-primary-contrast);
   --border-width: 0;
   --min-height: 56px;
 }
@@ -28,7 +28,7 @@
   height: 100%;
   min-height: 0;
   overflow-y: auto;
-  background: url('pattern.png'), linear-gradient(156.39deg, #1b80b9 7.75%, #0e3977 100.99%);
+  background: url('pattern.png'), var(--app-page-gradient);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom;
@@ -38,7 +38,7 @@
   display: flex;
   align-items: stretch;
   min-height: 56px;
-  background: #fff;
+  background: var(--app-surface);
   padding-bottom: var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px));
 }
 
@@ -53,9 +53,9 @@
   padding: 6px 4px;
   border: 0;
   background: transparent;
-  color: #8c8c8c;
+  color: var(--app-muted);
 }
 
 .p-tabbtn.selected {
-  color: #3f64a9;
+  color: var(--ion-color-tertiary);
 }

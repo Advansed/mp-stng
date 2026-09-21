@@ -8,7 +8,7 @@
     display: block;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #666;
+    color: var(--app-muted);
     margin: 12px 10px 4px 14px;
     text-transform: uppercase;
   }
@@ -16,15 +16,15 @@
   .inputWrapper {
     margin: 0 10px 10px 10px;
     padding: 4px 12px;
-    border: 1px solid #dcdcdc;
+    border: 1px solid var(--app-border);
     border-radius: 10px;
-    background: #f9f9f9;
+    background: var(--ion-color-light);
     transition: all 0.2s ease;
   }
   
   .inputWrapperFocus {
     border-color: var(--ion-color-primary);
-    background: #ffffff;
+    background: var(--app-surface);
     box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb), 0.1);
   }
   
@@ -37,12 +37,12 @@
   
   .dropdownList {
     margin: -5px 10px 15px 10px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--app-border);
     border-top: none;
     border-radius: 0 0 10px 10px;
     max-height: 200px;
     overflow-y: auto;
-    background: white;
+    background: var(--app-surface);
     z-index: 10;
   }
   

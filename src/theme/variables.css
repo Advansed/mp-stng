@@ -3,29 +3,29 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
-  /** primary **/
-  --ion-color-primary: #3880ff;
-  --ion-color-primary-rgb: 56, 128, 255;
+  /** primary — бренд СТНГ **/
+  --ion-color-primary: #086CA2;
+  --ion-color-primary-rgb: 8, 108, 162;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #3171e0;
-  --ion-color-primary-tint: #4c8dff;
+  --ion-color-primary-shade: #075f8e;
+  --ion-color-primary-tint: #217bb0;
 
   /** secondary **/
-  --ion-color-secondary: #3dc2ff;
-  --ion-color-secondary-rgb: 61, 194, 255;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #36abe0;
-  --ion-color-secondary-tint: #50c8ff;
+  --ion-color-secondary: #ffba00;
+  --ion-color-secondary-rgb: 255, 186, 0;
+  --ion-color-secondary-contrast: #000000;
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-shade: #e0a400;
+  --ion-color-secondary-tint: #ffc11a;
 
   /** tertiary **/
-  --ion-color-tertiary:             #3f64a9;    /** #5260ff; **/
-  --ion-color-tertiary-rgb: 82, 96, 255;
+  --ion-color-tertiary: #3f64a9;
+  --ion-color-tertiary-rgb: 63, 100, 169;
   --ion-color-tertiary-contrast: #ffffff;
   --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #4854e0;
-  --ion-color-tertiary-tint: #6370ff;
+  --ion-color-tertiary-shade: #375895;
+  --ion-color-tertiary-tint: #5274b2;
 
   /** success **/
   --ion-color-success: #2dd36f;
@@ -74,6 +74,22 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  --main-color: #0F3C79;
+  --background-color: #f0f0f0;
+  --dop-color: #ffba00;
+  --ion-background-color: #ffffff;
+  --ion-text-color: #000000;
+  --app-surface: #ffffff;
+  --app-muted: #666666;
+  --app-border: #e0e0e0;
+  --app-header: #1F3766;
+  --app-gradient: linear-gradient(164.84deg, #1B7DB6 8.63%, #0F3C79 89.24%);
+  --app-page-gradient: linear-gradient(156.39deg, #1b80b9 7.75%, #0e3977 100.99%);
+  --app-on-gradient: #71C4F4;
+  --app-on-gradient-link: #7AE6E4;
+  --app-cta-gradient: linear-gradient(89.74deg, #75E2E4 -0.72%, #2AA0DC 49.53%, #75E2E4 99.77%);
+  --app-brand-gradient: linear-gradient(135deg, #0f3c79 0%, #086ca2 100%);
 }
 
 /* @media (prefers-color-scheme: dark) { */

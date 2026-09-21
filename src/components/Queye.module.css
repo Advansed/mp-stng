@@ -1,7 +1,7 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #F3F4F6;
-  color: #1F2937;
+  background-color: var(--ion-color-light);
+  color: var(--ion-text-color);
 }
 
 body {
@@ -26,11 +26,11 @@ body {
   font-size: 24px;
   margin: 0;
   font-weight: 800;
-  color: #111827;
+  color: var(--ion-text-color);
 }
 
 .header p {
-  color: #6B7280;
+  color: var(--app-muted);
   font-size: 14px;
   margin-top: 5px;
   margin-bottom: 0;
@@ -38,7 +38,7 @@ body {
 
 /* --- БЛОК С ДАТОЙ --- */
 .dateBlock {
-  background-color: #FFFFFF;
+  background-color: var(--app-surface);
   border-radius: 12px;
   padding: 12px 16px;
   margin-bottom: 20px;
@@ -46,13 +46,13 @@ body {
   align-items: center;
   gap: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid #E5E7EB;
+  border: 1px solid var(--app-border);
 }
 
 .dateIcon {
   font-size: 24px;
-  color: #3B82F6;
-  background-color: #EFF6FF;
+  color: var(--ion-color-primary);
+  background-color: rgba(var(--ion-color-primary-rgb), 0.1);
   width: 40px;
   height: 40px;
   display: flex;
@@ -68,13 +68,13 @@ body {
 .dateDay {
   font-size: 18px;
   font-weight: 700;
-  color: #111827;
+  color: var(--ion-text-color);
   margin-bottom: 4px;
 }
 
 .dateTime {
   font-size: 14px;
-  color: #6B7280;
+  color: var(--app-muted);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -82,7 +82,7 @@ body {
 
 .timeUpdate {
   font-size: 12px;
-  color: #9CA3AF;
+  color: var(--ion-color-medium);
   margin-left: auto;
 }
 
@@ -95,7 +95,7 @@ body {
 
 /* --- КАРТОЧКА (Обычная) --- */
 .listItem {
-  background-color: #FFFFFF;
+  background-color: var(--app-surface);
   border-radius: 16px;
   padding: 16px 12px;
   display: flex;
@@ -111,9 +111,9 @@ body {
 
 /* --- АКТИВНАЯ КАРТОЧКА (СИНИЙ АКЦЕНТ) --- */
 .listItemActive {
-  background-color: #EFF6FF;
-  border-color: #3B82F6;
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.15), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+  background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 10px 15px -3px rgba(var(--ion-color-primary-rgb), 0.15), 0 4px 6px -2px rgba(var(--ion-color-primary-rgb), 0.1);
 }
 
 /* --- Верхняя часть карточки --- */
@@ -126,7 +126,7 @@ body {
 .ticketNumber {
   font-size: 24px;
   font-weight: 800;
-  color: #111827;
+  color: var(--ion-text-color);
   letter-spacing: 0.5px;
   line-height: 1.2;
   word-break: break-word;
@@ -134,12 +134,12 @@ body {
 
 /* Цвет талона в активной строке */
 .listItemActive .ticketNumber {
-  color: #1E40AF;
+  color: var(--main-color);
 }
 
 .windowBadge {
-  background-color: #F3F4F6;
-  color: #374151;
+  background-color: var(--ion-color-light);
+  color: var(--ion-text-color);
   font-size: 14px;
   padding: 4px 10px;
   border-radius: 20px;
@@ -149,8 +149,8 @@ body {
 
 /* Бейдж окна (АКТИВНЫЙ) */
 .listItemActive .windowBadge {
-  background-color: #3B82F6;
-  color: white;
+  background-color: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
 }
 
 /* --- Нижняя часть карточки --- */
@@ -158,12 +158,12 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #F3F4F6;
+  border-top: 1px solid var(--ion-color-light);
 }
 
 .opName {
   font-size: 12px;
-  color: #9CA3AF;
+  color: var(--ion-color-medium);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -173,19 +173,19 @@ body {
 
 /* Цвет операции в активной строке */
 .listItemActive .opName {
-  color: #60A5FA;
+  color: var(--ion-color-primary-tint);
 }
 
 .timeLabel {
   font-size: 12px;
-  color: #9CA3AF;
+  color: var(--ion-color-medium);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
 .listItemActive .timeLabel {
-  color: #1E40AF;
+  color: var(--main-color);
 }
 
 /* --- Полоска сбоку --- */
@@ -195,7 +195,7 @@ body {
   top: 0;
   bottom: 0;
   width: 5px;
-  background-color: #3B82F6;
+  background-color: var(--ion-color-primary);
 }
 
 /* --- СТАТИСТИКА (опционально) --- */
@@ -204,9 +204,9 @@ body {
   justify-content: space-between;
   margin-top: 20px;
   padding: 16px;
-  background-color: #FFFFFF;
+  background-color: var(--app-surface);
   border-radius: 12px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid var(--app-border);
 }
 
 .statItem {
@@ -217,12 +217,12 @@ body {
 .statValue {
   font-size: 20px;
   font-weight: 800;
-  color: #111827;
+  color: var(--ion-text-color);
 }
 
 .statLabel {
   font-size: 12px;
-  color: #6B7280;
+  color: var(--app-muted);
   margin-top: 4px;
 }
 
@@ -264,8 +264,8 @@ body {
 }
 
 .timeBadge {
-  background-color: #F3F4F6;
-  color: #374151;
+  background-color: var(--ion-color-light);
+  color: var(--ion-text-color);
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 12px;
@@ -275,8 +275,8 @@ body {
 }
 
 .listItemActive .timeBadge {
-  background-color: #3B82F6;
-  color: white;
+  background-color: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
 }
 
 /* Адаптивность для мобильных устройств */
