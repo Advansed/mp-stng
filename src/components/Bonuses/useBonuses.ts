@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useToken } from '../Login/authStore'
 import useBonusesStore from '../../Store/bonusesStore'
+import { ROUTES } from '../../routes'
 
 export const useBonuses = () => {
   const token = useToken()
@@ -17,7 +18,7 @@ export const useBonuses = () => {
 
   useEffect(() => {
     // Загружаем только если находимся на странице бонусов
-    if (token && window.location.pathname.includes('/page/bonuse')) {
+    if (token && window.location.pathname.includes(ROUTES.bonuses)) {
       fetchBonusCard(token)
     }
   }, [token, fetchBonusCard])

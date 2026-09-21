@@ -3,27 +3,49 @@ export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2";
 
 export const version = '2.5.6'
 
-interface FetchResponse {
-  error: boolean;
-  data?: any;
-  message: string;
+interface RequestJsonOptions {
+  method?: string;
+  params?: unknown;
+  headers?: HeadersInit;
+}
+
+export async function requestJson(
+  name: string,
+  url: string,
+  options: RequestJsonOptions = {}
+) {
+  const method = options.method ?? 'GET';
+  const init: RequestInit = {
+    method,
+    headers: options.headers ?? { 'Content-Type': 'application/json' },
+  };
+
+  if (method !== 'GET' && options.params !== undefined) {
+    init.body = JSON.stringify(options.params);
+  }
+
+  console.log(`[API] ${name} request`, { url, method, params: options.params });
+
+  try {
+    const res = await fetch(url, init);
+    const data = await res.json();
+    console.log(`[API] ${name} response`, { status: res.status, data });
+    return data;
+  } catch (error) {
+    console.error(`[API] ${name} error`, { url, params: options.params, error });
+    throw error;
+  }
 }
 
 export const api = async (endpoint: string, data: any) => {
-  const res = await fetch(`${URL}/${endpoint}`, {
+  return requestJson(endpoint, `${URL}/${endpoint}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    params: data,
   });
-  return res.json();
 };
 
 export const getVersion = async () => {
-  const res = await fetch(`${URL}/getVersion`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  return res.json()
+  return requestJson('getVersion', `${URL}/getVersion`);
 };
 
 
@@ -33,15 +55,10 @@ export async function fetchData1C(
   params: any
 ): Promise<any> {
   try {
-    const res = await fetch(URL + method, {
+    return await requestJson(method, URL + method, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
+      params,
     });
-
-    const data = await res.json();
-
-    return data;
   } catch (error) {
     console.error('Error in fetchData1C:', error);
     return { Код: 200 };
@@ -51,13 +68,7 @@ export async function fetchData1C(
 
 export async function getCameras() {
   try {
-    const response = await fetch('https://aostng.ru/api/v2/camera/get');
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = await requestJson('getCameras', 'https://aostng.ru/api/v2/camera/get');
 
     if (data.error) {
       console.error('Error in getCameras response:', data);

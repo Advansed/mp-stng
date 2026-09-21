@@ -23,7 +23,7 @@ export interface FieldData {
   name?:      string;
   label:      string;
   type:       'preview' |  'text' | 'number' | 'select' | 'date' | 'boolean' | 'city' | 'address' | 'view' | 'party' | 'images' | 'image' 
-                | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' | 'sign' | 'equip' | 'email' | "pass_front";
+                | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' | 'sign' | 'equip' | 'email' | "pass_front" | 'snils' | 'series' | 'pass_number';
   values?:    string[] | null;
   ai_method?: string;
   ai_status?: any;

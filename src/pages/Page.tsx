@@ -3,6 +3,7 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonImg,
@@ -10,104 +11,38 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonTabBar,
-  IonTabButton,
   IonToolbar,
   isPlatform,
 } from '@ionic/react';
-import { useParams } from 'react-router';
-import { useRouteMatch } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import './Page.css';
-import { Lics } from '../components/Lics';
 import {
   arrowBackOutline,
   chatboxEllipsesOutline,
   contractOutline,
   documentTextOutline,
 } from 'ionicons/icons';
-import { Profile } from '../components/Profile/Profile';
-import { Contacts } from '../components/Contacts';
-import { Appeals } from '../components/Appeals';
 import { useLicsStore } from '../Store/licsStore';
 import { useToken } from '../components/Login/authStore';
-import { Apps } from '../components/Apps';
-import { Notifications } from '../components/Notificications';
-import { News } from '../components/News';
-import { Agzs } from '../components/AGZS/AGZS';
-import { Queye } from '../components/Queye';
-import { Services } from '../components/Services/Services';
 import { useNavigation } from './useNavigation';
-import VideoPage from './VideoPage';
+import { ROUTES } from '../routes';
 
-const Page: React.FC = () => {
-  const { goTo, goBack } = useNavigation();
+interface PageProps {
+  children: React.ReactNode;
+  showRefresher?: boolean;
+}
 
-  const { name } = useParams<{ name: string }>();
-  const appStatusMatch = useRouteMatch<{ appId: string }>('/page/apps/status/:appId');
+const tabs = [
+  { path: ROUTES.services, label: 'Услуги', icon: contractOutline },
+  { path: ROUTES.lics, label: 'Лицевые счета', icon: documentTextOutline },
+  { path: ROUTES.push, label: 'Уведомления', icon: chatboxEllipsesOutline },
+];
 
+const Page: React.FC<PageProps> = ({ children, showRefresher }) => {
+  const { goBack, goTo } = useNavigation();
+  const location = useLocation();
   const getLics = useLicsStore((state) => state.getLics);
   const token = useToken();
-
-  function Main(): JSX.Element {
-    if (appStatusMatch?.params.appId) {
-      return (
-        <div className={isPlatform('ios') ? 'p-content-ios' : 'p-content'}>
-          <Apps />
-        </div>
-      );
-    }
-
-    let elem = <></>;
-    switch (name) {
-      case '':
-        elem = <></>;
-        break;
-      case 'lics':
-        elem = <Lics />;
-        break;
-      case 'news':
-        elem = <News />;
-        break;
-      case 'profile':
-        elem = <Profile />;
-        break;
-      case 'agzs':
-        elem = <Agzs />;
-        break;
-      case 'apps':
-        elem = <Apps />;
-        break;
-      case 'queye':
-        elem = <Queye />;
-        break;
-      case 'bonuse':
-        elem = <></>;
-        break;
-      case 'services':
-        elem = <Services />;
-        break;
-      case 'appeals':
-        elem = <Appeals />;
-        break;
-      case 'contacts':
-        elem = <Contacts />;
-        break;
-      case 'push':
-        elem = <Notifications />;
-        break;
-      case 'video':
-        elem = <VideoPage onNavigate={() => goTo('lics')} />;
-        break;
-      default:
-        elem = <></>;
-    }
-
-    return (
-      <div className={isPlatform('ios') ? 'p-content-ios' : 'p-content'}>
-        {elem}
-      </div>
-    );
-  }
 
   const handleRefresh = async (event: CustomEvent) => {
     setTimeout(() => {
@@ -118,15 +53,10 @@ const Page: React.FC = () => {
 
   return (
     <IonPage>
-      {/* IonHeader / IonToolbar сами учитывают safe-area сверху */}
       <IonHeader className="ion-no-border">
         <IonToolbar className="p-toolbar">
           <IonButtons slot="start">
-            <IonButton
-              onClick={() => {
-                goBack(name || (appStatusMatch ? 'apps' : undefined));
-              }}
-            >
+            <IonButton onClick={() => goBack()}>
               <IonIcon icon={arrowBackOutline} slot="icon-only" color="light" />
             </IonButton>
           </IonButtons>
@@ -142,7 +72,7 @@ const Page: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-        {name === 'lics' ? (
+        {showRefresher ? (
           <IonRefresher slot="fixed" pullMin={120} onIonRefresh={handleRefresh}>
             <IonRefresherContent
               pullingIcon="arrow-down-outline"
@@ -153,45 +83,28 @@ const Page: React.FC = () => {
           </IonRefresher>
         ) : null}
 
-        <Main />
-
-        <div className="p-footer">
-          <IonTabBar slot="bottom">
-            <IonTabButton
-              tab="services"
-              href="/page/services"
-              onClick={() => {
-                goTo('/page/services');
-              }}
-            >
-              <IonIcon icon={contractOutline} className="w-1 h-1" />
-              <div className="h-2"> Услуги </div>
-            </IonTabButton>
-
-            <IonTabButton
-              tab="lics"
-              href="/page/lics"
-              onClick={() => {
-                goTo('/page/lics');
-              }}
-            >
-              <IonIcon icon={documentTextOutline} className="w-1 h-1" />
-              <div className="h-2">Лицевые счета</div>
-            </IonTabButton>
-
-            <IonTabButton
-              tab="news"
-              href="/page/push"
-              onClick={() => {
-                goTo('/page/push');
-              }}
-            >
-              <IonIcon icon={chatboxEllipsesOutline} className="w-1 h-1" />
-              <div className="h-2">Уведомления</div>
-            </IonTabButton>
-          </IonTabBar>
+        <div className={isPlatform('ios') ? 'p-content-ios' : 'p-content'}>
+          {children}
         </div>
       </IonContent>
+
+      <IonFooter className="ion-no-border p-footer">
+        <nav className="p-tabbar">
+          {tabs.map((tab) => (
+            <button
+              key={tab.path}
+              type="button"
+              className={
+                location.pathname === tab.path ? 'p-tabbtn selected' : 'p-tabbtn'
+              }
+              onClick={() => goTo(tab.path)}
+            >
+              <IonIcon icon={tab.icon} className="w-1 h-1" />
+              <div className="h-2">{tab.label}</div>
+            </button>
+          ))}
+        </nav>
+      </IonFooter>
     </IonPage>
   );
 };

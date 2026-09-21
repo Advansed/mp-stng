@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { requestJson } from './api'
 
 interface NewsItem {
   id: string
@@ -51,8 +52,9 @@ const useNewsStore = create<NewsStore>((set, get) => ({
   fetchNews: async (page: number) => {
     set({ loading: true })
     try {
-      const response = await fetch(`https://aostng.ru/api/v2/news/all/page/${page}`)
-      const data = await response.json()
+      const data = await requestJson('news/all', `https://aostng.ru/api/v2/news/all/page/${page}`, {
+        params: { page },
+      })
       
       if (data.status && data.data) {
         // Обработка URL изображений
@@ -77,8 +79,9 @@ const useNewsStore = create<NewsStore>((set, get) => ({
   fetchNotices: async (page: number) => {
     set({ loading: true })
     try {
-      const response = await fetch(`https://aostng.ru/api/v2/notice/all/page/${page}`)
-      const data = await response.json()
+      const data = await requestJson('notice/all', `https://aostng.ru/api/v2/notice/all/page/${page}`, {
+        params: { page },
+      })
       
       if (data.status && data.data) {
         // Обработка URL изображений
@@ -102,8 +105,9 @@ const useNewsStore = create<NewsStore>((set, get) => ({
 
   fetchNewsDetail: async (id: string) => {
     try {
-      const response = await fetch(`https://aostng.ru/api/v2/news/${id}/`)
-      const data = await response.json()
+      const data = await requestJson('news/detail', `https://aostng.ru/api/v2/news/${id}/`, {
+        params: { id },
+      })
       
       if (data.status && data.data) {
         // Обработка URL изображения
@@ -120,8 +124,9 @@ const useNewsStore = create<NewsStore>((set, get) => ({
 
   fetchNoticeDetail: async (id: string) => {
     try {
-      const response = await fetch(`https://aostng.ru/api/v2/notice/${id}/`)
-      const data = await response.json()
+      const data = await requestJson('notice/detail', `https://aostng.ru/api/v2/notice/${id}/`, {
+        params: { id },
+      })
       
       if (data.status && data.data) {
         // Обработка URL изображения

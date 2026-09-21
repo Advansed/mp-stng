@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IonLoading, IonText } from '@ionic/react';
+import { requestJson } from '../Store/api';
 import styles from './Queye.module.css';
 
 interface QueueItem {
@@ -18,10 +19,10 @@ export function Queye(): JSX.Element {
   const loadQueue = async () => {
     try {
       setError(null);
-      const res = await fetch(
+      const json = await requestJson(
+        'queye',
         'https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/queye'
       );
-      const json = await res.json();
       if (json && json.success && Array.isArray(json.data)) {
         setItems(json.data as QueueItem[]);
       } else {

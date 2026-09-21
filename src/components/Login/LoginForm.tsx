@@ -20,9 +20,6 @@ export function LoginForm({ onNavigate, onLogin }: LoginFormProps) {
 
 
     useEffect(()=>{
-
-        console.log('check')
-        
         const login = { phone: "'", password: ""}
         login.phone = localStorage.getItem("stngul.phone") || '';
         login.password = localStorage.getItem("stngul.pass") || '';

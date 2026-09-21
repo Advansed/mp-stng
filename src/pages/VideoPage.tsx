@@ -4,6 +4,8 @@ import { close } from 'ionicons/icons';
 import './VideoPage.css'
 import { LoginPage } from '../components/Login/Login';
 import { useNavigateStore } from '../Store/navigateStore';
+import { ROUTES } from '../routes';
+import { useNavigation } from './useNavigation';
 
 interface VideoPageProps {
     onNavigate:     ( page: LoginPage ) => void;
@@ -18,7 +20,7 @@ const VideoPage: React.FC<VideoPageProps> = ({ onNavigate }) => {
         const v = videoRef.current;
         if (!v) return;
 
-        if (currentPage === "/page/video") {
+        if (currentPage === ROUTES.video) {
             v.muted = false;
             v.play().catch((e) => { console.error('Error playing video:', e)});
         } else {
@@ -57,5 +59,10 @@ const VideoPage: React.FC<VideoPageProps> = ({ onNavigate }) => {
   );
 };
 
+
+export function AppVideoPage() {
+    const { goTo } = useNavigation();
+    return <VideoPage onNavigate={() => goTo(ROUTES.lics)} />;
+}
 
 export default VideoPage;

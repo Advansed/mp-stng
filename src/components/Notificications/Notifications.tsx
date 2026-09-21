@@ -3,6 +3,7 @@ import { IonIcon, IonLoading, IonText } from "@ionic/react"
 import { notificationsOutline, timeOutline } from "ionicons/icons"
 import { useNotifications } from "./useNotifications"
 import { useNavigateStore } from "../../Store/navigateStore"
+import { ROUTES } from "../../routes"
 import styles from "./Notifications.module.css"
 
 function formatPeriod(period: unknown): string {
@@ -28,7 +29,7 @@ export function Notifications() {
   const currentPage = useNavigateStore((state) => state.currentPage)
 
   useEffect(() => {
-    if (currentPage !== "/page/push") return
+    if (currentPage !== ROUTES.push) return
     if (pages !== -1 || loading) return
     refreshNotifications()
   }, [currentPage, pages, loading, refreshNotifications])

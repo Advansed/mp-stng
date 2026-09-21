@@ -20,9 +20,7 @@ export function useCheckAI(opts: UseCheckAIOptions) {
     async (method: string, objectKey: string): Promise<any> => {
       setAIChecking(true)
       try {
-        console.log( service )
         const res = await api("checkAI", { token, method, app: service ?? undefined, url: objectKey })
-        console.log("checkAI", res)
         return res
       } catch {
         return null

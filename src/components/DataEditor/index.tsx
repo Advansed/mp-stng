@@ -16,13 +16,16 @@ import { ImageField } from './fields/ImageField';
 import { ImagesField } from './fields/ImagesField';
 import { CheckField } from './fields/CheckField';
 import { RateField } from './fields/RateField';
-import { useLicsStore } from '../../Store/licsStore';
+import { licNumberFromValue, useLicsStore } from '../../Store/licsStore';
 import { FioField } from './fields/FIOField';
 import { IonLoading } from '@ionic/react';
 import { PreviewField } from './fields/PreviewField';
 import { SignField } from './fields/SignField';
 import { EquipField } from './fields/Equip';
 import { EmailField } from './fields/EmailField';
+import { SnilsField } from './fields/SnilsField';
+import { SeriesField } from './fields/SeriesField';
+import { PassNumberField } from './fields/PassNumberField';
 import useAppsStore from '../../Store/appStore';
 import type { AiPassportImageResult } from '../../Store/appStore';
 import {
@@ -305,7 +308,6 @@ const DataEditor: React.FC<DataEditorProps> = ({
   }
 
   const aiStatusResolved             = (raw: any) => {
-    console.log('raw', raw)
     if (!raw) return null;
     if (!Array.isArray(raw)) return raw;
     if (raw.length === 0) return null;
@@ -355,7 +357,6 @@ const DataEditor: React.FC<DataEditorProps> = ({
 
     resolved.errors = errors;
 
-    console.log('resolved', resolved)
     return resolved;
   };
   
@@ -548,12 +549,9 @@ const DataEditor: React.FC<DataEditorProps> = ({
     const mergedRemoteAiCheck =
       async (args: { method: string; objectKey: string; fileUrl: string }): Promise<any> => {
         if (!onCheckAI || !field.ai_method) return null;
-        console.log('field1', field.ai_status?.data?.address)
         const res = await onCheckAI(args);
-        console.log('field2', field.ai_status?.data?.address)
         const incoming = extractAiInboundFromCheckResponse(field.ai_method, res);
         if (incoming != null) {
-          console.log('field3', field.ai_status?.data?.address)
           applyAiStatus(incoming, field.ai_method);
         }
         return res;
@@ -567,7 +565,12 @@ const DataEditor: React.FC<DataEditorProps> = ({
       case 'number':      return <NumberField     {...props} />;
       case 'box':         return <SelectField     {...props} options={field.values || []} />;
       case 'select':      return <SelectField     {...props} options={field.values || []} />;
-      case 'lics':        return <SelectField     {...props} options={getLics() || []} />;
+      case 'lics':        return <SelectField
+                                    {...props}
+                                    value={licNumberFromValue(lics, field.data)}
+                                    options={getLics() || []}
+                                    onChange={(code) => update(code)}
+                                  />;
       case 'date':        return <DateField       {...props} />;
       case 'city':        return <CityField       {...props} onFIAS={setFias} />;
       case 'address':     return <AddressField    {...props} cityFias={fias} />;
@@ -589,6 +592,9 @@ const DataEditor: React.FC<DataEditorProps> = ({
       case 'sign':        return <SignField       {...props} />;
       case 'equip':       return <EquipField      {...props} />;
       case 'email':       return <EmailField      {...props} />;
+      case 'snils':       return <SnilsField      {...props} />;
+      case 'series':      return <SeriesField     {...props} />;
+      case 'pass_number': return <PassNumberField {...props} />;
       case 'preview':     return loading ? <>
         <IonLoading isOpen={loading} message={"Подождите..."} />
         <PreviewField getPreview={handlePreview} />

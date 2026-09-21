@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { requestJson } from './api'
 
 interface Appeal {
   Код: string
@@ -48,12 +49,10 @@ const useAppealsStore = create<AppealsStore>((set, get) => ({
   fetchAppeals:         async (token: string) => {
     set({ loading: true })
     try {
-      const response = await fetch('https://aostng.ru/api/v2/getChannels/', {
+      const data = await requestJson('getChannels', 'https://aostng.ru/api/v2/getChannels/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
+        params: { token },
       })
-      const data = await response.json()
       
       if (!data.error) {
         set({ appeals: data.data })
@@ -68,12 +67,10 @@ const useAppealsStore = create<AppealsStore>((set, get) => ({
   fetchMessages:        async (token: string, channelCode: string) => {
     set({ loading: true })
     try {
-      const response = await fetch('https://aostng.ru/api/v2/getMessages/', {
+      const data = await requestJson('getMessages', 'https://aostng.ru/api/v2/getMessages/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, Канал: channelCode })
+        params: { token, Канал: channelCode },
       })
-      const data = await response.json()
       
       if (!data.error) {
         set({ messages: data.data })
@@ -91,12 +88,10 @@ const useAppealsStore = create<AppealsStore>((set, get) => ({
       const body: any = { token, Получатель: recipient, Текст: text }
       if (image) body.Картинка = image
 
-      const response = await fetch('https://aostng.ru/api/v2/sendMessage/', {
+      const data = await requestJson('sendMessage', 'https://aostng.ru/api/v2/sendMessage/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        params: body,
       })
-      const data = await response.json()
       
       if (!data.error) {
         // Перезагрузить сообщения после отправки

@@ -57,8 +57,6 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
   ): Promise<{ uploadUrl: string; fileUrl: string; fields: any }> => {
     const response = await api("getUploadURL", { token, filename, format })
 
-    console.log("getUploadUrl", filename, response)
-
     if (response.error) {
       throw new Error("Failed to get upload URL: " + response.message)
     }
@@ -68,8 +66,6 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
 
   const delFileS3 = async (filename: string): Promise<{ uploadUrl: string; fileUrl: string; fields: any }> => {
     const response = await api("delFileS3", { token, filename })
-
-    console.log("delFileS3", filename, response)
 
     if (response.error) {
       throw new Error("Failed to get upload URL")
@@ -89,8 +85,6 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
       const extension = fileName?.split(".").pop() || "jpg"
       const uniqueFileName = fileName || `images/${timestamp}_${randomString}.${extension}`
 
-      console.log("uploadFile", fileName, uniqueFileName)
-
       const { uploadUrl, fileUrl } = await getUploadUrl(uniqueFileName, file.type)
 
       let simulatedProgress = 0
@@ -100,14 +94,14 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
         options.onProgress?.(simulatedProgress)
       }, 200)
 
-      console.log("uploadUrl", uploadUrl)
+      console.log("[API] S3 PUT request", { url: uploadUrl, fileName, uniqueFileName, type: file.type, size: file.size })
       const response = await fetch(uploadUrl, {
         method: "PUT",
         body: file,
         headers: {},
       })
+      console.log("[API] S3 PUT response", { status: response.status, ok: response.ok })
 
-      console.log("upload", response)
       clearInterval(progressInterval)
 
       if (!response.ok) {
@@ -120,7 +114,6 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
       options.onProgress?.(100)
       options.onSuccess?.(fileUrl)
 
-      console.log("✅ Upload successful:", fileUrl)
       return fileUrl
     } catch (err) {
       const errObj = err instanceof Error ? err : new Error("Upload failed")

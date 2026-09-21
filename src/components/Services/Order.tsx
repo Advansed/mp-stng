@@ -1,16 +1,16 @@
 // Order.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useToast } from '../Toast';
 import { TService } from '../../Store/serviceStore';
 import { FieldChangeEvent, FieldData, PageData, Section } from '../DataEditor/types';
 import DataEditor from '../DataEditor';
 import { useProfileData } from '../Login/authStore';
 import { useCheckAI } from './useCheckAI';
-import { useLicsStore } from '../../Store/licsStore';
+import { licNumberFromValue, useLicsStore } from '../../Store/licsStore';
 
 interface OrderProps {
   service:                                            TService;
-  onSave:                                             (orderData: any) => Promise<void>;
+  onSave:                                             (orderData: any, options?: { silent?: boolean }) => Promise<void>;
   onBack:                                             () => void;
   onPreview:                                          (order: any) => Promise<any>
 }
@@ -24,6 +24,8 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
   const [isLoading, setIsLoading]                     = useState(true);
   const [normalizedService, setNormalizedService]     = useState<TService | null>(null);
   const { checkAI, isAIChecking }                     = useCheckAI({ service: normalizedService });
+  const didPersistRef                                 = useRef(false);
+  const persistRef                                    = useRef<(() => Promise<void>) | null>(null);
 
   /**
    * Получает значение из профиля по имени поля формы
@@ -80,7 +82,9 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
           name: field.name,
           label: field.label,
           type: field.type,
-          data: field.value ?? fromProfile ?? '',
+          data: field.type === 'lics'
+            ? licNumberFromValue(lics.lics, field.value ?? fromProfile ?? '')
+            : (field.value ?? fromProfile ?? ''),
           ai_method: field.ai_method,
           ai_status: undefined,
           values: field.values,
@@ -108,7 +112,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
   }, [service, profile]);
 
 
-  const getOrderData    = (data: PageData): any => {
+  const getOrderData    = (data: PageData, проведен?: 0 | 2): any => {
     if (!normalizedService) return {};
     const next: { [key: string]: any } = {};
     next.Ссылка = normalizedService.id;
@@ -129,7 +133,8 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       chapter.data.forEach((field, fieldIndex) => {
         const originalField = normalizedService.chapters[chapterIndex]?.data?.[fieldIndex];
         if (originalField) {
-          next[originalField.name] = field.data;
+          next[originalField.name] =
+            originalField.type === 'lics' ? licNumberFromValue(lics.lics, field.data) : field.data;
           return;
         }
 
@@ -187,18 +192,46 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
 
     next.ai_status.status = !ii_pass;
 
+    if (проведен !== undefined) next.Проведен = проведен;
+
     return next;
   }
 
+  const persistDraft    = async (data: PageData) => {
+    if (didPersistRef.current) return;
+    if (isLoading || !normalizedService?.chapters?.length) return;
+    if ((service.type || normalizedService.type) !== 'agreement') return;
+    didPersistRef.current = true;
+    await onSave(getOrderData(data, 2), { silent: true });
+  };
+
+  persistRef.current = () => persistDraft(orderData);
+
+  useEffect(() => {
+    return () => {
+      void persistRef.current?.();
+    };
+  }, []);
+
+  const handleExit      = async () => {
+    try {
+      await persistDraft(orderData);
+    } catch (error) {
+      console.error('Error saving order:', error);
+    } finally {
+      onBack();
+    }
+  };
+
   const handleSave      = async (data: PageData) => {
     try {
-      const payload = getOrderData(data);
-
-      await onSave(payload);
+      if (isLoading || !normalizedService?.chapters?.length) return;
+      didPersistRef.current = true;
+      await onSave(getOrderData(data, 0));
       onBack();
-
     } catch (error) {
-      console.log('Error saving order:', error);
+      didPersistRef.current = false;
+      console.error('Error saving order:', error);
       toast.error('Ошибка при отправке заявки');
     }
   };
@@ -221,7 +254,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       if (nextSection.title === 'Объект газификации') {
 
         const selectedLic   = nextSection.data.find((field) => field.type === 'lics')?.data;
-        const lic           = lics.lics.find((item) => item.code === selectedLic);
+        const lic           = lics.lics.find((item) => item.id === selectedLic || item.code === selectedLic);
         const licAddress    = lic?.address || '';
 
         nextSection = {
@@ -255,7 +288,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     const chapter = normalizedService.chapters[event.sectionIndex];
     if (!chapter || chapter.label !== 'Объект газификации') return;
 
-    const lic = lics.lics.find((item) => item.code === event.value);
+    const lic = lics.lics.find((item) => item.id === event.value || item.code === event.value);
     const licAddress = lic?.address || '';
     const addressIdx = (chapter.data || []).findIndex((item: any) => item.type === 'address');
     if (addressIdx < 0) return;
@@ -298,7 +331,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     <DataEditor
       data            = { orderData }
       onSave          = { handleSave }
-      onBack          = { onBack }
+      onBack          = { handleExit }
       onPreview       = { (data: PageData) => onPreview(getOrderData(data)) }
       onCheckAI       = { ({ method, objectKey, fileUrl }) => checkAI(method, objectKey) }
       isAIChecking    = { isAIChecking }

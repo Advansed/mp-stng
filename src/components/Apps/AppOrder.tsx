@@ -5,7 +5,7 @@ import { TService } from '../../Store/serviceStore';
 import useAppsStore from '../../Store/appStore';
 import { FieldChangeEvent, FieldData, PageData, Section } from '../DataEditor/types';
 import DataEditor from '../DataEditor';
-import { useLicsStore } from '../../Store/licsStore';
+import { licNumberFromValue, useLicsStore } from '../../Store/licsStore';
 import { useCheckAI } from './useCheckAI';
 
 interface AppOrderProps {
@@ -57,7 +57,7 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
           doc:          field.doc,
           label:        field.label,
           type:         field.type,
-          data:         field.value,
+          data:         field.type === 'lics' ? licNumberFromValue(lics.lics, field.value) : field.value,
           ai_method:    field.ai_method,
           ai_status:    field.ai_status,
           values:       field.values,
@@ -113,7 +113,8 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
       chapter.data.forEach((field, fieldIndex) => {
         const originalField = normalizedService.chapters[chapterIndex]?.data?.[fieldIndex];
         if (originalField) {
-          orderData[originalField.name] = field.data;
+          orderData[originalField.name] =
+            originalField.type === 'lics' ? licNumberFromValue(lics.lics, field.data) : field.data;
         } else {
           // Проверяем файлы с учетом того, что data может включать и поля и файлы
           const fileIndex = fieldIndex - (normalizedService.chapters[chapterIndex]?.data?.length || 0);
@@ -175,9 +176,7 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
 
   const handleSave      = async (data: PageData) => {
     try {
-      console.log("save PageData", data)
       const orderData = getOrderData(data);
-      console.log("orderData", orderData)
       await onSave(orderData);
       onBack();
     } catch (error) {
@@ -202,7 +201,7 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
 
       if (nextSection.title === "Объект газификации") {
         const selectedLic = nextSection.data.find((field) => field.type === "lics")?.data
-        const lic = lics.lics.find((item) => item.code === selectedLic)
+        const lic = lics.lics.find((item) => item.id === selectedLic || item.code === selectedLic)
         const licAddress  = lic?.address || ""
 
         nextSection = {
@@ -236,7 +235,7 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
     const chapter = appNow.service.chapters[event.sectionIndex]
     if (!chapter || chapter.label !== "Объект газификации") return
 
-    const lic = lics.lics.find((item) => item.code === event.value)
+    const lic = lics.lics.find((item) => item.id === event.value || item.code === event.value)
     const licAddress = lic?.address || ""
     const addressIdx = (chapter.data || []).findIndex((item: any) => item.type === "address")
     if (addressIdx < 0) return

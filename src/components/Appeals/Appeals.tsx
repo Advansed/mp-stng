@@ -5,6 +5,7 @@ import { cameraOutline, imageOutline, syncCircleOutline } from "ionicons/icons"
 import { useAppeals } from "./useAppeals"
 import { PickSource } from "../Files"
 import { useNavigateStore } from "../../Store/navigateStore"
+import { ROUTES } from "../../routes"
 
 export function Appeals() {
     const { 
@@ -21,7 +22,7 @@ export function Appeals() {
     const currentPage = useNavigateStore(state => state.currentPage)
     
     useEffect(()=>{
-        if(currentPage === '/page/appeals')
+        if(currentPage === ROUTES.appeals)
             refreshAppeals()
     },[currentPage])
 

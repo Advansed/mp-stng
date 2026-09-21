@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useEffect, useRef } from "react"
 import { IonCard, IonLoading, IonText, IonBadge, IonIcon, useIonViewWillEnter } from "@ionic/react"
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom"
+import { ROUTES, appStatusPath } from "../../routes"
 import { useApps } from "./useApps"
 import { useNavigateStore } from "../../Store/navigateStore"
 import { locationOutline, calendarOutline, documentTextOutline, codeOutline } from "ionicons/icons"
@@ -24,7 +25,7 @@ export function Apps(): JSX.Element {
   const setCurrentPage = useNavigateStore((state) => state.setCurrentPage)
   const location = useLocation<AppsLocationState>()
   const history = useHistory()
-  const statusMatch = useRouteMatch<{ appId: string }>("/page/apps/status/:appId")
+  const statusMatch = useRouteMatch<{ appId: string }>(ROUTES.appStatusPattern)
   const lastHandledEditIdRef = useRef<string>("")
 
   const refreshAppsRef = useRef(refreshApps)
@@ -60,7 +61,7 @@ export function Apps(): JSX.Element {
 
     lastHandledEditIdRef.current = editAppId
     void handleEdit(editAppId)
-    history.replace("/page/apps")
+    history.replace(ROUTES.apps)
   }, [location.search, location.state, history, handleEdit])
 
   const handleBack = useCallback(() => {
@@ -76,7 +77,7 @@ export function Apps(): JSX.Element {
   }, [saveApp, refreshApps, setApp])
 
   const openStatuses = useCallback((id: string, statuses?: AppStatusEntry[]) => {
-    const path = `/page/apps/status/${id}`
+    const path = appStatusPath(id)
     setCurrentPage(path)
     history.push(path, { statuses })
   }, [setCurrentPage, history])

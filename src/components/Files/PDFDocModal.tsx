@@ -179,9 +179,9 @@ export function PDFDocModal({
         
         setIsLoading(true);
         setMessage('');
-        
+
         try {
-           console.log("handleEmailSend")
+            // Email sending is not implemented yet
         } catch (error) {
             setMessage('Ошибка отправки документа');
             console.error('Email send error:', error);

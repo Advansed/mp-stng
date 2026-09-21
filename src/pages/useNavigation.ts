@@ -1,12 +1,11 @@
-// useNavigation.ts
-import { useIonRouter }         from '@ionic/react';
-import { useCallback }          from 'react';
-import { useNavigateStore }     from '../Store/navigateStore';
-import { LicsPage }             from '../components/Lics';
+import { useHistory } from 'react-router-dom';
+import { useCallback } from 'react';
+import { useNavigateStore } from '../Store/navigateStore';
+import { LicsPage } from '../components/Lics';
+import { resolveAppPath } from '../routes';
 
 export const useNavigation = () => {
-
-  const ionRouter   = useIonRouter();
+  const history = useHistory();
 
   const {
     setCurrentPage,
@@ -15,37 +14,39 @@ export const useNavigation = () => {
     page,
     item,
     setItem,
-    setPage
+    setPage,
   } = useNavigateStore();
 
-  const goTo        = useCallback((path: string) => {
-    if (currentPage === path) return
-    setCurrentPage( path );
-    ionRouter.push( path );
-  }, [ionRouter, setCurrentPage, currentPage]);
+  const goTo = useCallback(
+    (path: string) => {
+      const resolved = resolveAppPath(path);
+      if (currentPage === resolved) return;
+      setCurrentPage(resolved);
+      history.push(resolved);
+    },
+    [history, setCurrentPage, currentPage]
+  );
 
-  const goBack      = useCallback((currentPage?: string) => {
-    if ( page > LicsPage.MAIN) {
-        if(page === LicsPage.HISTORY_INDICES) setPage(LicsPage.INDICES)
-        else setPage( LicsPage.MAIN)
-    }
-    else {
+  const goBack = useCallback(() => {
+    if (page > LicsPage.MAIN) {
+      if (page === LicsPage.HISTORY_INDICES) setPage(LicsPage.INDICES);
+      else setPage(LicsPage.MAIN);
+    } else {
       const previousPage = navigateBack();
       if (previousPage) {
-        ionRouter.push( previousPage);
+        history.push(previousPage);
       } else {
-        ionRouter.goBack();
+        history.goBack();
       }
     }
-  }, [ionRouter, page, navigateBack]);
+  }, [history, page, navigateBack, setPage]);
 
   return {
     goTo,
-    goBack, 
-    item, 
-    setItem, 
-    page, 
-    setPage
+    goBack,
+    item,
+    setItem,
+    page,
+    setPage,
   };
 };
-

@@ -66,9 +66,7 @@ export const useApps = () => {
     orderData.token = token
     setLoading(true)
     try {
-      console.log("save orderData", orderData )
       const res = await api("upd_details1", orderData)
-      console.log("upd_details1", res)
       if (res.error) toast.error(res.message || "Ошибка сохранения")
       else toast.success(res.message || "Заявка сохранена")
 
@@ -89,8 +87,6 @@ export const useApps = () => {
         token,
         fileUrl: agreementContractPath(docId),
       })
-
-      console.log('getsignedurl res:', agreementContractPath(docId), res)
 
       return parseSignedUrlResponse(res)
     } catch (error) {

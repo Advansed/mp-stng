@@ -39,10 +39,8 @@ function deferForIosOverlay(): Promise<void> {
 }
 
 async function pickSource(): Promise<PickSource | null> {
-    console.log('[PickSource] pickSource: start');
     let actionSheet: HTMLIonActionSheetElement;
     try {
-        console.log('[PickSource] pickSource: create() …');
         actionSheet = await actionSheetController.create({
             header: "Выберите источник",
             buttons: [
@@ -52,7 +50,6 @@ async function pickSource(): Promise<PickSource | null> {
                 { text: "Отмена", role: "cancel" },
             ],
         });
-        console.log('[PickSource] pickSource: create() done', actionSheet);
     } catch (e) {
         console.error('[PickSource] pickSource: create() failed', e);
         throw e;
@@ -60,11 +57,8 @@ async function pickSource(): Promise<PickSource | null> {
 
     try {
         await deferForIosOverlay();
-        console.log('[PickSource] pickSource: deferForIosOverlay done');
         await actionSheet.present();
-        console.log('[PickSource] pickSource: present() done');
         const result = await actionSheet.onDidDismiss<{ source?: PickSource }>();
-        console.log('[PickSource] pickSource: onDidDismiss', result);
         return result.data?.source ?? null;
     } catch (e) {
         console.error('[PickSource] pickSource: present/dismiss failed', e);
@@ -91,25 +85,20 @@ async function getPhotoFromSource(source: CameraSource) {
 }
 
 export async function       PickSource() {
-    console.log('[PickSource] PickSource: start');
     try {
         const source = await pickSource();
-        console.log('[PickSource] PickSource: source chosen', source);
         if (!source) throw new Error("Файл не выбран");
 
         if (source === "pdf") {
-            console.log('[PickSource] PickSource: branch pdf');
             const pdf = await pickPdfFile();
             if (!pdf) throw new Error("PDF не выбран");
             return pdf;
         }
 
         if (source === "gallery") {
-            console.log('[PickSource] PickSource: branch gallery');
             return getPhotoFromSource(CameraSource.Photos);
         }
 
-        console.log('[PickSource] PickSource: branch camera');
         return getPhotoFromSource(CameraSource.Camera);
     } catch (e) {
         console.error('[PickSource] PickSource: error', e);

@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { FieldData, PageData } from '../types';
+import { snilsValidationError } from '../fields/snils';
+import { passNumberValidationError, seriesValidationError } from '../fields/passport';
 
 interface ValidationErrors {
   [key: string]: string;
@@ -73,6 +75,15 @@ export const useValidation = () => {
             if (!emailRegex.test(value.trim())) return 'Введите корректный email адрес';
         }
         break;
+
+      case 'snils':
+        return snilsValidationError(typeof value === 'string' ? value : '', true);
+
+      case 'series':
+        return seriesValidationError(typeof value === 'string' ? value : '', true);
+
+      case 'pass_number':
+        return passNumberValidationError(typeof value === 'string' ? value : '', true);
 
       case 'equip':
         if (!value || !Array.isArray(value) || value.length === 0) {

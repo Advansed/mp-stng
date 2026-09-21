@@ -9,7 +9,8 @@
 .p-toolbar-logo {
   position: absolute;
   left: 50%;
-  top: 50%;
+  /* Центр относительно области ниже статус-бара, а не всей высоты toolbar */
+  top: calc(50% + var(--ion-safe-area-top, env(safe-area-inset-top, 0px)) / 2);
   transform: translate(-50%, -50%);
   pointer-events: none;
   display: flex;
@@ -22,8 +23,9 @@
   height: 45px;
 }
 
-.p-content {
-  height: calc(100% - 4.5em);
+.p-content,
+.p-content-ios {
+  height: 100%;
   min-height: 0;
   overflow-y: auto;
   background: url('pattern.png'), linear-gradient(156.39deg, #1b80b9 7.75%, #0e3977 100.99%);
@@ -32,12 +34,28 @@
   background-position: bottom;
 }
 
-.p-content-ios {
-  height: calc(100% - 4.5em);
-  min-height: 0;
-  overflow-y: auto;
-  background: url('pattern.png'), linear-gradient(156.39deg, #1b80b9 7.75%, #0e3977 100.99%);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: bottom;
+.p-tabbar {
+  display: flex;
+  align-items: stretch;
+  min-height: 56px;
+  background: #fff;
+  padding-bottom: var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px));
+}
+
+.p-tabbtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin: 0;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: #8c8c8c;
+}
+
+.p-tabbtn.selected {
+  color: #3f64a9;
 }

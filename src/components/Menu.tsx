@@ -8,7 +8,6 @@ import {
   isPlatform,
 } from '@ionic/react';
 
-import { useHistory } from 'react-router-dom';
 import { callOutline, callSharp, contractOutline, contractSharp, documentSharp, documentTextOutline, exitOutline, exitSharp, 
     notificationsCircleOutline, 
     notificationsCircleSharp, 
@@ -19,6 +18,8 @@ import './Menu.css';
 import { version } from '../Store/api';
 import { useNavigation } from '../pages/useNavigation';
 import { useAuthStore } from './Login/authStore';
+import { ROUTES } from '../routes';
+import { useNavigateStore } from '../Store/navigateStore';
 
 interface AppPage {
   url: string;
@@ -30,61 +31,61 @@ interface AppPage {
 const appPages: AppPage[] = [
   {
     title: 'Личные данные',
-    url: '/page/profile',
+    url: ROUTES.profile,
     iosIcon: personOutline,
     mdIcon: personSharp
   },
   {
     title: 'Лицевые счета',
-    url: '/page/lics',
+    url: ROUTES.lics,
     iosIcon: documentTextOutline,
     mdIcon: documentSharp
   },
   {
     title: 'Услуги',
-    url: '/page/services',
+    url: ROUTES.services,
     iosIcon: contractOutline,
     mdIcon: contractSharp
   },
   {
     title: 'Договора, заявки',
-    url: '/page/apps',
+    url: ROUTES.apps,
     iosIcon: pencilOutline,
     mdIcon: pencilSharp
   },
   {
     title: 'Мониторинг эл. очередь',
-    url: '/page/queye',
+    url: ROUTES.queye,
     iosIcon: notificationsCircleOutline,
     mdIcon: notificationsCircleSharp
   },
   {
     title: 'Мониторинг АГЗС',
-    url: '/page/agzs',
+    url: ROUTES.agzs,
     iosIcon: videocamOutline,
     mdIcon: videocamSharp
   },
   {
     title: 'Уведомления',
-    url: '/page/push',
+    url: ROUTES.push,
     iosIcon: notificationsOutline,
     mdIcon: notificationsSharp
   },
   {
     title: 'Видео инструкция',
-    url: '/page/video',
+    url: ROUTES.video,
     iosIcon: callOutline,
     mdIcon: callSharp
   },
   {
     title: 'Контакты',
-    url: '/page/contacts',
+    url: ROUTES.contacts,
     iosIcon: callOutline,
     mdIcon: callSharp
   },
   {
     title: 'Выйти',
-    url: '/page/exit',
+    url: ROUTES.exit,
     iosIcon: exitOutline,
     mdIcon: exitSharp
   }
@@ -93,6 +94,7 @@ const appPages: AppPage[] = [
 
 const Menu: React.FC = () => {
   const { setAuth } = useAuthStore()
+  const clearHistory = useNavigateStore((state) => state.clearHistory)
   const { goTo } = useNavigation();
 
   return (
@@ -110,11 +112,11 @@ const Menu: React.FC = () => {
                 <IonMenuToggle key={index} autoHide={false}>
                   <div className='flex ml-1 mr-1 mt-1'
                     onClick={()=>{ 
-                      if( appPage.url === "/page/exit" ){
+                      if( appPage.url === ROUTES.exit ){
 
                         localStorage.removeItem( "stngul.phone" )
                         localStorage.removeItem( "stngul.pass" )
-        
+                        clearHistory()
                         setAuth( false )
                       } 
                         

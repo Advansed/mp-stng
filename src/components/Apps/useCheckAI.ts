@@ -25,7 +25,6 @@ export function useCheckAI(_opts?: UseCheckAIOptions) {
       setAIChecking(true)
       try {
         const res = await api("checkAI", { token, method, app: app?.service, url: objectKey })
-        console.log("checkAI", res)
         return res
       } catch {
         return null

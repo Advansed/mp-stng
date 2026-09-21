@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { api } from './api'
+import { api, requestJson } from './api'
 
 interface BonusCard {
   owner_id?: string
@@ -65,12 +65,10 @@ const useBonusesStore = create<BonusesStore>((set, get) => ({
   createBonusCard: async (token: string) => {
     set({ loading: true, message: '' })
     try {
-      const response = await fetch('https://aostng.ru/api/v2/spCreateClient/', {
+      const data = await requestJson('spCreateClient', 'https://aostng.ru/api/v2/spCreateClient/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
+        params: { token },
       })
-      const data = await response.json()
       
       if (!data.error) {
         set({ bonusCard: data.data })
@@ -88,17 +86,15 @@ const useBonusesStore = create<BonusesStore>((set, get) => ({
   saveProfile: async (token: string, profile: Profile) => {
     set({ loading: true })
     try {
-      const response = await fetch('https://aostng.ru/api/v2/profile/', {
+      const data = await requestJson('profile', 'https://aostng.ru/api/v2/profile/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          token, 
+        params: {
+          token,
           surname: profile.surname,
           name: profile.name,
-          lastname: profile.lastname
-        })
+          lastname: profile.lastname,
+        },
       })
-      const data = await response.json()
       
       if (!data.error) {
         set({ profile: data.data })

@@ -7,6 +7,7 @@ export interface TService {
     id:         string,
     icon:       string,
     text:       string,
+    type?:      string,
     chapters:   TChapter[]
 }
 
@@ -50,9 +51,9 @@ interface ServiceState {
   setInfo:      ( info: any ) => void
   setLoading:   ( loading: boolean ) => void
   
-  saveService:  ( order:any ) => Promise<any>
+  saveService:  ( order:any, options?: { silent?: boolean } ) => Promise<any>
   preview:      ( order:any ) => Promise<any>
-  loadServices: ( token: string ) => Promise<any>
+  loadServices: ( token: string, options?: { silent?: boolean } ) => Promise<any>
   resetState:   () => void
 }
 
@@ -70,16 +71,20 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
   
     setLoading:     ( loading )   => set({ loading }),
   
-    saveService:    async ( orderData: any) => {
-        set({ loading: true})
+    saveService:    async ( orderData: any, options?: { silent?: boolean }) => {
+        const silent = options?.silent || orderData?.Проведен === 2
+        if (!silent) set({ loading: true})
         try {
-            const res = await api('services1', orderData )
+            const res = await api('services_set', orderData )
+            if (!res?.error && orderData?.token) {
+                await get().loadServices(orderData.token, { silent: true })
+            }
             return res
         } catch (error:any) {
             console.error('Error saving service:', error);
             return { error: true, message: error.message }
         } finally {
-            set((state) => ({ ...state, loading: false })) // Функциональное обновление
+            if (!silent) set((state) => ({ ...state, loading: false }))
         }
         
     },
@@ -94,24 +99,23 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
         }        
     },
 
-    loadServices:   async( token: string) => {
+    loadServices:   async( token: string, options?: { silent?: boolean }) => {
 
-        set({ loading: true })
+        const silent = !!options?.silent
+        if (!silent) set({ loading: true })
         try {
-            const res = await api("s_details", { token: token })
-            console.log( "s_details", res );
+            const res = await api("services_get", { token: token })
             if(res.error){
-                set({ loading: false})
+                if (!silent) set({ loading: false})
                 return res
             }
             else {
-                set({ services: res.data })
-                set({ loading: false})
+                set(silent ? { services: res.data } : { services: res.data, loading: false })
                 return res
             }
         } catch(e) {
             console.error("Error loading services:", e)
-            set({ loading: false})
+            if (!silent) set({ loading: false})
         
         }
     },

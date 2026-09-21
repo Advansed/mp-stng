@@ -50,8 +50,6 @@ const ESIALoginButton: React.FC = () => {
   // Обработка возврата из браузера
   useEffect(() => {
     const handleAppUrlOpen = async (data: any) => {
-      console.log('Received URL:', data.url);
-
       if (data.url && data.url.includes('mystnglk://auth/callback')) {
         try {
           // Закрываем браузер

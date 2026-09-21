@@ -1,6 +1,7 @@
 // RestoreForm.tsx
 import React, { useState } from "react";
-import { IonImg, IonText, IonButton, IonInput } from "@ionic/react";
+import { IonImg, IonText, IonButton, IonInput, IonIcon } from "@ionic/react";
+import { eyeOffOutline, eyeOutline } from "ionicons/icons";
 import { LoginPage } from "./Login";
 import { useToast } from "../Toast";
 
@@ -12,6 +13,8 @@ interface PassFormProps {
 
 export function PassForm({ onNavigate, onPassword }: PassFormProps) {
     const [ info, setInfo ] = useState({ password: "", password1: "",})
+    const [ showPassword, setShowPassword ] = useState(false)
+    const [ showPassword1, setShowPassword1 ] = useState(false)
     const toast  = useToast()
 
     const handlePassword = async() => {
@@ -38,27 +41,37 @@ export function PassForm({ onNavigate, onPassword }: PassFormProps) {
                 </p>
             </IonText>
 
-                <div className="login-input ml-1 mr-1 mt-1">
+                <div className="login-input mt-1 flex pl-1 ml-1 mr-1">
                     <IonInput
-                        className="ml-1"
-                        placeholder="Пароль" 
-                        value={ info.password } 
-                        type="password"  
+                        placeholder="Пароль"
+                        value={ info.password }
+                        type={ showPassword ? 'text' : 'password' }
                         onIonChange={(e)=>{
                             info.password = e.target.value as string;
                         }}
                     />
+                    <IonButton
+                        fill="clear"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        <IonIcon icon={ showPassword ? eyeOffOutline : eyeOutline } />
+                    </IonButton>
                 </div>
-                <div className="login-input mt-1 ml-1 mr-1">
-                    <IonInput 
-                        className="ml-1"
-                        placeholder="Повторите пароль" 
-                        value={ info.password1 } 
-                        type="password"  
+                <div className="login-input mt-1 flex pl-1 ml-1 mr-1">
+                    <IonInput
+                        placeholder="Повторите пароль"
+                        value={ info.password1 }
+                        type={ showPassword1 ? 'text' : 'password' }
                         onIonChange={(e)=>{
                             info.password1 = e.target.value as string;
                         }}
                     />
+                    <IonButton
+                        fill="clear"
+                        onClick={() => setShowPassword1(!showPassword1)}
+                    >
+                        <IonIcon icon={ showPassword1 ? eyeOffOutline : eyeOutline } />
+                    </IonButton>
                 </div>
 
             <IonText>

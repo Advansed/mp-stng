@@ -134,6 +134,9 @@ function            AddLics(props:{ setPage, addLic }) {
 function            Payments(props:{ item, setPage }){
     const item  = props.item
     const [ upd, setUpd ] = useState( 0 )
+    item.debts.forEach((d) => {
+        if (d.pay === undefined) d.pay = d.sum > 0 ? d.sum : 0
+    })
     const totalPay = item.debts.reduce((total, d) => total + (d.pay || 0), 0)
     const money = (n: number) =>
         new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(n)
@@ -175,7 +178,6 @@ function            Payments(props:{ item, setPage }){
                 </div>
                 <div className="pay-rows">
                     {item.debts.map((d, i) => {
-                        if (d.pay === undefined) d.pay = d.sum > 0 ? d.sum : 0
                         const show =
                             d.pay > 0 ||
                             d.label === 'Газоснабжение природным газом' ||
@@ -349,7 +351,6 @@ function            Equaring({ item, setPage, equairing }:{ item: any, setPage: 
 
     const handleIframeLoad = () => {
         setIframeLoading( false )
-        console.log('load frame')
     }
 
     const elem = <>
@@ -403,7 +404,6 @@ function            SBP({ item, setPage, sbp }:{ item: any, setPage: any, sbp: a
         async function load(){
             setLoad( true )
             const res = await sbp( item.order )
-            console.log("SBP", res )
             if(res.error){ 
 
                 setPage( 4 )

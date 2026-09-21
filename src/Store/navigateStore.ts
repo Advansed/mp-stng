@@ -1,109 +1,99 @@
-// Store/navigateStore.ts
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface NavigateState {
-  currentPage:      string;
-  previousPage:     string;
-  page:             number;
-  item:             any;
-  history:          string[];
-  back:             number,
-  isPageActive:     (pageName: string) => boolean;
-  setCurrentPage:   (pageName: string) => void;
-  goBack:           () => string | null;
-  setBack:          () => void;
-  setPage:          (page:number) => void;
-  setItem:          (item: any) => void;
-  getPreviousPage:  () => string | null;
-  clearHistory:     () => void;
+  currentPage: string;
+  previousPage: string;
+  page: number;
+  item: any;
+  history: string[];
+  back: number;
+  isPageActive: (pageName: string) => boolean;
+  setCurrentPage: (pageName: string) => void;
+  goBack: () => string | null;
+  setBack: () => void;
+  setPage: (page: number) => void;
+  setItem: (item: any) => void;
+  getPreviousPage: () => string | null;
+  clearHistory: () => void;
 }
 
-export const useNavigateStore = create<NavigateState>()(
-  
-    persist(
-        (set, get) => ({
-            currentPage:    '',
-            previousPage:   '',
-            page:           0,
-            item:           null,
-            history:        [],
-            back:           0,
+try {
+  localStorage.removeItem('navigate-storage');
+} catch {
+  // ignore
+}
 
-            isPageActive: (pageName: string) => {
-                return get().currentPage === pageName;
-            },
+export const useNavigateStore = create<NavigateState>()((set, get) => ({
+  currentPage: '',
+  previousPage: '',
+  page: 0,
+  item: null,
+  history: [],
+  back: 0,
 
-            setCurrentPage: (pageName: string) => {
-                const { currentPage, history } = get();
-                
-                if (currentPage === pageName) return;
+  isPageActive: (pageName: string) => {
+    return get().currentPage === pageName;
+  },
 
-                set({
-                    previousPage:       currentPage,
-                    currentPage:        pageName,
-                    page:               0,
-                    history:            [...history.slice(-9), pageName] // храним последние 10 страниц
-                });
-            },
+  setCurrentPage: (pageName: string) => {
+    const { currentPage, history } = get();
 
-            goBack: () => {
-                const { history } = get();
-                if (history.length < 2) return null;
+    if (currentPage === pageName) return;
 
-                const newHistory = history.slice(0, -1);
-                const previousPage = newHistory[newHistory.length - 1] || '';
+    set({
+      previousPage: currentPage,
+      currentPage: pageName,
+      page: 0,
+      history: [...history.slice(-9), pageName],
+    });
+  },
 
-                set({
-                history: newHistory,
-                currentPage: previousPage,
-                previousPage: history[history.length - 1]
-                });
+  goBack: () => {
+    const { history } = get();
+    if (history.length < 2) return null;
 
-                return previousPage;
-            },
+    const newHistory = history.slice(0, -1);
+    const previousPage = newHistory[newHistory.length - 1] || '';
 
-            setBack: () => {
-                set({ back: 1 })
-            },
+    set({
+      history: newHistory,
+      currentPage: previousPage,
+      previousPage: history[history.length - 1],
+    });
 
-            setPage: (page: number) => {
-                set({ page : page})
-            },
+    return previousPage;
+  },
 
-            setItem: (item: any) => {
-                set({ item : item})
-            },
+  setBack: () => {
+    set({ back: 1 });
+  },
 
-            getPreviousPage: () => {
-                const { history } = get();
-                return history.length > 1 ? history[history.length - 2] : null;
-            },
+  setPage: (page: number) => {
+    set({ page: page });
+  },
 
-            clearHistory: () => {
-                set({
-                currentPage: '',
-                previousPage: '',
-                history: []
-                });
-            }
-        }
-    ),
-    {
-      name: 'navigate-storage',
-      partialize: (state) => ({ 
-        history: state.history,
-        currentPage: state.currentPage 
-      })
-    }
-  )
-);
+  setItem: (item: any) => {
+    set({ item: item });
+  },
 
-// Хук для использования в компонентах
+  getPreviousPage: () => {
+    const { history } = get();
+    return history.length > 1 ? history[history.length - 2] : null;
+  },
+
+  clearHistory: () => {
+    set({
+      currentPage: '',
+      previousPage: '',
+      history: [],
+    });
+  },
+}));
+
 export const useCurrentPage = () => {
-  return useNavigateStore(state => state.currentPage);
+  return useNavigateStore((state) => state.currentPage);
 };
 
 export const useIsPageActive = (pageName: string) => {
-  return useNavigateStore(state => state.isPageActive(pageName));
+  return useNavigateStore((state) => state.isPageActive(pageName));
 };

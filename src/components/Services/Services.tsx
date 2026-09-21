@@ -7,6 +7,7 @@ import { buildOutline, callOutline, documentTextOutline, gitBranchOutline, gitMe
                                 from 'ionicons/icons';
 import { useNavigateStore }     from '../../Store/navigateStore';
 import { useNavigation }        from '../../pages/useNavigation';
+import { ROUTES }               from '../../routes';
 import { Order }                from './Order';
 import { TService, useServiceStore }             from '../../Store/serviceStore';
 
@@ -34,12 +35,11 @@ export const Services: React.FC = () => {
 
 
   useEffect(()=>{
-    if(currentPage === '/page/services'){
-        if(!services || services.length === 0 )
-            loadServices()
-
-    }
-  },[currentPage])
+    if(currentPage !== ROUTES.services) return
+    if(page !== 0) return
+    if(!services || services.length === 0) loadServices()
+    else void loadServices({ silent: true })
+  },[currentPage, page])
 
 
   let elem = <></>
@@ -68,7 +68,9 @@ export const Services: React.FC = () => {
           ? elem
           : <Order 
               service   = { item as TService }
-              onSave    = { async(orderData: any)=>{ return await saveService(orderData)  } }
+              onSave    = { async (orderData: any, options?: { silent?: boolean }) => {
+                return await saveService(orderData, options)
+              } }
               onBack    = { ()=>{ setPage( 0 )} }
               onPreview = { preview }
           />
