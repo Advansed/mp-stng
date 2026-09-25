@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { FieldData, PageData } from '../types';
+import { FieldData, PageData, ValidationRule } from '../types';
 import { snilsValidationError } from '../fields/snils';
 import { passNumberValidationError, seriesValidationError } from '../fields/passport';
 
@@ -7,11 +7,48 @@ interface ValidationErrors {
   [key: string]: string;
 }
 
+function fieldText(value: unknown): string {
+  if (typeof value === 'string') return value.trim();
+  if (value == null) return '';
+  return String(value).trim();
+}
+
+function findFieldByName(pageData: PageData, name: string): FieldData | undefined {
+  for (const section of pageData) {
+    const found = section.data.find((item) => item.name === name);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function ruleMatches(rule: ValidationRule, sourceValue: unknown): boolean {
+  const current = fieldText(sourceValue);
+  if (rule.operator === 'eq') {
+    return !Array.isArray(rule.value) && current === fieldText(rule.value);
+  }
+  if (rule.operator === 'in') {
+    const list = Array.isArray(rule.value) ? rule.value : [rule.value];
+    return list.some((item) => fieldText(item) === current);
+  }
+  return false;
+}
+
+export function isFieldRequired(field: FieldData, pageData: PageData): boolean {
+  const rule = field.validation_rule;
+  if (!rule || !rule.field) return field.validate;
+
+  const source = findFieldByName(pageData, rule.field);
+  if (!source) return field.validate;
+  if (ruleMatches(rule, source.data)) return true;
+  return field.validate;
+}
+
 export const useValidation = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
 
-  const validateField   = useCallback( (field: FieldData, sectionIndex: number, fieldIndex: number): string | null => {
-    if (!field.validate) return null;
+  const validateField   = useCallback( (field: FieldData, sectionIndex: number, fieldIndex: number, pageData?: PageData): string | null => {
+    const required = pageData ? isFieldRequired(field, pageData) : field.validate;
+    if (!required) return null;
 
     const value = field.data;
     const key = `${sectionIndex}-${fieldIndex}`;
@@ -48,11 +85,13 @@ export const useValidation = () => {
         break;
       
       case 'image':
+        if (field.upload_later?.later) break;
         if (!value) return 'Надо добавить фото';
         break;
 
       case 'images':
-        if (value.length === 0) return 'Надо добавить фото';
+        if (field.upload_later?.later) break;
+        if (!value || value.length === 0) return 'Надо добавить фото';
         break;
       
       case 'rate':
@@ -111,7 +150,7 @@ export const useValidation = () => {
     
     data.forEach((section, sIdx) => {
       section.data.forEach((field, fIdx) => {
-        const error = validateField(field, sIdx, fIdx);
+        const error = validateField(field, sIdx, fIdx, data);
         if (error) {
           newErrors[`${sIdx}-${fIdx}`] = error;
         }
@@ -131,12 +170,23 @@ export const useValidation = () => {
     setErrors(prev => ({ ...prev, [key]: error }));
   }, []);
 
+  const clearError      = useCallback( (sectionIndex: number, fieldIndex: number) => {
+    const key = `${sectionIndex}-${fieldIndex}`;
+    setErrors((prev) => {
+      if (!(key in prev)) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }, []);
+
   return {
     errors,
     validateField,
     validateAll,
     clearAll,
     setError,
+    clearError,
     isValid: Object.keys(errors).length === 0
   };
 };

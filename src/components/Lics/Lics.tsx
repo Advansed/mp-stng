@@ -13,15 +13,15 @@ import { useNavigation }                                                from '..
 import { LicItem }                                                      from './components/LicItem/LicItem';
 import History                                                          from './components/History';
 import HistoryIndices                                                   from './components/HistoryIndice';
-import { useToast } from '../Toast';
+import { useToast }                                                     from '../Toast';
 
 
 type WidgetParams = {
-    bankInvoiceId: string;
-    lifeTime?: number;
-    expirationDate?: number;
-    isFinishPage?: true;
-    finishPageTimeOut?: 10;
+    bankInvoiceId:          string;
+    lifeTime?:              number;
+    expirationDate?:        number;
+    isFinishPage?:          true;
+    finishPageTimeOut?:     10;
 };
 
 
@@ -30,9 +30,13 @@ function            openWidget( info ){
     const widget = createWidget("PRODUCTION");    
 
     const params = {
-        bankInvoiceId: info.orderId,
-        backUrl: 'https://fhd.aostng.ru',
-        isEmbedded: true
+
+        bankInvoiceId:  info.orderId,
+        
+        backUrl:        'https://fhd.aostng.ru',
+        
+        isEmbedded:     true
+
     };
 
     widget.open(params);
@@ -178,10 +182,10 @@ function            Payments(props:{ item, setPage }){
                 </div>
                 <div className="pay-rows">
                     {item.debts.map((d, i) => {
-                        const show =
-                            d.pay > 0 ||
-                            d.label === 'Газоснабжение природным газом' ||
-                            d.label === 'Техническое обслуживание'
+                        const show = d.sum >= 0
+                            // d.pay > 0 ||
+                            // d.label === 'Газоснабжение природным газом' ||
+                            // d.label === 'Техническое обслуживание'
                         if (!show) return null
                         return (
                             <div className="pay-row pay-row-input" key={`pay-${i}`}>

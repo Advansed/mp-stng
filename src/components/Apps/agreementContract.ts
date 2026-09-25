@@ -13,24 +13,4 @@ export function resolveAppDocId(
   return String(raw || fallbackId).trim()
 }
 
-/** URL или dataUrl из ответа `getsignedurl`. */
-export function parseSignedUrlResponse(res: {
-  error?: boolean
-  message?: string
-  data?: unknown
-  url?: string
-} | null | undefined): string | null {
-  if (!res || res.error) return null
-  const d = res.data
-  if (typeof d === 'string' && d.trim()) return d.trim()
-  if (d && typeof d === 'object') {
-    const obj = d as Record<string, unknown>
-    for (const key of ['url', 'dataUrl', 'signedUrl', 'href']) {
-      if (typeof obj[key] === 'string' && (obj[key] as string).trim()) {
-        return (obj[key] as string).trim()
-      }
-    }
-  }
-  if (typeof res.url === 'string' && res.url.trim()) return res.url.trim()
-  return null
-}
+export { parseSignedUrlResponse } from '../../utils/signedUrl'

@@ -6,6 +6,8 @@ import { PickSource } from "../../Files";
 import styles from './ImageField.module.css';
 import { useS3Upload } from "../hooks/useS3Upload";
 import { AiStatusResultPanel } from "./AiStatusResultPanel";
+import { UploadLaterBlock } from "./UploadLaterBlock";
+import { isDisplayableFileSrc } from "../../../utils/signedUrl";
 
 interface ImageFieldProps {
   name?: string;
@@ -21,6 +23,9 @@ interface ImageFieldProps {
   placeholder?: string;
   disabled?: boolean;
   error?: string;
+  description?: string;
+  uploadLater?: { active?: boolean; later?: boolean };
+  onLaterChange?: (later: boolean) => void;
 }
 
 function normalizeImageSrc(v: unknown): string {
@@ -46,12 +51,16 @@ export function ImageField({
   isAIChecking = false,
   placeholder = "Доба вить изображение",
   disabled = false,
-  error
+  error,
+  description,
+  uploadLater,
+  onLaterChange,
 }: ImageFieldProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const imageSrc = normalizeImageSrc(value);
-  const isPdf = isPdfSrc(imageSrc);
+  const canPreview = isDisplayableFileSrc(imageSrc);
+  const isPdf = canPreview && isPdfSrc(imageSrc);
 
   const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress, pruneAiByFileUrl } = useS3Upload({
     onError: (error) => console.error("Upload error:", error),
@@ -106,7 +115,11 @@ export function ImageField({
         
         {imageSrc && (
           <div className={styles.imageContainer}>
-            {isPdf ? (
+            {!canPreview ? (
+              <div className={styles.pdfPreview} aria-hidden>
+                <IonSpinner name="crescent" />
+              </div>
+            ) : isPdf ? (
               <div
                 className={styles.pdfPreview}
                 role="button"
@@ -202,6 +215,20 @@ export function ImageField({
             ai_method={ai_method}
             ai_status={ai_status}
             imageSrcForSingle={imageSrc}
+          />
+        ) : null}
+
+        <UploadLaterBlock
+          active={uploadLater?.active}
+          later={uploadLater?.later}
+          visible={!imageSrc}
+          onLaterChange={onLaterChange}
+        />
+
+        {description ? (
+          <div
+            className={styles.fieldDescription}
+            dangerouslySetInnerHTML={{ __html: description }}
           />
         ) : null}
       </div>

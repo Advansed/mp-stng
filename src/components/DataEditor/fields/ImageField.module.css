@@ -240,6 +240,41 @@
   cursor: not-allowed;
 }
 
+.fieldDescription {
+  margin: 12px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--app-muted);
+}
+
+.fieldDescription h1,
+.fieldDescription h2,
+.fieldDescription h3 {
+  margin: 0 0 0.4em;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.fieldDescription p,
+.fieldDescription ol,
+.fieldDescription ul {
+  margin: 0 0 0.4em;
+  padding-left: 1.2em;
+}
+
+.fieldDescription p {
+  padding-left: 0;
+}
+
+.fieldDescription li {
+  margin: 0 0 0.15em;
+}
+
+.fieldDescription :last-child {
+  margin-bottom: 0;
+}
+
 .buttonIcon {
   margin-right: 8px;
 }

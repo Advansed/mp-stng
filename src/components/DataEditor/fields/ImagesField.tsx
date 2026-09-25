@@ -5,7 +5,9 @@ import { PickSource } from "../../Files";
 import styles from "./ImageField.module.css";
 import { useS3Upload } from "../hooks/useS3Upload";
 import { AiStatusResultPanel } from "./AiStatusResultPanel";
+import { UploadLaterBlock } from "./UploadLaterBlock";
 import { normalizeAiResultsArray, pickAiResultForImagesFieldDisplay } from "../../../utils/aiRequisites";
+import { isDisplayableFileSrc } from "../../../utils/signedUrl";
 
 interface ImagesFieldProps {
   doc?: string;
@@ -23,6 +25,9 @@ interface ImagesFieldProps {
   error?: string;
   maxImages?: number;
   validate?: boolean;
+  description?: string;
+  uploadLater?: { active?: boolean; later?: boolean };
+  onLaterChange?: (later: boolean) => void;
 }
 
 function normalizeList(v: unknown): string[] {
@@ -50,6 +55,9 @@ export function ImagesField({
   disabled = false,
   error,
   maxImages = 10,
+  description,
+  uploadLater,
+  onLaterChange,
 }: ImagesFieldProps) {
   const value = normalizeList(valueProp);
   const [modalFile, setModalFile] = useState<{ url: string; isPdf: boolean } | undefined>(undefined);
@@ -133,9 +141,15 @@ export function ImagesField({
       <div className={`${styles.imageWrapper} ${error ? styles.wrapperError : ""}`}>
         <div style={{ position: "relative" }}>
           <div className={styles.imageGrid}>
-            {value.map((image, index) => (
+            {value.map((image, index) => {
+              const canPreview = isDisplayableFileSrc(image);
+              return (
               <div key={`${image}-${index}`} className={styles.imageItem}>
-                {isPdfSrc(image) ? (
+                {!canPreview ? (
+                  <div className={styles.pdfThumb} aria-hidden>
+                    <IonSpinner name="crescent" />
+                  </div>
+                ) : isPdfSrc(image) ? (
                   <div
                     className={styles.pdfThumb}
                     style={{
@@ -193,7 +207,8 @@ export function ImagesField({
                   </IonButton>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
           {isAIChecking && (
             <div className={styles.aiCheckingOverlay} aria-live="polite" style={{ maxWidth: "100%" }}>
@@ -236,6 +251,20 @@ export function ImagesField({
         )}
 
         {ai_method ? <AiStatusResultPanel ai_method={ai_method} ai_status={aiSummary} /> : null}
+
+        <UploadLaterBlock
+          active={uploadLater?.active}
+          later={uploadLater?.later}
+          visible={value.length === 0}
+          onLaterChange={onLaterChange}
+        />
+
+        {description ? (
+          <div
+            className={styles.fieldDescription}
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
+        ) : null}
       </div>
 
       {error && <span className={styles.errorMessage}>{error}</span>}

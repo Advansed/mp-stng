@@ -7,6 +7,7 @@ import DataEditor from '../DataEditor';
 import { useProfileData } from '../Login/authStore';
 import { useCheckAI } from './useCheckAI';
 import { licNumberFromValue, useLicsStore } from '../../Store/licsStore';
+import { fileKeysForPayload, laterFromField, uploadLaterFromFile } from '../../utils/signedUrl';
 
 interface OrderProps {
   service:                                            TService;
@@ -23,7 +24,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
   const [orderData, setOrderData]                     = useState<PageData>([]);
   const [isLoading, setIsLoading]                     = useState(true);
   const [normalizedService, setNormalizedService]     = useState<TService | null>(null);
-  const { checkAI, isAIChecking }                     = useCheckAI({ service: normalizedService });
+  const { checkAI, isAIChecking }                     = useCheckAI({ service });
   const didPersistRef                                 = useRef(false);
   const persistRef                                    = useRef<(() => Promise<void>) | null>(null);
 
@@ -74,6 +75,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     }
 
     setNormalizedService(service);
+
     const data = service.chapters.map((chapter) => {
       const chapterData = (chapter.data || []).map((field) => {
         const fromProfile = getProfileValue(field.label || field.name || '');
@@ -81,6 +83,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
           doc: field.doc,
           name: field.name,
           label: field.label,
+          description: field.description,
           type: field.type,
           data: field.type === 'lics'
             ? licNumberFromValue(lics.lics, field.value ?? fromProfile ?? '')
@@ -89,20 +92,27 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
           ai_status: undefined,
           values: field.values,
           validate: field.validate,
+          upload_later: field.upload_later,
         } as FieldData;
       });
 
-      const chapterFiles = (chapter.files || []).map((field) => ({
-        doc: field.doc,
-        name: field.name,
-        label: field.label,
-        type: 'images',
-        data: Array.isArray(field.data) ? field.data : [],
-        ai_method: field.ai_method,
-        ai_status: field.ai_status,
-        values: [],
-        validate: field.validate,
-      } as FieldData));
+      const chapterFiles = (chapter.files || []).map((field) => {
+        const rawFiles = Array.isArray(field.data) ? field.data : [];
+        return {
+          doc:             field.doc,
+          name:            field.name,
+          label:           field.label,
+          description:     field.description,
+          type:            'images',
+          data:            rawFiles,
+          ai_method:       field.ai_method,
+          ai_status:       field.ai_status,
+          values:          [],
+          validate:        field.validate,
+          ...(field.validation_rule ? { validation_rule: field.validation_rule } : {}),
+          upload_later:    uploadLaterFromFile(field),
+        } as FieldData;
+      });
 
       return { title: chapter.label, data: [...chapterData, ...chapterFiles] };
     });
@@ -115,15 +125,15 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
   const getOrderData    = (data: PageData, проведен?: 0 | 2): any => {
     if (!normalizedService) return {};
     const next: { [key: string]: any } = {};
-    next.Ссылка = normalizedService.id;
-    next.Заявка = normalizedService.text;
-    next.ai_status = {
-      status: false,
+    next.Ссылка =          normalizedService.id;
+    next.Заявка =          normalizedService.text;
+    next.ai_status =       {
+      status:              false,
       checks: {
-        passport_front: null,
-        passport_reg: null,
-        egrn: null,
-        akt: null,
+        passport_front:    null,
+        passport_reg:      null,
+        egrn:              null,
+        akt:               null,
       },
     };
 
@@ -144,15 +154,14 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
 
         if (next.Файлы === undefined) next.Файлы = [] as any[];
 
-        const jarr: any[] = [];
-        const filesArr = Array.isArray(field.data) ? field.data : [];
-        filesArr.forEach((elem: any) => {
-          if (typeof elem !== 'string') return;
-          const match = elem.match(/\/stng\/([^?]+)/);
-          if (match?.[1]) jarr.push(match[1]);
-        });
+        const jarr = fileKeysForPayload(field);
 
-        next.Файлы.push({ name: originalFile.name, label: originalFile.label, files: jarr });
+        next.Файлы.push({
+          name: originalFile.name,
+          label: originalFile.label,
+          files: jarr,
+          later: laterFromField(field),
+        });
 
         switch (originalFile.name) {
           case 'Passport1':
@@ -213,9 +222,9 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     };
   }, []);
 
-  const handleExit      = async () => {
+  const handleExit      = async (data?: PageData) => {
     try {
-      await persistDraft(orderData);
+      await persistDraft(data ?? orderData);
     } catch (error) {
       console.error('Error saving order:', error);
     } finally {
@@ -329,6 +338,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
 
   return (
     <DataEditor
+      key             = { normalizedService.id }
       data            = { orderData }
       onSave          = { handleSave }
       onBack          = { handleExit }

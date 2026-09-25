@@ -18,17 +18,28 @@ export interface EquipData {
   release_date: string;
 }
 
+export interface ValidationRule {
+  field: string;
+  operator: 'eq' | 'in';
+  value: string | string[];
+}
+
 export interface FieldData {
   doc?:       string;
   name?:      string;
   label:      string;
+  description?: string;
   type:       'preview' |  'text' | 'number' | 'select' | 'date' | 'boolean' | 'city' | 'address' | 'view' | 'party' | 'images' | 'image' 
                 | 'password' | 'check' | 'rate' | 'fio' | 'lics' | 'box' | 'textarea' | 'fio' | 'sign' | 'equip' | 'email' | "pass_front" | 'snils' | 'series' | 'pass_number';
   values?:    string[] | null;
   ai_method?: string;
   ai_status?: any;
   validate:   boolean;
-  data:       any; 
+  validation_rule?: ValidationRule;
+  data:       any;
+  upload_later?: { active?: boolean; later?: boolean };
+  later?: boolean;
+  s3KeyByUrl?: Record<string, string>;
 }
 
 export interface Section {
@@ -55,7 +66,7 @@ export interface DataEditorProps {
   onSave?:      (data: PageData) => void;
   onChange?:    (data: Section) => void;
   onFieldChange?: (event: FieldChangeEvent) => void;
-  onBack:       () => void;
+  onBack:       (data?: PageData) => void;
   onPreview:    (data: PageData) => Promise<any>;
   /** checkAI через useCheckAI: API + сверка полей анкеты, ответ уже с errors в checks */
   onCheckAI?:   (args: { method: string; objectKey: string; fileUrl: string }) => Promise<any>;

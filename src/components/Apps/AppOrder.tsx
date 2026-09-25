@@ -7,6 +7,7 @@ import { FieldChangeEvent, FieldData, PageData, Section } from '../DataEditor/ty
 import DataEditor from '../DataEditor';
 import { licNumberFromValue, useLicsStore } from '../../Store/licsStore';
 import { useCheckAI } from './useCheckAI';
+import { fileKeysForPayload, laterFromField, uploadLaterFromFile } from '../../utils/signedUrl';
 
 interface AppOrderProps {
   onSave: (orderData: any) => Promise<void>;
@@ -55,13 +56,16 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
       const chapterData = (chapter.data || []).map((field) => {
         return {
           doc:          field.doc,
+          name:         field.name,
           label:        field.label,
+          description:  field.description,
           type:         field.type,
           data:         field.type === 'lics' ? licNumberFromValue(lics.lics, field.value) : field.value,
           ai_method:    field.ai_method,
           ai_status:    field.ai_status,
           values:       field.values,
-          validate:     field.validate
+          validate:     field.validate,
+          upload_later: field.upload_later
         } as FieldData;
       });
 
@@ -70,12 +74,15 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
           doc:          field.doc,
           name:         field.name,
           label:        field.label,
+          description:  field.description,
           type:         'images',
           data:         field.data || [],
           ai_method:    field.ai_method,
           ai_status:    field.ai_status,
           values:       [],
-          validate:     field.validate
+          validate:     field.validate,
+          ...(field.validation_rule ? { validation_rule: field.validation_rule } : {}),
+          upload_later: uploadLaterFromFile(field),
         } as FieldData;
       });
 
@@ -124,15 +131,14 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
           if (originalFile) {
             if (orderData.Файлы === undefined) orderData.Файлы = [] as any;
 
-            const jarr: any[] = [];
-            const filesArr = Array.isArray(field.data) ? field.data : [];
-            filesArr.forEach((elem: any) => {
-              if (typeof elem !== 'string') return;
-              const match = elem.match(/\/stng\/([^?]+)/);
-              if (match?.[1]) jarr.push(match[1]);
-            });
+            const jarr = fileKeysForPayload(field);
 
-            orderData.Файлы.push({ name: originalFile.name, label: originalFile.label, files: jarr });
+            orderData.Файлы.push({
+              name: originalFile.name,
+              label: originalFile.label,
+              files: jarr,
+              later: laterFromField(field),
+            });
 
             switch(originalFile.name) {
               case "Passport1":
@@ -279,6 +285,7 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
 
   return (
     <DataEditor
+      key             = { app?.id || 'app-order' }
       data            = { orderData }
       onSave          = { handleSave }
       onBack          = { onBack }

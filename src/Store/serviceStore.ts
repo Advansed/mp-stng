@@ -24,18 +24,28 @@ export interface TField {
     type:       string,
     ai_method:  string,
     label:      string,
+    description?: string,
     values:     string[],
-    validate:   boolean
+    validate:   boolean,
+    upload_later?: { active?: boolean; later?: boolean }
 }
 
 export interface TFile {
     doc?:       string,
     name:       string,
     label:      string,
+    description?: string,
     validate:   boolean,
+    validation_rule?: {
+        field: string,
+        operator: 'eq' | 'in',
+        value: string | string[],
+    },
     data:       TURL[],
     ai_method:  string,
     ai_status?: any,
+    upload_later?: { active?: boolean; later?: boolean },
+    later?: boolean,
 }
 
 export interface TURL {

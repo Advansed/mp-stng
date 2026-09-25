@@ -1,0 +1,60 @@
+.block {
+  margin: 12px 0 0;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.45em 0;
+}
+
+.checkbox {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--app-border);
+  border-radius: 6px;
+  background: var(--app-surface);
+  margin-right: 0.75em;
+  margin-top: 0.1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.checkbox.checked {
+  border-color: var(--main-color);
+  background: var(--main-color);
+}
+
+.checkIcon {
+  color: var(--ion-color-primary-contrast);
+  font-size: 14px;
+}
+
+.checkboxLabel {
+  font-size: 0.95rem;
+  color: var(--ion-text-color);
+  line-height: 1.4;
+}
+
+.confirm {
+  margin-top: 0.4em;
+}
+
+.confirmTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  margin-bottom: 0.3em;
+}
+
+.confirmText {
+  margin: 0 0 0.5em;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--ion-text-color);
+}

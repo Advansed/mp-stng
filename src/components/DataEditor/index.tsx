@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useHydrateDraftFiles } from './hooks/useHydrateDraftFiles';
 import { DataEditorProps, FieldData } from './types';
 import { useNavigation } from './hooks/useNavigation';
 import { useFormState } from './hooks/useFormState';
@@ -10,7 +11,7 @@ import { PartyField } from './fields/PartyField';
 import { WizardHeader } from './components/WizardHeader';
 import { CityField } from './fields/СityField';
 import { AddressField } from './fields/AddressField';
-import { useValidation } from './hooks/useValidation';
+import { isFieldRequired, useValidation } from './hooks/useValidation';
 import { ViewField } from './fields/ViewField';
 import { ImageField } from './fields/ImageField';
 import { ImagesField } from './fields/ImagesField';
@@ -54,10 +55,18 @@ const DataEditor: React.FC<DataEditorProps> = ({
   const navigation                   = useNavigation(data.length);
   const formState                    = useFormState(data);
 
+  useHydrateDraftFiles({
+    currentPage: navigation.currentPage,
+    section: formState.data[navigation.currentPage],
+    replaceSectionData: formState.replaceSectionData,
+    onChange,
+    onCheckAI,
+  });
+
   const [loading, setLoading]        = useState(false);
 
   const { errors, validateField
-      , setError, clearAll }         = useValidation();
+      , setError, clearError, clearAll }         = useValidation();
 
   const lics                         = useLicsStore(state => state.lics)
   const app                          = useAppsStore((state) => state.app)
@@ -65,34 +74,112 @@ const DataEditor: React.FC<DataEditorProps> = ({
 
   const [fias, setFias]              = useState('')
 
+  useEffect(() => {
+    const pageData = formState.data
+    const cleared: { sIdx: number; fIdx: number }[] = []
+    const nextSections = pageData.map((section, sIdx) => {
+      let changed = false
+      const nextFields = section.data.map((field, fIdx) => {
+        if (!field.upload_later?.later && !field.later) return field
+        if (isFieldRequired(field, pageData)) return field
+        changed = true
+        cleared.push({ sIdx, fIdx })
+        return {
+          ...field,
+          later: false,
+          upload_later: { ...field.upload_later, later: false },
+        }
+      })
+      return changed ? { ...section, data: nextFields } : section
+    })
+    if (cleared.length === 0) return
+
+    const sectionIdxs = cleared
+      .map((item) => item.sIdx)
+      .filter((sIdx, index, list) => list.indexOf(sIdx) === index)
+    sectionIdxs.forEach((sIdx) => {
+      const section = nextSections[sIdx]
+      if (!section) return
+      formState.replaceSectionData(sIdx, section.data)
+      onChange?.({ ...section, __sectionIndex: sIdx } as typeof section & { __sectionIndex: number })
+    })
+
+    const appNow = useAppsStore.getState().app
+    if (!appNow?.service?.chapters?.length) return
+    let appChanged = false
+    const chapters = appNow.service.chapters.map((chapter, sIdx) => {
+      const dataLen = chapter.data?.length || 0
+      let dataChanged = false
+      let filesChanged = false
+      const nextData = (chapter.data || []).map((item, itemIdx) => {
+        if (!cleared.some((itemPos) => itemPos.sIdx === sIdx && itemPos.fIdx === itemIdx)) return item
+        if (!item.upload_later?.later) return item
+        dataChanged = true
+        return { ...item, upload_later: { ...item.upload_later, later: false } }
+      })
+      const nextFiles = (chapter.files || []).map((item, fileIdx) => {
+        const fieldIdx = dataLen + fileIdx
+        if (!cleared.some((itemPos) => itemPos.sIdx === sIdx && itemPos.fIdx === fieldIdx)) return item
+        if (!item.upload_later?.later && !item.later) return item
+        filesChanged = true
+        return {
+          ...item,
+          later: false,
+          upload_later: { ...item.upload_later, later: false },
+        }
+      })
+      if (!dataChanged && !filesChanged) return chapter
+      appChanged = true
+      return {
+        ...chapter,
+        ...(dataChanged ? { data: nextData } : {}),
+        ...(filesChanged ? { files: nextFiles } : {}),
+      }
+    })
+    if (!appChanged) return
+    setApp({
+      ...appNow,
+      service: { ...appNow.service, chapters },
+    })
+  }, [formState.data])
+
   const scrollToTop                  = () => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const currentSectionHasErrors      = (): boolean => {
+    const pageIndex = navigation.currentPage;
+    const currentSection = formState.data[pageIndex];
+    if (!currentSection) return false;
+
+    let hasErrors = false;
+    currentSection.data.forEach((field, fIdx) => {
+      if (!isFieldRequired(field, formState.data)) {
+        clearError(pageIndex, fIdx);
+        return;
+      }
+      const error = validateField(field, pageIndex, fIdx, formState.data);
+      if (error) {
+        setError(pageIndex, fIdx, error);
+        hasErrors = true;
+      } else {
+        clearError(pageIndex, fIdx);
+      }
+    });
+    return hasErrors;
+  };
 
   const handleBackNavigation         = () => {
     if (navigation.currentPage > 0) {
       navigation.prevPage();
       scrollToTop();
     } else {
-      onBack();
+      onBack(formState.data);
     }
   };
 
   const handleForwardNavigation      = () => {
     if (navigation.canGoNext) {
-      // Валидация полей текущей страницы
-      const currentSection = data[navigation.currentPage];
-      let hasErrors = false;
+      const hasErrors = currentSectionHasErrors();
 
-      currentSection.data.forEach((field, fIdx) => {
-        if (field.validate) {
-          const error = validateField(field, navigation.currentPage, fIdx);
-          if (error) {
-            setError(navigation.currentPage, fIdx, error);
-            hasErrors = true;
-          }
-        }
-      });
-
-      // Переход только если нет ошибок
       if (!hasErrors) {
         clearAll();
         navigation.nextPage();
@@ -102,21 +189,8 @@ const DataEditor: React.FC<DataEditorProps> = ({
   };
 
   const handleSave                   = () => {
+    const hasErrors = currentSectionHasErrors();
 
-    const currentSection = data[navigation.currentPage];
-    let hasErrors = false;
-
-    currentSection.data.forEach((field, fIdx) => {
-      if (field.validate) {
-        const error = validateField(field, navigation.currentPage, fIdx);
-        if (error) {
-          setError(navigation.currentPage, fIdx, error);
-          hasErrors = true;
-        }
-      }
-    });
-
-    // Переход только если нет ошибок
     if (!hasErrors) {
       clearAll();
       const orderData = [...formState.data] as typeof formState.data & { ai_status?: any }
@@ -129,18 +203,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
 
     setLoading(true)
 
-    const currentSection = data[navigation.currentPage];
-    let hasErrors = false;
-
-    currentSection.data.forEach((field, fIdx) => {
-      if (field.validate) {
-        const error = validateField(field, navigation.currentPage, fIdx);
-        if (error) {
-          setError(navigation.currentPage, fIdx, error);
-          hasErrors = true;
-        }
-      }
-    });
+    const hasErrors = currentSectionHasErrors();
 
     // Переход только если нет ошибок
     if (!hasErrors) {
@@ -156,8 +219,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
   }
 
   const handleClose                  = () => {
-    // Закрытие с отменой - просто возвращаемся назад
-    onBack();
+    onBack(formState.data);
   }
 
   const getPageTitle                 = () => {
@@ -424,6 +486,55 @@ const DataEditor: React.FC<DataEditorProps> = ({
 
     }
 
+    const persistUploadLater = (later: boolean) => {
+      formState.updateUploadLater(sectionIdx, fieldIdx, later)
+      if (later) clearError(sectionIdx, fieldIdx)
+      const nextUploadLater = { ...field.upload_later, later }
+
+      const appNow = useAppsStore.getState().app
+      if (appNow?.service?.chapters?.length) {
+        const chapter = appNow.service.chapters[sectionIdx]
+        if (chapter) {
+          const chapterDataLength = chapter.data?.length || 0
+          const isDataField = fieldIdx < chapterDataLength
+          const updatedChapters = appNow.service.chapters.map((currentChapter, chapterIdx) => {
+            if (chapterIdx !== sectionIdx) return currentChapter
+            if (isDataField && currentChapter.data?.[fieldIdx]) {
+              return {
+                ...currentChapter,
+                data: currentChapter.data.map((item, itemIdx) =>
+                  itemIdx === fieldIdx ? { ...item, upload_later: nextUploadLater } : item
+                ),
+              }
+            }
+            const fileIndex = fieldIdx - chapterDataLength
+            if (fileIndex >= 0 && currentChapter.files?.[fileIndex]) {
+              return {
+                ...currentChapter,
+                files: currentChapter.files.map((item, itemIdx) =>
+                  itemIdx === fileIndex ? { ...item, upload_later: nextUploadLater } : item
+                ),
+              }
+            }
+            return currentChapter
+          })
+          setApp({
+            ...appNow,
+            service: {
+              ...appNow.service,
+              chapters: updatedChapters,
+            },
+          })
+        }
+      }
+
+      emitSectionChange({
+        ...field,
+        upload_later: nextUploadLater,
+        data: formState.data?.[sectionIdx]?.data?.[fieldIdx]?.data,
+      })
+    }
+
     const update = (value: any) => {
       const prevValue = formState.data?.[sectionIdx]?.data?.[fieldIdx]?.data
       const prevAiSnapshot = formState.data?.[sectionIdx]?.data?.[fieldIdx]?.ai_status
@@ -480,7 +591,22 @@ const DataEditor: React.FC<DataEditorProps> = ({
         source: 'user',
       })
 
-      emitSectionChange({ ...field, data: value })
+      const hasUploadedFile =
+        field.type === 'images'
+          ? Array.isArray(value) && value.length > 0
+          : field.type === 'image'
+            ? Boolean(value)
+            : false
+      const nextLater = hasUploadedFile ? false : !!field.upload_later?.later
+      const nextUploadLater = field.upload_later
+        ? { ...field.upload_later, later: nextLater }
+        : field.upload_later
+
+      if (hasUploadedFile && field.upload_later?.later) {
+        persistUploadLater(false)
+      }
+
+      emitSectionChange({ ...field, data: value, upload_later: nextUploadLater })
 
       if (
         shouldInvalidateAiStatusOnFieldChange({
@@ -525,6 +651,10 @@ const DataEditor: React.FC<DataEditorProps> = ({
         }
       }
     }
+
+    const uploadLater = field.upload_later && !isFieldRequired(field, formState.data)
+      ? { ...field.upload_later, active: false }
+      : field.upload_later
 
     const key = `${sectionIdx}-${fieldIdx}`
 
@@ -576,12 +706,18 @@ const DataEditor: React.FC<DataEditorProps> = ({
       case 'address':     return <AddressField    {...props} cityFias={fias} />;
       case 'party':       return <PartyField      {...props} cityFias={fias} />;
       case 'image':       return <ImageField      {...props}
+                                                      description = { field.description }
+                                                      uploadLater = { uploadLater }
+                                                      onLaterChange = { persistUploadLater }
                                                       ai_method = { field.ai_method }
                                                       ai_status = { aiStatusResolved( field.ai_status ) }
                                                       onCheckAI = { onCheckAI ? mergedRemoteAiCheck : undefined }
                                                       isAIChecking = { isAIChecking }/>;
       case 'pass_front':  return <PassportFront   {...props} />;
       case 'images':      return <ImagesField     {...props} 
+                                                      description = { field.description }
+                                                      uploadLater = { uploadLater }
+                                                      onLaterChange = { persistUploadLater }
                                                       ai_method = { field.ai_method } 
                                                       ai_status = { aiStatusResolved( field.ai_status ) } 
                                                       onCheckAI = { onCheckAI ? mergedRemoteAiCheck : undefined }

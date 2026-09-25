@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PageData } from '../types';
+import { FieldData, PageData } from '../types';
 
 export const useFormState = (initialData: PageData) => {
   const [data, setData] = useState<PageData>(initialData);
@@ -24,5 +24,22 @@ export const useFormState = (initialData: PageData) => {
     }
   };
 
-  return { data, updateField, updateAiStatus };
+  const updateUploadLater = (sectionIndex: number, fieldIndex: number, later: boolean) => {
+    const newData = [...data];
+    const field = newData[sectionIndex]?.data[fieldIndex];
+    if (field) {
+      field.upload_later = { ...field.upload_later, later };
+      setData(newData);
+    }
+  };
+
+  const replaceSectionData = (sectionIndex: number, fields: FieldData[]) => {
+    setData((prev) =>
+      prev.map((section, idx) =>
+        idx === sectionIndex ? { ...section, data: fields } : section
+      )
+    );
+  };
+
+  return { data, updateField, updateAiStatus, updateUploadLater, replaceSectionData };
 };
