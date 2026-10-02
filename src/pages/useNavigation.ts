@@ -2,7 +2,7 @@ import { useHistory } from 'react-router-dom';
 import { useCallback } from 'react';
 import { useNavigateStore } from '../Store/navigateStore';
 import { LicsPage } from '../components/Lics';
-import { resolveAppPath } from '../routes';
+import { ROUTES, isAppStatusPath, resolveAppPath } from '../routes';
 
 export const useNavigation = () => {
   const history = useHistory();
@@ -20,26 +20,36 @@ export const useNavigation = () => {
   const goTo = useCallback(
     (path: string) => {
       const resolved = resolveAppPath(path);
+      if (resolved === ROUTES.services) setPage(0);
       if (currentPage === resolved) return;
       setCurrentPage(resolved);
       history.push(resolved);
     },
-    [history, setCurrentPage, currentPage]
+    [history, setCurrentPage, setPage, currentPage]
   );
 
   const goBack = useCallback(() => {
-    if (page > LicsPage.MAIN) {
+    const onServices = currentPage === ROUTES.services;
+    const onStatus = isAppStatusPath(currentPage);
+
+    if (onServices && page > LicsPage.MAIN) {
+      setPage(page - 1);
+      return;
+    }
+
+    if (!onStatus && page > LicsPage.MAIN) {
       if (page === LicsPage.HISTORY_INDICES) setPage(LicsPage.INDICES);
       else setPage(LicsPage.MAIN);
-    } else {
-      const previousPage = navigateBack();
-      if (previousPage) {
-        history.push(previousPage);
-      } else {
-        history.goBack();
-      }
+      return;
     }
-  }, [history, page, navigateBack, setPage]);
+
+    const previousPage = navigateBack();
+    if (previousPage) {
+      history.push(previousPage);
+    } else {
+      history.goBack();
+    }
+  }, [history, page, currentPage, navigateBack, setPage]);
 
   return {
     goTo,

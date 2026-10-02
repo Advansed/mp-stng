@@ -2,7 +2,8 @@ import {  IonButton, IonCard, IonCheckbox, IonIcon, IonInput, IonLoading, IonMod
 import React, { useEffect, useState } from "react"
 import { FioSuggestions } from "react-dadata"
 import 'react-dadata/dist/react-dadata.css'
-import { atOutline, barcodeOutline, businessOutline, calendarOutline, callOutline, codeWorkingOutline, ellipsisHorizontalOutline, eyeOffOutline, eyeOutline, saveOutline } from "ionicons/icons"
+import { atOutline, barcodeOutline, businessOutline, calendarOutline, callOutline, cardOutline, codeWorkingOutline, ellipsisHorizontalOutline, eyeOffOutline, eyeOutline, saveOutline } from "ionicons/icons"
+import { formatSnils, SNILS_MASK, snilsValidationError } from "../DataEditor/fields/snils"
 import { Maskito } from "../Classes"
 import { useProfile } from "./useProfile"
 import UserAgree from "../Login/userAgree"
@@ -26,7 +27,7 @@ export function Profile() {
                         passport:   info?.passport,
                         surname:    mode.surname || info.surname,
                         name:       mode.name || info.name,
-                        lastname:   mode.lastname || info.lastname
+                        lastname:   mode.lastname || info.lastname,
                     })
                     setMode({});
                 }}
@@ -200,11 +201,14 @@ export function Profile() {
             setShow( !show );
           };
 
+        const snilsError = snilsValidationError(info.snils || '', false)
+
         const elem = <>
             <div className=" ml-1 mr-1 t-underline mt-1 flex fl-space"> 
                 <b>Настройки</b> 
                 <IonIcon icon = { saveOutline } className="w-2 h-2 pb-05" color={ Object.keys(mode).length === 0 ? "medium" : "success" }
                     onClick={()=>{
+                        if (snilsValidationError(info.snils || '', false)) return
                         save( mode )
                         setMode({});
                     }}
@@ -231,6 +235,28 @@ export function Profile() {
                         }}
                     />
                 </div>                    
+            </div>
+
+            <div className=" flex cl-black">
+                <IonIcon icon = { cardOutline } className="w-15 h-15 ml-1" color="primary"/>
+                <div className="ml-1 w-80 mr-1 t-underline">
+                    <Maskito
+                        mask = { SNILS_MASK }
+                        placeholder="000-000-000 00"
+                        value={ formatSnils(info.snils || '') }
+                        onIonInput = {(e)=>{
+                            const next = formatSnils(e.detail.value || e.target.value || '')
+                            info.snils = next
+                            mode.snils = next
+                            setUpd( upd + 1)
+                        }}
+                    />
+                    {snilsError ? (
+                        <IonText color="danger">
+                            <p className="ion-no-margin ion-padding-start">{snilsError}</p>
+                        </IonText>
+                    ) : null}
+                </div>
             </div>
 
             <div className=" flex cl-black">

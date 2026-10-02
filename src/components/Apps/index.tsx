@@ -1,16 +1,18 @@
-import React, { memo, useCallback, useEffect, useRef } from "react"
-import { IonCard, IonLoading, IonText, IonBadge, IonIcon, useIonViewWillEnter } from "@ionic/react"
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom"
-import { ROUTES, appStatusPath } from "../../routes"
+import React, { memo, useCallback, useEffect, useRef, useState } from "react"
+import { IonCard, IonLoading, IonBadge, IonIcon } from "@ionic/react"
+import { Redirect, useHistory, useLocation, useRouteMatch } from "react-router-dom"
+import { ROUTES } from "../../routes"
 import { useApps } from "./useApps"
-import { useNavigateStore } from "../../Store/navigateStore"
 import { locationOutline, calendarOutline, documentTextOutline, codeOutline } from "ionicons/icons"
 import styles from "./Apps.module.css"
-import { TService } from "../../Store/serviceStore"
+import { TServiceRecord, useServiceStore } from "../../Store/serviceStore"
 import useAppsStore from "../../Store/appStore"
+import { useNavigateStore } from "../../Store/navigateStore"
+import { useToken } from "../Login/authStore"
+import { serviceEditorTarget, ServiceGroup } from "../Services/Services"
 import { AppOrder } from "./AppOrder"
 import { AppStatuses } from "./AppStatuses"
-import type { AppStatusEntry, EditingApp } from "../../Store/appStore"
+import type { AppStatusEntry } from "../../Store/appStore"
 import { badgeColor, statusLabel } from "./appStatusUtils"
 
 type AppsLocationState = {
@@ -19,50 +21,56 @@ type AppsLocationState = {
 }
 
 export function Apps(): JSX.Element {
-  const { apps, loading, refreshApps, get_details1, saveApp, previewApp } = useApps()
+  const { loading, get_details1, saveApp, previewApp } = useApps()
+  const token = useToken()
   const editingApp = useAppsStore((state) => state.app)
   const setApp = useAppsStore((state) => state.setApp)
-  const setCurrentPage = useNavigateStore((state) => state.setCurrentPage)
   const location = useLocation<AppsLocationState>()
   const history = useHistory()
   const statusMatch = useRouteMatch<{ appId: string }>(ROUTES.appStatusPattern)
   const lastHandledEditIdRef = useRef<string>("")
+  const [editPending, setEditPending] = useState(false)
+  const editAppId =
+    new URLSearchParams(location.search).get("editAppId") || location.state?.editAppId || ""
 
-  const refreshAppsRef = useRef(refreshApps)
-
-  useEffect(() => {
-    refreshAppsRef.current = refreshApps
-  }, [refreshApps])
-
-  useIonViewWillEnter(() => {
-    void refreshAppsRef.current()
-  }, [])
+  const openServiceEditor = useCallback((target: ServiceGroup) => {
+    const nav = useNavigateStore.getState()
+    nav.setItem(target)
+    nav.setPage(2)
+    nav.setCurrentPage(ROUTES.services)
+    history.push(ROUTES.services)
+  }, [history])
 
   const handleEdit = useCallback(async (id: string) => {
-    const res = await get_details1(id)
-    if (res !== undefined && res.details) {
-      const next: EditingApp = { id, service: res.details as TService }
-      if (res.ai_status && typeof res.ai_status === "object") {
-        next.ai_status = res.ai_status as EditingApp["ai_status"]
-      }
-      setApp(next)
-    } else if (res !== undefined) {
-      setApp({ id, service: res as TService })
+    let target = serviceEditorTarget(useServiceStore.getState().services, id)
+    if (!target && token) {
+      await useServiceStore.getState().loadServices(token, { silent: true })
+      target = serviceEditorTarget(useServiceStore.getState().services, id)
     }
-  }, [get_details1, setApp])
+    if (target) {
+      openServiceEditor(target)
+      return
+    }
+
+    const res = await get_details1(id)
+    const service = (res && res.details ? res.details : res) as TServiceRecord | undefined
+    if (!service || !Array.isArray(service.chapters) || service.chapters.length === 0) return
+    openServiceEditor({
+      title: String(service.text || service.title || 'Заявка'),
+      source: service,
+      submitted: [],
+      editing: service,
+    })
+  }, [get_details1, openServiceEditor, token])
 
   useEffect(() => {
-    const queryEditId = new URLSearchParams(location.search).get("editAppId") || ""
-    const stateEditId = location.state?.editAppId || ""
-    const editAppId = queryEditId || stateEditId
-
     if (!editAppId) return
     if (lastHandledEditIdRef.current === editAppId) return
 
     lastHandledEditIdRef.current = editAppId
-    void handleEdit(editAppId)
-    history.replace(ROUTES.apps)
-  }, [location.search, location.state, history, handleEdit])
+    setEditPending(true)
+    void handleEdit(editAppId).finally(() => setEditPending(false))
+  }, [editAppId, handleEdit])
 
   const handleBack = useCallback(() => {
     setApp(null)
@@ -73,14 +81,7 @@ export function Apps(): JSX.Element {
     if (id) orderData.id = id
     await saveApp(orderData)
     setApp(null)
-    void refreshApps()
-  }, [saveApp, refreshApps, setApp])
-
-  const openStatuses = useCallback((id: string, statuses?: AppStatusEntry[]) => {
-    const path = appStatusPath(id)
-    setCurrentPage(path)
-    history.push(path, { statuses })
-  }, [setCurrentPage, history])
+  }, [saveApp, setApp])
 
   if (editingApp) {
     return (
@@ -96,21 +97,11 @@ export function Apps(): JSX.Element {
     return <AppStatuses appId={statusMatch.params.appId} onEditApp={handleEdit} />
   }
 
-  return (
-    <>
-      <IonText>
-        <h1 className="main-title ion-text-wrap ml-1">Договора, заявки</h1>
-      </IonText>
+  if (!editingApp && !editAppId && !editPending) {
+    return <Redirect to={ROUTES.services} />
+  }
 
-      {loading && <IonLoading isOpen={loading} message="Загрузка заявок..." />}
-
-      <div className={styles.appsContainer}>
-        {apps.map((row, i) => (
-          <AppCard key={row.id || i} info={row} onOpenStatuses={openStatuses} />
-        ))}
-      </div>
-    </>
-  )
+  return <IonLoading isOpen={loading || editPending} message="Загрузка заявки..." />
 }
 
 interface AppCardProps {
@@ -126,7 +117,7 @@ interface AppCardProps {
   onOpenStatuses: (id: string, statuses?: AppStatusEntry[]) => void
 }
 
-const AppCard = memo(function AppCard({ info, onOpenStatuses }: AppCardProps): JSX.Element {
+export const AppCard = memo(function AppCard({ info, onOpenStatuses }: AppCardProps): JSX.Element {
   const address = typeof info.address === "object" ? info.address?.address : info.address
   const dateStr = (() => {
     if (!info.date) return "—"

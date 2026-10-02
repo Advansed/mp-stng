@@ -22,6 +22,10 @@ export function appStatusPath(appId: string): string {
   return `/page/apps/status/${encodeURIComponent(appId)}`;
 }
 
+export function isAppStatusPath(path: string): boolean {
+  return path.startsWith('/page/apps/status/');
+}
+
 /** Приводит 'lics' / 'page/lics' к '/page/lics'. Абсолютные пути не трогает. */
 export function resolveAppPath(path: string): string {
   const trimmed = (path || '').trim();

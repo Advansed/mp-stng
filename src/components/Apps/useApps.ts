@@ -5,33 +5,12 @@ import { useToast } from '../Toast'
 import { api } from '../../Store/api'
 import { agreementContractPath, parseSignedUrlResponse } from './agreementContract'
 
-let refreshInFlight: Promise<any> | null = null
-
 export const useApps = () => {
   const token               = useToken()
   const toast               = useToast()
-  const apps                = useAppsStore((state) => state.apps)
   const loading             = useAppsStore((state) => state.loading)
-  const fetchApps           = useAppsStore((state) => state.fetchApps)
   const saveFiles           = useAppsStore((state) => state.saveFiles)
   const setLoading          = useAppsStore((state) => state.setLoading)
-
-  const handleRefresh       = useCallback(async () => {
-    if (refreshInFlight) return refreshInFlight
-
-    refreshInFlight = (async () => {
-      const res = await fetchApps(token || '')
-      if (res?.error) toast.error("Ошибка загрузки заявок")
-      else toast.success("Данные загрузились")
-      return res
-    })()
-
-    try {
-      return await refreshInFlight
-    } finally {
-      refreshInFlight = null
-    }
-  }, [token, fetchApps, toast])
 
   const handleSaveFiles     = useCallback(async (id: string, files: any) => {
     if (token) {
@@ -108,13 +87,11 @@ export const useApps = () => {
   }, [token])
 
   return useMemo(() => ({
-    apps,
     loading,
-    refreshApps: handleRefresh,
     saveFiles: handleSaveFiles,
     get_details1,
     saveApp,
     previewApp,
     getSignedAgreementUrl,
-  }), [apps, loading, handleRefresh, handleSaveFiles, get_details1, saveApp, previewApp, getSignedAgreementUrl])
+  }), [loading, handleSaveFiles, get_details1, saveApp, previewApp, getSignedAgreementUrl])
 }

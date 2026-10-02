@@ -34,8 +34,9 @@ export function useHydrateDraftFiles(args: {
   replaceSectionData: (sectionIndex: number, fields: FieldData[]) => void
   onChange?: (section: Section) => void
   onCheckAI?: (args: { method: string; objectKey: string; fileUrl: string }) => Promise<any>
+  recheckAiOnLoad?: boolean
 }) {
-  const { currentPage, section, replaceSectionData, onChange, onCheckAI } = args
+  const { currentPage, section, replaceSectionData, onChange, onCheckAI, recheckAiOnLoad } = args
   const token = useToken()
   const hydratedRef = useRef(new Set<string>())
   const sectionRef = useRef(section)
@@ -76,7 +77,7 @@ export function useHydrateDraftFiles(args: {
           !!field.ai_method &&
           raw.length > 0 &&
           !laterNow &&
-          !hasAiResult(field.ai_status)
+          (recheckAiOnLoad || !hasAiResult(field.ai_status))
 
         if (hydratedRef.current.has(id) && !needsSign) continue
         if (!needsSign && !needsAi) {
@@ -97,7 +98,7 @@ export function useHydrateDraftFiles(args: {
         let ai_status = field.ai_status
         const check = onCheckAIRef.current
         const laterAfter = !!(sectionRef.current?.data[i]?.upload_later?.later ?? field.upload_later?.later)
-        if (needsAi && !laterAfter && !hasAiResult(ai_status) && check && field.ai_method) {
+        if (needsAi && !laterAfter && (recheckAiOnLoad || !hasAiResult(ai_status)) && check && field.ai_method) {
           const results: any[] = []
           for (let idx = 0; idx < raw.length; idx++) {
             const key = s3KeyFromFileRef(raw[idx])

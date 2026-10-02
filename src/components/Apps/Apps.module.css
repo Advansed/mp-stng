@@ -161,6 +161,38 @@
     word-break: break-word;
 }
 
+.emptyCard {
+    margin: 0 8px;
+    border-radius: 16px;
+    padding: 28px 16px;
+    text-align: center;
+    background: var(--app-surface);
+    border: 1px dashed rgba(var(--ion-color-primary-rgb), 0.28);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.emptyIcon {
+    font-size: 32px;
+    color: var(--ion-color-primary);
+    opacity: 0.75;
+    margin-bottom: 10px;
+}
+
+.emptyTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    letter-spacing: -0.015em;
+    margin-bottom: 6px;
+}
+
+.emptyText {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--app-muted);
+}
+
 /* Кнопка «Редактировать» — если появится снова */
 .editButton {
     --background: var(--ion-color-primary);
@@ -187,7 +219,8 @@
         padding: 4px 0 16px;
     }
 
-    .appCard {
+    .appCard,
+    .emptyCard {
         margin: 0 6px;
         border-radius: 14px;
     }

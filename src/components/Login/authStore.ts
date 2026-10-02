@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 import { api, version } from '../../Store/api';
+import { formatSnils } from '../DataEditor/fields/snils';
+
+function readSnils(user: AuthUser & { СНИЛС?: string }): string {
+  return formatSnils(user.snils || user.СНИЛС || '');
+}
 
 // ============================================================================
 // ТИПЫ ДЛЯ АВТОРИЗАЦИИ
@@ -15,6 +20,7 @@ export interface AuthUser {
   surname: string;
   lastname: string;
   phone: string;
+  snils?: string;
   token: string;
   pincode?: string;
   code?: string; // код телефона для восстановления
@@ -101,6 +107,7 @@ const createInitialProfile = (): AuthUser => {
     surname: '',
     lastname: '',
     phone: '',
+    snils: '',
     token: token,
     monthes: 0,
     borders: {
@@ -209,6 +216,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       surname: user.surname || currentProfile.surname || '',
       lastname: user.lastname || currentProfile.lastname || '',
       phone: user.phone || currentProfile.phone || '',
+      snils: readSnils(user) || currentProfile.snils || '',
       token: user.token || currentProfile.token || '',
       pincode: user.pincode ?? currentProfile.pincode,
       code: user.code ?? currentProfile.code,

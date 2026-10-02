@@ -1,4 +1,5 @@
 import { AuthUser } from '../components/Login/authStore';
+import { formatSnils } from '../components/DataEditor/fields/snils';
 
 export type EsiaHashResult =
   | { kind: 'registr' }
@@ -51,6 +52,7 @@ export function parseEsiaHash(hash: string): EsiaHashResult {
     surname: surname || '',
     lastname: lastname || '',
     phone: loginData.phone || loginData.code || loginData.login || '',
+    snils: formatSnils(loginData.snils || loginData.СНИЛС || ''),
     token: loginData.token || '',
     code: loginData.code || loginData.phone || '',
     monthes: loginData.monthes ? parseInt(loginData.monthes, 10) : undefined,

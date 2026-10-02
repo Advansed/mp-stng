@@ -11,7 +11,7 @@ import {
 import { callOutline, callSharp, contractOutline, contractSharp, documentSharp, documentTextOutline, exitOutline, exitSharp, 
     notificationsCircleOutline, 
     notificationsCircleSharp, 
-    notificationsOutline, notificationsSharp, pencilOutline, pencilSharp, personOutline, personSharp, ribbonOutline, 
+    notificationsOutline, notificationsSharp, personOutline, personSharp, ribbonOutline, 
     ribbonSharp, videocamOutline, videocamSharp } from 'ionicons/icons';
     
 import './Menu.css';
@@ -46,12 +46,6 @@ const appPages: AppPage[] = [
     url: ROUTES.services,
     iosIcon: contractOutline,
     mdIcon: contractSharp
-  },
-  {
-    title: 'Договора, заявки',
-    url: ROUTES.apps,
-    iosIcon: pencilOutline,
-    mdIcon: pencilSharp
   },
   {
     title: 'Мониторинг эл. очередь',

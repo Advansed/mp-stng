@@ -47,6 +47,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       'фамилия':            profile.surname,
       'контактныйтелефон':  profile.phone,
       'почта':              profile.email,
+      'снилс':              profile.snils,
       
       // Паспортные данные
       'паспортсерия':       profile.passport?.serial,
@@ -211,7 +212,9 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     if (isLoading || !normalizedService?.chapters?.length) return;
     if ((service.type || normalizedService.type) !== 'agreement') return;
     didPersistRef.current = true;
-    await onSave(getOrderData(data, 2), { silent: true });
+    const kind = String((service as { Тип?: string }).Тип || '').trim();
+    const проведен: 0 | 2 = kind === 'Договор' ? 0 : 2;
+    await onSave(getOrderData(data, проведен), { silent: true });
   };
 
   persistRef.current = () => persistDraft(orderData);
@@ -344,6 +347,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       onBack          = { handleExit }
       onPreview       = { (data: PageData) => onPreview(getOrderData(data)) }
       onCheckAI       = { ({ method, objectKey, fileUrl }) => checkAI(method, objectKey) }
+      recheckAiOnLoad = { String((service as { Тип?: string }).Тип || '').trim() === 'Договор' }
       isAIChecking    = { isAIChecking }
       onChange        = { onChange }
       onFieldChange   = { onFieldChange }

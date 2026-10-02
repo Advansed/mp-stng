@@ -1,7 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { IonLoading, IonText } from '@ionic/react';
 import { requestJson } from '../Store/api';
+import { useNavigateStore } from '../Store/navigateStore';
+import { ROUTES } from '../routes';
 import styles from './Queye.module.css';
+
+let queuePollTimer: ReturnType<typeof setInterval> | null = null;
+let queuePollSession = 0;
+
+function clearQueuePoll() {
+  if (queuePollTimer == null) return;
+  clearInterval(queuePollTimer);
+  queuePollTimer = null;
+}
 
 interface QueueItem {
   window_number: string;
@@ -15,29 +26,55 @@ export function Queye(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const currentPage = useNavigateStore((state) => state.currentPage);
+  const open = currentPage === ROUTES.queye;
+  const sessionRef = useRef(0);
 
-  const loadQueue = async () => {
+  const loadQueue = useCallback(async (session: number) => {
     try {
       setError(null);
       const json = await requestJson(
         'queye',
         'https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2/queye'
       );
+      if (session !== queuePollSession) return;
       if (json && json.success && Array.isArray(json.data)) {
         setItems(json.data as QueueItem[]);
       } else {
         setError('Не удалось загрузить данные очереди');
       }
     } catch (e) {
+      if (session !== queuePollSession) return;
       setError('Ошибка загрузки данных очереди');
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadQueue();
-    const timer = setInterval(loadQueue, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    if (!open) {
+      if (sessionRef.current !== 0 && sessionRef.current === queuePollSession) {
+        queuePollSession += 1;
+        sessionRef.current = 0;
+        clearQueuePoll();
+      }
+      return;
+    }
+
+    clearQueuePoll();
+    queuePollSession += 1;
+    const session = queuePollSession;
+    sessionRef.current = session;
+    void loadQueue(session);
+    queuePollTimer = setInterval(() => {
+      void loadQueue(session);
+    }, 5000);
+
+    return () => {
+      if (sessionRef.current !== queuePollSession) return;
+      queuePollSession += 1;
+      sessionRef.current = 0;
+      clearQueuePoll();
+    };
+  }, [open, loadQueue]);
 
   // Обновление текущего времени каждую минуту
   useEffect(() => {

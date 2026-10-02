@@ -70,6 +70,8 @@ export interface DataEditorProps {
   onPreview:    (data: PageData) => Promise<any>;
   /** checkAI через useCheckAI: API + сверка полей анкеты, ответ уже с errors в checks */
   onCheckAI?:   (args: { method: string; objectKey: string; fileUrl: string }) => Promise<any>;
+  /** Для договора: один раз прогнать checkAI по уже загруженным фото, даже если ai_status уже есть. */
+  recheckAiOnLoad?: boolean;
   isAIChecking?: boolean;
   title?:       string;
 }

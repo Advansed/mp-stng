@@ -53,9 +53,21 @@ export interface TURL {
     format:     string,
 }
 
+/** Сырая запись services_get: черновик, отправленный документ или шаблон без таблицы документов. */
+export type TServiceRecord = Partial<TService> & {
+    title?:             string,
+    doc_id?:            string,
+    Тип?:               string,
+    Статус?:            string,
+    status?:            string,
+    statuses?:          Array<{ period: string; status: string }>,
+    СтатусДокумента?:   string | number,
+    ДатаДокумента?:     string,
+}
+
 interface ServiceState {
 
-  services:     TService[]
+  services:     TServiceRecord[]
   loading:      boolean
   
   setInfo:      ( info: any ) => void
@@ -71,7 +83,7 @@ export const useServiceStore = create<ServiceState>((set, get) => ({
   
     _storeInstanceId: ++storeInstanceId,
     
-    services:       [],
+    services:       [] as TServiceRecord[],
 
     order:          { icon: "", text: "", chapters: [] },
   

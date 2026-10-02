@@ -11,7 +11,7 @@ import { PartyField } from './fields/PartyField';
 import { WizardHeader } from './components/WizardHeader';
 import { CityField } from './fields/СityField';
 import { AddressField } from './fields/AddressField';
-import { isFieldRequired, useValidation } from './hooks/useValidation';
+import { isFieldRequired, isFieldVisible, useValidation, visibleSectionIndexes } from './hooks/useValidation';
 import { ViewField } from './fields/ViewField';
 import { ImageField } from './fields/ImageField';
 import { ImagesField } from './fields/ImagesField';
@@ -48,6 +48,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
   onPreview,
   onCheckAI,
   isAIChecking,
+  recheckAiOnLoad,
   onFieldChange,
   onChange,
 }) => {
@@ -61,6 +62,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
     replaceSectionData: formState.replaceSectionData,
     onChange,
     onCheckAI,
+    recheckAiOnLoad,
   });
 
   const [loading, setLoading]        = useState(false);
@@ -143,6 +145,17 @@ const DataEditor: React.FC<DataEditorProps> = ({
     })
   }, [formState.data])
 
+  const visibleIndexes               = visibleSectionIndexes(formState.data);
+  const visibleKey                   = visibleIndexes.join(',');
+
+  useEffect(() => {
+    if (visibleIndexes.length === 0) return;
+    if (visibleIndexes.indexOf(navigation.currentPage) >= 0) return;
+    const fallback = visibleIndexes.find((index) => index > navigation.currentPage)
+      ?? visibleIndexes[visibleIndexes.length - 1];
+    navigation.goToPage(fallback);
+  }, [visibleKey, navigation.currentPage]);
+
   const scrollToTop                  = () => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
   const currentSectionHasErrors      = (): boolean => {
@@ -168,8 +181,9 @@ const DataEditor: React.FC<DataEditorProps> = ({
   };
 
   const handleBackNavigation         = () => {
-    if (navigation.currentPage > 0) {
-      navigation.prevPage();
+    const pos = visibleIndexes.indexOf(navigation.currentPage);
+    if (pos > 0) {
+      navigation.goToPage(visibleIndexes[pos - 1]);
       scrollToTop();
     } else {
       onBack(formState.data);
@@ -177,14 +191,15 @@ const DataEditor: React.FC<DataEditorProps> = ({
   };
 
   const handleForwardNavigation      = () => {
-    if (navigation.canGoNext) {
-      const hasErrors = currentSectionHasErrors();
+    const pos = visibleIndexes.indexOf(navigation.currentPage);
+    if (pos < 0 || pos >= visibleIndexes.length - 1) return;
 
-      if (!hasErrors) {
-        clearAll();
-        navigation.nextPage();
-        scrollToTop();
-      }
+    const hasErrors = currentSectionHasErrors();
+
+    if (!hasErrors) {
+      clearAll();
+      navigation.goToPage(visibleIndexes[pos + 1]);
+      scrollToTop();
     }
   };
 
@@ -223,7 +238,10 @@ const DataEditor: React.FC<DataEditorProps> = ({
   }
 
   const getPageTitle                 = () => {
-    return (navigation.currentPage + 1) + ' страница из ' + data.length
+    const pos = visibleIndexes.indexOf(navigation.currentPage);
+    const current = pos >= 0 ? pos + 1 : 1;
+    const total = Math.max(visibleIndexes.length, 1);
+    return current + ' страница из ' + total
   }
 
   const getLics                      = () => {
@@ -743,7 +761,8 @@ const DataEditor: React.FC<DataEditorProps> = ({
   const currentSection               = formState.data[navigation.currentPage];
   if (!currentSection) return null;
 
-  const isLastPage                   = navigation.currentPage === navigation.totalPages - 1;
+  const visiblePos                   = visibleIndexes.indexOf(navigation.currentPage);
+  const isLastPage                   = visibleIndexes.length === 0 || visiblePos === visibleIndexes.length - 1;
 
   return (
     <div className="data-editor-wizard">
@@ -756,16 +775,18 @@ const DataEditor: React.FC<DataEditorProps> = ({
           onClose={handleClose} // Изменили onSave на onClose
           isLastStep={isLastPage}
           canGoBack={true}
-          canGoForward={navigation.canGoNext}
+          canGoForward={visiblePos >= 0 && visiblePos < visibleIndexes.length - 1}
         />
 
         <div className="step-container">
           <div className="page-content">
             {
               currentSection.data.map((field, idx) => (
+                isFieldVisible(field, formState.data) ? (
                 <div key={idx}>
                   {renderField(field, navigation.currentPage, idx)}
                 </div>
+                ) : null
               ))
             }
 

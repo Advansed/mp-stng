@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { ROUTES, isAppStatusPath } from '../routes';
 
 interface NavigateState {
   currentPage: string;
@@ -36,14 +37,18 @@ export const useNavigateStore = create<NavigateState>()((set, get) => ({
   },
 
   setCurrentPage: (pageName: string) => {
-    const { currentPage, history } = get();
+    const { currentPage, history, page } = get();
 
     if (currentPage === pageName) return;
+
+    const keepStep =
+      (currentPage === ROUTES.services && isAppStatusPath(pageName)) ||
+      (isAppStatusPath(currentPage) && pageName === ROUTES.services);
 
     set({
       previousPage: currentPage,
       currentPage: pageName,
-      page: 0,
+      page: keepStep ? page : 0,
       history: [...history.slice(-9), pageName],
     });
   },

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { FieldData, PageData, ValidationRule } from '../types';
+import { FieldData, PageData, Section, ValidationRule } from '../types';
 import { snilsValidationError } from '../fields/snils';
 import { passNumberValidationError, seriesValidationError } from '../fields/passport';
 
@@ -33,14 +33,36 @@ function ruleMatches(rule: ValidationRule, sourceValue: unknown): boolean {
   return false;
 }
 
-export function isFieldRequired(field: FieldData, pageData: PageData): boolean {
+function ruleActive(field: FieldData, pageData: PageData): boolean | null {
   const rule = field.validation_rule;
-  if (!rule || !rule.field) return field.validate;
+  if (!rule || !rule.field) return null;
 
   const source = findFieldByName(pageData, rule.field);
-  if (!source) return field.validate;
-  if (ruleMatches(rule, source.data)) return true;
-  return field.validate;
+  if (!source) return false;
+  return ruleMatches(rule, source.data);
+}
+
+export function isFieldRequired(field: FieldData, pageData: PageData): boolean {
+  const active = ruleActive(field, pageData);
+  if (active === null) return field.validate;
+  return active;
+}
+
+export function isFieldVisible(field: FieldData, pageData: PageData): boolean {
+  const active = ruleActive(field, pageData);
+  if (active === null) return true;
+  return active;
+}
+
+export function isSectionVisible(section: Section, pageData: PageData): boolean {
+  return section.data.some((field) => isFieldVisible(field, pageData));
+}
+
+export function visibleSectionIndexes(pageData: PageData): number[] {
+  return pageData.reduce<number[]>((indexes, section, index) => {
+    if (isSectionVisible(section, pageData)) indexes.push(index);
+    return indexes;
+  }, []);
 }
 
 export const useValidation = () => {

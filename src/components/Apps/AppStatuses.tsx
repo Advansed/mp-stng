@@ -3,7 +3,8 @@ import { IonBadge, IonButton, IonCard, IonLoading, IonText } from '@ionic/react'
 import { useLocation } from 'react-router-dom'
 import { createOutline, documentTextOutline, timeOutline } from 'ionicons/icons'
 import { IonIcon } from '@ionic/react'
-import useAppsStore, { AppStatusEntry } from '../../Store/appStore'
+import { AppStatusEntry } from '../../Store/appStore'
+import { useServiceStore } from '../../Store/serviceStore'
 import { useToken } from '../Login/authStore'
 import { PDFDocModal, usePDFDocModal } from '../Files/PDFDocModal'
 import { useToast } from '../Toast'
@@ -53,8 +54,8 @@ function collapseConsecutiveSameStatus(rows: AppStatusEntry[]): AppStatusEntry[]
 
 export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element {
   const location                     = useLocation()
-  const apps                         = useAppsStore((s) => s.apps)
-  const fetchApps                    = useAppsStore((s) => s.fetchApps)
+  const services                     = useServiceStore((s) => s.services)
+  const loadServices                 = useServiceStore((s) => s.loadServices)
   const token                        = useToken()
   const toast                        = useToast()
   const { getSignedAgreementUrl }    = useApps()
@@ -63,19 +64,25 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
 
   useEffect(() => {
     if (!token) return
-    const hasApp = useAppsStore.getState().apps.some((a) => a.id === appId)
-    if (!hasApp) void fetchApps(token)
-  }, [appId, fetchApps, token])
+    const found = useServiceStore.getState().services.some((row) => (row.id || row.doc_id) === appId)
+    if (!found) void loadServices(token, { silent: true })
+  }, [appId, loadServices, token])
 
-  const app = useMemo(() => apps.find((a) => a.id === appId), [apps, appId])
-  const docId = useMemo(() => resolveAppDocId(app, appId), [app, appId])
+  const record = useMemo(
+    () => services.find((row) => (row.id || row.doc_id) === appId),
+    [services, appId]
+  )
+  const docId = useMemo(
+    () => resolveAppDocId(record ? { id: record.id, doc_id: record.doc_id } : undefined, appId),
+    [record, appId]
+  )
 
   const statuses: AppStatusEntry[] = useMemo(() => {
     const fromState = (location.state as LocationState | undefined)?.statuses
     if (fromState?.length) return fromState
-    if (app?.statuses?.length) return app.statuses
+    if (record?.statuses?.length) return record.statuses as AppStatusEntry[]
     return []
-  }, [location.state, app])
+  }, [location.state, record])
 
   const sorted = useMemo(() => {
     return [...statuses].sort(
@@ -110,9 +117,9 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
     if (!lastStatus || !isEditStatus(lastStatus.status)) return []
     return extractAiCheckErrorGroups(
       lastStatus as unknown as Record<string, unknown>,
-      (app || {}) as unknown as Record<string, unknown>
+      (record || {}) as unknown as Record<string, unknown>
     )
-  }, [lastStatus, app])
+  }, [lastStatus, record])
 
   const openSignedContract = useCallback(async () => {
     setContractLoading(true)
@@ -136,11 +143,7 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
         <h1 className={`main-title ion-text-wrap ${styles.title}`}>Статусы заявки</h1>
       </IonText>
       <IonCard className={styles.contentCard}>
-        {app?.number ? (
-          <p className={styles.subtitle}>Номер: {app.number}</p>
-        ) : (
-          <p className={styles.subtitle}>История изменений статуса</p>
-        )}
+        <p className={styles.subtitle}>История изменений статуса</p>
 
         {sorted.length === 0 ? (
           <div className={styles.empty}>Нет записей о статусах для этой заявки.</div>
