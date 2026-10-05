@@ -1,7 +1,6 @@
-// src/components/DataEditor/fields/DateField.tsx
-import React, { useMemo } from 'react';
-import { IonIcon } from '@ionic/react';
-import { calendarOutline } from 'ionicons/icons';
+import React, { useId, useMemo, useState } from 'react';
+import { IonDatetime, IonIcon, IonModal } from '@ionic/react';
+import { calendarOutline, closeOutline } from 'ionicons/icons';
 import styles from './DateField.module.css';
 
 interface DateFieldProps {
@@ -16,97 +15,121 @@ interface DateFieldProps {
   validate?: boolean;
 }
 
-export const DateField: React.FC<DateFieldProps> = ({ 
-  label, 
-  value, 
+function toIsoDate(value: string): string {
+  if (!value) return '';
+
+  const ddmmyyyy = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (ddmmyyyy) {
+    const [, day, month, year] = ddmmyyyy;
+    return `${year}-${month}-${day}`;
+  }
+
+  const iso = value.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (iso) return iso[1];
+
+  const date = new Date(value);
+  if (!isNaN(date.getTime())) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  return '';
+}
+
+function toDisplay(iso: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '';
+  const [year, month, day] = iso.split('-');
+  return `${day}.${month}.${year}`;
+}
+
+function emitValue(iso: string, format: 'ddmmyyyy' | 'iso'): string {
+  if (!iso) return '';
+  if (format === 'ddmmyyyy') return toDisplay(iso);
+  return iso;
+}
+
+export const DateField: React.FC<DateFieldProps> = ({
+  label,
+  value,
   onChange,
-  placeholder = "ДД.ММ.ГГГГ",
+  placeholder = 'ДД.ММ.ГГГГ',
   disabled = false,
   error,
   min,
-  max
+  max,
 }) => {
-  // Определение формата даты и конвертация в YYYY-MM-DD для input
-  const normalizedValue = useMemo(() => {
-    if (!value) return '';
-    
-    // Проверяем, является ли значение форматом ДД.ММ.ГГГГ
-    const ddmmyyyyPattern = /^(\d{2})\.(\d{2})\.(\d{4})$/;
-    const match = value.match(ddmmyyyyPattern);
-    
-    if (match) {
-      // Конвертируем из ДД.ММ.ГГГГ в YYYY-MM-DD
-      const [, day, month, year] = match;
-      return `${year}-${month}-${day}`;
-    }
-    
-    // Проверяем, является ли значение форматом YYYY-MM-DD
-    const yyyymmddPattern = /^\d{4}-\d{2}-\d{2}$/;
-    if (yyyymmddPattern.test(value)) {
-      return value;
-    }
-    
-    // Если формат не распознан, пытаемся распарсить как Date
-    try {
-      const date = new Date(value);
-      if (!isNaN(date.getTime())) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      }
-    } catch {
-      // Игнорируем ошибки парсинга
-    }
-    
-    return value;
-  }, [value]);
+  const datetimeId = useId().replace(/:/g, '');
+  const [open, setOpen] = useState(false);
 
-  // Определение исходного формата для сохранения при изменении
-  const originalFormat = useMemo(() => {
+  const normalizedValue = useMemo(() => toIsoDate(value), [value]);
+  const minIso = useMemo(() => toIsoDate(min || ''), [min]);
+  const maxIso = useMemo(() => toIsoDate(max || ''), [max]);
+  const originalFormat = useMemo<'ddmmyyyy' | 'iso'>(() => {
     if (!value) return 'iso';
-    const ddmmyyyyPattern = /^(\d{2})\.(\d{2})\.(\d{4})$/;
-    return ddmmyyyyPattern.test(value) ? 'ddmmyyyy' : 'iso';
+    return /^\d{2}\.\d{2}\.\d{4}$/.test(value) ? 'ddmmyyyy' : 'iso';
   }, [value]);
 
-  // Обработчик изменения даты
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value; // input type="date" всегда возвращает YYYY-MM-DD
-    
-    if (!newValue) {
-      onChange('');
-      return;
-    }
+  const display = normalizedValue ? toDisplay(normalizedValue) : '';
 
-    // Если исходный формат был ДД.ММ.ГГГГ, конвертируем обратно
-    if (originalFormat === 'ddmmyyyy') {
-      const [year, month, day] = newValue.split('-');
-      onChange(`${day}.${month}.${year}`);
-    } else {
-      // Иначе возвращаем в ISO формате
-      onChange(newValue);
-    }
+  const commit = (iso: string) => {
+    onChange(emitValue(iso, originalFormat));
+    setOpen(false);
   };
 
   return (
     <div className={styles.field}>
-      <label className={styles.label}>{label}</label>
+      <label className={styles.label} htmlFor={datetimeId}>{label}</label>
       <div className={styles.dateWrapper}>
-        <input 
-          type="date"
-          className={`${styles.dateInput} ${error ? styles.inputError : ''} ${!normalizedValue ? styles.placeholder : ''}`}
-          value={normalizedValue} 
-          onChange={handleChange}
-          // placeholder={placeholder}
+        <button
+          id={datetimeId}
+          type="button"
+          className={`${styles.dateButton} ${error ? styles.inputError : ''} ${!display ? styles.placeholder : ''}`}
           disabled={disabled}
-          min={min}
-          max={max}
-        />
+          onClick={() => setOpen(true)}
+        >
+          {display || placeholder}
+        </button>
+        {display && !disabled ? (
+          <button
+            type="button"
+            className={styles.clearButton}
+            aria-label="Очистить дату"
+            onClick={() => onChange('')}
+          >
+            <IonIcon icon={closeOutline} />
+          </button>
+        ) : null}
         <div className={styles.iconWrapper}>
           <IonIcon icon={calendarOutline} className={styles.icon} />
         </div>
       </div>
       {error && <span className={styles.errorMessage}>{error}</span>}
+
+      <IonModal
+        isOpen={open}
+        onDidDismiss={() => setOpen(false)}
+        className={styles.modal}
+      >
+        <IonDatetime
+          presentation="date"
+          locale="ru-RU"
+          firstDayOfWeek={1}
+          value={normalizedValue || undefined}
+          min={minIso || undefined}
+          max={maxIso || undefined}
+          showDefaultButtons
+          doneText="Готово"
+          cancelText="Отмена"
+          onIonChange={(event) => {
+            const raw = event.detail.value;
+            const picked = Array.isArray(raw) ? raw[0] : raw;
+            commit(toIsoDate(String(picked || '')));
+          }}
+          onIonCancel={() => setOpen(false)}
+        />
+      </IonModal>
     </div>
   );
 };
