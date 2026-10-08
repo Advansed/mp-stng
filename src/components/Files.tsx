@@ -38,13 +38,14 @@ function deferForIosOverlay(): Promise<void> {
     });
 }
 
-async function pickSource(): Promise<PickSource | null> {
+async function pickSource(options?: { camera?: boolean }): Promise<PickSource | null> {
+    const allowCamera = options?.camera !== false;
     let actionSheet: HTMLIonActionSheetElement;
     try {
         actionSheet = await actionSheetController.create({
             header: "Выберите источник",
             buttons: [
-                { text: "Сделать фото", data: { source: "camera" } },
+                ...(allowCamera ? [{ text: "Сделать фото", data: { source: "camera" as const } }] : []),
                 { text: "Выбрать из галереи", data: { source: "gallery" } },
                 { text: "Выбрать PDF", data: { source: "pdf" } },
                 { text: "Отмена", role: "cancel" },
@@ -84,9 +85,9 @@ async function getPhotoFromSource(source: CameraSource) {
     };
 }
 
-export async function       PickSource() {
+export async function       PickSource(options?: { camera?: boolean }) {
     try {
-        const source = await pickSource();
+        const source = await pickSource(options);
         if (!source) throw new Error("Файл не выбран");
 
         if (source === "pdf") {
@@ -95,7 +96,7 @@ export async function       PickSource() {
             return pdf;
         }
 
-        if (source === "gallery") {
+        if (source === "gallery" || options?.camera === false) {
             return getPhotoFromSource(CameraSource.Photos);
         }
 

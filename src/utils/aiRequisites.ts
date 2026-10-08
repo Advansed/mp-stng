@@ -178,6 +178,34 @@ export function mergeDataFromAiResultArray(items: AiPassportImageResult[]): Reco
   return acc as Record<string, any>
 }
 
+function aiResultFailed(result: AiPassportImageResult | null | undefined): boolean {
+  if (!result || typeof result !== "object") return false
+  return Array.isArray(result.errors) && result.errors.length > 0
+}
+
+function collectAiResults(ai_status: unknown): AiPassportImageResult[] {
+  if (ai_status == null) return []
+  if (Array.isArray(ai_status)) {
+    return ai_status.filter((item): item is AiPassportImageResult => !!item && typeof item === "object")
+  }
+  if (typeof ai_status !== "object") return []
+  const source = ai_status as Record<string, unknown>
+  const results: AiPassportImageResult[] = []
+  if (source.byUrl && typeof source.byUrl === "object") {
+    for (const item of Object.values(source.byUrl as Record<string, AiPassportImageResult>)) {
+      if (item && typeof item === "object") results.push(item)
+    }
+  }
+  results.push(source as AiPassportImageResult)
+  return results
+}
+
+/** Файл не прошёл проверку ИИ: в результате есть непустой массив errors. Пустой массив — проверка пройдена. */
+export function aiStatusFailed(method: string, ai_status: unknown): boolean {
+  if (!method) return false
+  return collectAiResults(ai_status).some((result) => aiResultFailed(result))
+}
+
 /** «Правильный» снимок: без ошибок проверки/ИИ для карточки. */
 export function aiResultLooksClean(r: AiPassportImageResult | null | undefined): boolean {
   if (!r) return false

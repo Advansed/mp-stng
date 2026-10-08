@@ -92,7 +92,7 @@ export function ImagesField({
     if (disabled || isBusy || value.length >= maxImages) return;
 
     try {
-      const photo = await PickSource();
+      const photo = await PickSource({ camera: false });
       if (!photo?.dataUrl) return;
 
       const randomDigits = () => Math.floor(1000 + Math.random() * 9000).toString();

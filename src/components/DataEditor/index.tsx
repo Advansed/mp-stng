@@ -11,7 +11,7 @@ import { PartyField } from './fields/PartyField';
 import { WizardHeader } from './components/WizardHeader';
 import { CityField } from './fields/СityField';
 import { AddressField } from './fields/AddressField';
-import { isFieldRequired, isFieldVisible, useValidation, visibleSectionIndexes } from './hooks/useValidation';
+import { fileAiBlockMessage, isFieldRequired, isFieldVisible, useValidation, visibleSectionIndexes } from './hooks/useValidation';
 import { ViewField } from './fields/ViewField';
 import { ImageField } from './fields/ImageField';
 import { ImagesField } from './fields/ImagesField';
@@ -165,11 +165,21 @@ const DataEditor: React.FC<DataEditorProps> = ({
 
     let hasErrors = false;
     currentSection.data.forEach((field, fIdx) => {
-      if (!isFieldRequired(field, formState.data)) {
+      if (!isFieldVisible(field, formState.data)) {
         clearError(pageIndex, fIdx);
         return;
       }
-      const error = validateField(field, pageIndex, fIdx, formState.data);
+      const aiError = fileAiBlockMessage(field);
+      if (!isFieldRequired(field, formState.data)) {
+        if (aiError) {
+          setError(pageIndex, fIdx, aiError);
+          hasErrors = true;
+        } else {
+          clearError(pageIndex, fIdx);
+        }
+        return;
+      }
+      const error = validateField(field, pageIndex, fIdx, formState.data) || aiError;
       if (error) {
         setError(pageIndex, fIdx, error);
         hasErrors = true;

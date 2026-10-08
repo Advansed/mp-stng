@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { FieldData, PageData, Section, ValidationRule } from '../types';
+import { aiStatusFailed } from '../../../utils/aiRequisites';
 import { snilsValidationError } from '../fields/snils';
 import { passNumberValidationError, seriesValidationError } from '../fields/passport';
 
@@ -56,6 +57,19 @@ export function isFieldVisible(field: FieldData, pageData: PageData): boolean {
 
 export function isSectionVisible(section: Section, pageData: PageData): boolean {
   return section.data.some((field) => isFieldVisible(field, pageData));
+}
+
+export function fileAiBlockMessage(field: FieldData): string | null {
+  if (field.type !== 'image' && field.type !== 'images') return null;
+  if (!field.ai_method) return null;
+  if (field.upload_later?.later || field.later) return null;
+
+  const hasFile = field.type === 'images'
+    ? Array.isArray(field.data) && field.data.some((item) => typeof item === 'string' && item.trim() !== '')
+    : typeof field.data === 'string' && field.data.trim() !== '';
+  if (!hasFile) return null;
+  if (!aiStatusFailed(field.ai_method, field.ai_status)) return null;
+  return 'Файл не прошёл проверку ИИ';
 }
 
 export function visibleSectionIndexes(pageData: PageData): number[] {

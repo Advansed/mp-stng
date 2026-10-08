@@ -75,7 +75,7 @@ export function ImageField({
     if (disabled || isBusy) return;
     
     try {
-      const photo = await PickSource();
+      const photo = await PickSource({ camera: false });
       if (photo?.dataUrl) {
         const blob      = await dataUrlToBlob( photo.dataUrl );
         const fileName  = name + '.' + photo.format; // generateFileName( photo.format );
