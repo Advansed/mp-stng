@@ -19,6 +19,8 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /src/utils/fileReferences.ts
+            /src/utils/attachmentUpload.ts
+            /src/Store/api.ts
             /test/lifecycle/
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -33,5 +35,6 @@ jobs:
       - name: Reference contract tests (no build or production access)
         shell: powershell
         run: |
-          node --experimental-strip-types --test test/lifecycle/references.test.mjs
+          $testFiles = @(Get-ChildItem test/lifecycle -Filter '*.test.mjs' | ForEach-Object { $_.FullName })
+          node --experimental-strip-types --test @testFiles
           if ($LASTEXITCODE -ne 0) { throw 'TESTS_FAILED' }

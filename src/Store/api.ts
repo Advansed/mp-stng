@@ -24,15 +24,15 @@ export async function requestJson(
     init.body = JSON.stringify(options.params);
   }
 
-  console.log(`[API] ${name} request`, { url, method, params: options.params });
+  console.log(`[API] ${name} request`, { method });
 
   try {
     const res = await fetch(url, init);
     const data = await res.json();
-    console.log(`[API] ${name} response`, { status: res.status, data });
+    console.log(`[API] ${name} response`, { status: res.status });
     return data;
   } catch (error) {
-    console.error(`[API] ${name} error`, { url, params: options.params, error });
+    console.error(`[API] ${name} request failed`);
     throw error;
   }
 }

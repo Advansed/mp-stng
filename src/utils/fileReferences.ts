@@ -1,3 +1,9 @@
+const confirmedUploads = new Map<string,string>()
+export function rememberConfirmedUpload(url: string, key: string) {
+  if (!/^lifecycle\/sealed\/[0-9a-f-]{36}$/.test(key)) throw new Error('INVALID_CONFIRMED_KEY')
+  if (confirmedUploads.size >= 1000) throw new Error('TOO_MANY_PENDING_REFERENCES')
+  confirmedUploads.set(url,key)
+}
 /** Keep storage origin and original persisted representation. Never turn a
  * historical MinIO/VK URL into an ambiguous REG key. Query signatures expire
  * and must not become part of document identity. The server validates origins.
@@ -19,7 +25,7 @@ export function persistentFileReference(value: unknown): string | null {
 export function persistentFileReferences(field: { data?: unknown; s3KeyByUrl?: Record<string, string> }): string[] {
   const refs: string[] = []
   for (const value of Array.isArray(field.data) ? field.data : []) {
-    const original = typeof value === 'string' ? field.s3KeyByUrl?.[value] : undefined
+    const original = typeof value === 'string' ? confirmedUploads.get(value) ?? field.s3KeyByUrl?.[value] : undefined
     const ref = persistentFileReference(original ?? value)
     if (ref && !refs.includes(ref)) refs.push(ref)
   }

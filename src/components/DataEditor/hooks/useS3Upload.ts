@@ -1,3 +1,5 @@
+import { uploadAttachment } from '../../../utils/attachmentUpload'
+import { rememberConfirmedUpload } from '../../../utils/fileReferences'
 import { useState } from "react"
 import { api } from "../../../Store/api"
 import { useToken } from "../../Login/authStore"
@@ -80,6 +82,19 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
     setProgress(0)
 
     try {
+      if (process.env.REACT_APP_ATTACHMENTS_V2 === 'true') {
+        const [documentId, group] = (fileName || '').split('/')
+        if (!token || !documentId || !group) throw new Error('Не определена заявка для загрузки')
+        const uploaded = await uploadAttachment({token,documentId,group,file,requestId:crypto.randomUUID()},async(operation,body)=>{
+          const response = await api('attachments_'+operation,body)
+          if (response.error || !response.data) throw new Error('Файл не подтверждён сервером')
+          return response.data
+        })
+        rememberConfirmedUpload(uploaded.url,uploaded.key)
+        setProgress(100)
+        options.onSuccess?.(uploaded.url)
+        return uploaded.url
+      }
       const timestamp = Date.now()
       const randomString = Math.random().toString(36).substring(2, 15)
       const extension = fileName?.split(".").pop() || "jpg"

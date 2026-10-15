@@ -7,7 +7,7 @@ import { useS3Upload } from "../hooks/useS3Upload";
 import { AiStatusResultPanel } from "./AiStatusResultPanel";
 import { UploadLaterBlock } from "./UploadLaterBlock";
 import { normalizeAiResultsArray, pickAiResultForImagesFieldDisplay } from "../../../utils/aiRequisites";
-import { isDisplayableFileSrc } from "../../../utils/signedUrl";
+import { isDisplayableFileSrc, s3KeyFromFileRef } from "../../../utils/signedUrl";
 
 interface ImagesFieldProps {
   doc?: string;
@@ -106,7 +106,7 @@ export function ImagesField({
       const fileUrl = await uploadFile(blob, objectKey);
 
       if (ai_method && onCheckAI) {
-        await onCheckAI({ method: ai_method, objectKey, fileUrl });
+        await onCheckAI({ method: ai_method, objectKey: process.env.REACT_APP_ATTACHMENTS_V2 === 'true' ? (s3KeyFromFileRef(fileUrl) || objectKey) : objectKey, fileUrl });
       }
 
       await onChange([...value, fileUrl]);
