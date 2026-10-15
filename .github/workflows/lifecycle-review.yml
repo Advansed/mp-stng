@@ -1,0 +1,37 @@
+name: Mobile attachment reference tests
+on:
+  push:
+    branches: [fix/application-attachment-lifecycle]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: attachment-review-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  isolated-tests:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/utils/fileReferences.ts
+            /test/lifecycle/
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.11.0'
+      - name: Confirm isolated checkout and remove history
+        shell: powershell
+        run: |
+          foreach ($path in @('.env', 'mobile.config.js', 'requests.js', 'database.js', 'package.json')) {
+            if (Test-Path $path) { throw 'UNEXPECTED_PRODUCTION_SOURCE' }
+          }
+          Remove-Item -LiteralPath .git -Recurse -Force
+      - name: Reference contract tests (no build or production access)
+        shell: powershell
+        run: |
+          node --experimental-strip-types --test test/lifecycle/references.test.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'TESTS_FAILED' }

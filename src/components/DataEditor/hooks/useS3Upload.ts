@@ -68,7 +68,7 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
     const response = await api("delFileS3", { token, filename })
 
     if (response.error) {
-      throw new Error("Failed to get upload URL")
+      throw new Error("Не удалось удалить вложение")
     }
 
     return response
@@ -94,7 +94,7 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
         options.onProgress?.(simulatedProgress)
       }, 200)
 
-      console.log("[API] S3 PUT request", { url: uploadUrl, fileName, uniqueFileName, type: file.type, size: file.size })
+      // Presigned URLs grant temporary access; never log them.
       const response = await fetch(uploadUrl, {
         method: "PUT",
         body: file,
@@ -105,8 +105,7 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
       clearInterval(progressInterval)
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error("Upload failed:", response.status, errorText)
+        console.error("Upload failed:", response.status)
         throw new Error(`Upload failed: ${response.status}`)
       }
 

@@ -1,3 +1,4 @@
+import { persistentFileReference, persistentFileReferences } from './fileReferences'
 import { api } from '../Store/api'
 
 /** URL или dataUrl из ответа `getsignedurl`. */
@@ -67,8 +68,8 @@ export async function resolveDraftFileUrls(
     if (!s) continue
     if (/^https?:\/\//i.test(s)) {
       urls.push(s)
-      const key = s3KeyFromFileRef(s)
-      if (key) s3KeyByUrl[s] = key
+      const original = persistentFileReference(s)
+      if (original) s3KeyByUrl[s] = original
       continue
     }
     const signed = await getSignedFileUrl(token, s)
@@ -84,15 +85,7 @@ export function fileKeysForPayload(field: {
   data?: unknown
   s3KeyByUrl?: Record<string, string>
 }): string[] {
-  const filesArr = Array.isArray(field.data) ? field.data : []
-  const keys: string[] = []
-  for (const elem of filesArr) {
-    const fromRef = s3KeyFromFileRef(elem)
-    const fromMap = typeof elem === 'string' ? field.s3KeyByUrl?.[elem] : undefined
-    const key = fromRef || fromMap
-    if (key) keys.push(key)
-  }
-  return keys
+  return persistentFileReferences(field)
 }
 
 /** Превью: только http(s) или data-URL, не сырой S3-ключ. */
