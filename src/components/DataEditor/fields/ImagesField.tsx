@@ -11,6 +11,7 @@ import { isDisplayableFileSrc, s3KeyFromFileRef } from "../../../utils/signedUrl
 
 interface ImagesFieldProps {
   doc?: string;
+  s3KeyByUrl?: Record<string,string>;
   name?: string;
   label: string;
   value: string[];
@@ -43,6 +44,7 @@ function isPdfSrc(src: string): boolean {
 
 export function ImagesField({
   doc,
+  s3KeyByUrl,
   name,
   label,
   value: valueProp,
@@ -72,6 +74,7 @@ export function ImagesField({
         : null;
 
   const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress } = useS3Upload({
+    documentId: doc, group: name,
     onError: (err) => console.error("ImagesField S3:", err),
   });
   
@@ -123,7 +126,7 @@ export function ImagesField({
     if (!url) return;
 
     try {
-      await delFileS3(url);
+      await delFileS3(url,doc,name,s3KeyByUrl?.[url]);
       const next = value.filter((_, i) => i !== index);
       onChange(next);
       setAiFocusedUrl((f) => {

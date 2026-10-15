@@ -10,6 +10,8 @@ import { UploadLaterBlock } from "./UploadLaterBlock";
 import { isDisplayableFileSrc } from "../../../utils/signedUrl";
 
 interface ImageFieldProps {
+  doc?:string;
+  s3KeyByUrl?:Record<string,string>;
   name?: string;
   label: string;
   value: string | unknown;
@@ -41,6 +43,7 @@ function isPdfSrc(src: string): boolean {
 }
 
 export function ImageField({
+  doc,s3KeyByUrl,
   name,
   label,
   value = '',
@@ -63,6 +66,7 @@ export function ImageField({
   const isPdf = canPreview && isPdfSrc(imageSrc);
 
   const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress, pruneAiByFileUrl } = useS3Upload({
+    documentId: doc, group: name,
     onError: (error) => console.error("Upload error:", error),
   });
   const isBusy = isUploading || isAIChecking;
@@ -96,11 +100,11 @@ export function ImageField({
     
     try {
         const prevUrl = value as string;
-        const response   = await delFileS3( prevUrl );
+        await delFileS3(prevUrl,doc,name,s3KeyByUrl?.[prevUrl]);
         if (ai_method) {
           pruneAiByFileUrl(ai_method, prevUrl);
         }
-        onChange( response );
+        onChange('');
 
     } catch (error) {
       console.error("Ошибка удаления фото:", error);

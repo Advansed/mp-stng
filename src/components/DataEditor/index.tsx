@@ -687,7 +687,8 @@ const DataEditor: React.FC<DataEditorProps> = ({
     const key = `${sectionIdx}-${fieldIdx}`
 
     const props = {
-      doc:      field.doc,
+      doc:      field.doc || app?.id,
+      s3KeyByUrl: (field as any).s3KeyByUrl,
       name:     field.name,
       label:    field.label,
       value:    field.data,

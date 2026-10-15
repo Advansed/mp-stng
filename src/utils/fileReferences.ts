@@ -31,3 +31,5 @@ export function persistentFileReferences(field: { data?: unknown; s3KeyByUrl?: R
   }
   return refs
 }
+
+export const confirmedUploadKey=(url:string)=>confirmedUploads.get(url);

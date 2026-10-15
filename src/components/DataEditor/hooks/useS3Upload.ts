@@ -1,12 +1,15 @@
 import { uploadAttachment } from '../../../utils/attachmentUpload'
-import { rememberConfirmedUpload } from '../../../utils/fileReferences'
-import { useState } from "react"
+import { deleteAttachment } from '../../../utils/attachmentDelete'
+import { rememberConfirmedUpload, confirmedUploadKey } from '../../../utils/fileReferences'
+import { useState, useRef } from "react"
 import { api } from "../../../Store/api"
 import { useToken } from "../../Login/authStore"
 import useAppsStore, { type AiMethodState, type EditingApp } from "../../../Store/appStore"
 import { normalizeMethodState } from "../../../utils/aiRequisites"
 
 interface UseS3UploadOptions {
+  documentId?: string
+  group?: string
   onProgress?: (progress: number) => void
   onError?: (error: Error) => void
   onSuccess?: (fileUrl: string) => void
@@ -44,6 +47,7 @@ function patchListItemAi(apps: any[], id: string | undefined, method: string, st
 }
 
 export function useS3Upload(options: UseS3UploadOptions = {}) {
+  const busy = useRef(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [progress, setProgress] = useState(0)
@@ -66,7 +70,12 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
     return response.data
   }
 
-  const delFileS3 = async (filename: string): Promise<{ uploadUrl: string; fileUrl: string; fields: any }> => {
+  const performDeletion = async (filename: string, documentId?:string, group?:string, originalKey?:string): Promise<any> => {
+    if(process.env.REACT_APP_ATTACHMENTS_V2 === 'true') {
+      documentId=documentId||useAppsStore.getState().app?.id
+      if(!token||!documentId||!group)throw new Error('Не определена заявка для удаления')
+      return deleteAttachment({token,documentId,group,reference:filename,originalKey:confirmedUploadKey(filename)||originalKey},api)
+    }
     const response = await api("delFileS3", { token, filename })
 
     if (response.error) {
@@ -76,14 +85,26 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
     return response
   }
 
+  const delFileS3 = async (...args: Parameters<typeof performDeletion>): Promise<any> => {
+    if (busy.current) throw new Error('Операция с файлом уже выполняется')
+    busy.current = true
+    setIsUploading(true)
+    try { return await performDeletion(...args) }
+    finally { busy.current = false; setIsUploading(false) }
+  }
+
   const uploadFile = async (file: Blob, fileName?: string, _ai_method?: string): Promise<string> => {
+    if (busy.current) throw new Error('Операция с файлом уже выполняется')
+    busy.current = true
     setIsUploading(true)
     setError(null)
     setProgress(0)
 
     try {
       if (process.env.REACT_APP_ATTACHMENTS_V2 === 'true') {
-        const [documentId, group] = (fileName || '').split('/')
+        const parts = (fileName || '').split('/')
+        const documentId = options.documentId || parts[0]
+        const group = options.group || parts[1]
         if (!token || !documentId || !group) throw new Error('Не определена заявка для загрузки')
         const uploaded = await uploadAttachment({token,documentId,group,file,requestId:crypto.randomUUID()},async(operation,body)=>{
           const response = await api('attachments_'+operation,body)
@@ -135,6 +156,7 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
       options.onError?.(errObj)
       throw errObj
     } finally {
+      busy.current = false
       setIsUploading(false)
     }
   }

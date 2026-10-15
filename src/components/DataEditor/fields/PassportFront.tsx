@@ -7,6 +7,9 @@ import styles from './ImageField.module.css';
 import { useS3Upload } from "../hooks/useS3Upload";
 
 interface ImageFieldProps {
+  doc?:string;
+  s3KeyByUrl?:Record<string,string>;
+  name?:string;
   label: string;
   value: string | unknown;
   onChange: (value: any) => void;
@@ -31,6 +34,7 @@ export function generateFileName( format: string ): string {
 }
 
 export const PassportFront: React.FC<ImageFieldProps> = ({
+  doc,name,s3KeyByUrl,
   label,
   value = '',
   onChange,
@@ -43,6 +47,7 @@ export const PassportFront: React.FC<ImageFieldProps> = ({
   const imageSrc = normalizeImageSrc(value);
 
   const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress } = useS3Upload({
+    documentId: doc, group: name,
     onError: (error) => console.error("Upload error:", error),
   });
 
@@ -70,9 +75,9 @@ export const PassportFront: React.FC<ImageFieldProps> = ({
     
     try {
 
-        const response   = await delFileS3( value as string );
+        await delFileS3(value as string,doc,name,s3KeyByUrl?.[value as string]);
 
-        onChange( response );
+        onChange('');
 
     } catch (error) {
       console.error("Ошибка удаления фото:", error);
