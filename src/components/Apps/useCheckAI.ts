@@ -32,7 +32,7 @@ export function useCheckAI(_opts?: UseCheckAIOptions) {
         setAIChecking(false)
       }
     },
-    [token, app?.id]
+    [token, app?.id, app?.service]
   )
 
   return useMemo(() => ({ checkAI, isAIChecking }), [checkAI, isAIChecking])

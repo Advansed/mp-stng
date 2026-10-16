@@ -30,7 +30,8 @@ export function formatSnils(value: string): string {
 }
 
 export function isValidSnils(value: string): boolean {
-  const digits = snilsDigits(value);
+  if (!/^[0-9\s-]+$/.test(value || '')) return false;
+  const digits = (value || '').replace(/[\s-]/g, '');
   if (digits.length !== 11) return false;
   if (digits === '00000000000') return false;
 

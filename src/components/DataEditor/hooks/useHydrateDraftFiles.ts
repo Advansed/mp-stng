@@ -63,6 +63,7 @@ export function useHydrateDraftFiles(args: {
     let cancelled = false
 
     const run = async () => {
+      const originalData = JSON.stringify(currentSection.data);
       const working = currentSection.data.map((field) => ({ ...field }))
       let changed = false
 
@@ -125,7 +126,7 @@ export function useHydrateDraftFiles(args: {
         changed = true
       }
 
-      if (cancelled || !changed) return
+      if (cancelled || !changed || JSON.stringify(sectionRef.current?.data) !== originalData) return
       replaceRef.current(currentPage, working)
       onChangeRef.current?.({
         ...(currentSection as any),

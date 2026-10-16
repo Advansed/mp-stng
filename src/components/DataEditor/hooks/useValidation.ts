@@ -44,6 +44,7 @@ function ruleActive(field: FieldData, pageData: PageData): boolean | null {
 }
 
 export function isFieldRequired(field: FieldData, pageData: PageData): boolean {
+  if (field.name === "SNILS" && field.ai_method === "snils") return true;
   const active = ruleActive(field, pageData);
   if (active === null) return field.validate;
   return active;

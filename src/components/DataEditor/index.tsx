@@ -55,6 +55,8 @@ const DataEditor: React.FC<DataEditorProps> = ({
   const scrollRef                    = useRef<HTMLDivElement>(null);
   const navigation                   = useNavigation(data.length);
   const formState                    = useFormState(data);
+  const latestForm = useRef(formState.data);
+  latestForm.current = formState.data;
 
   useHydrateDraftFiles({
     currentPage: navigation.currentPage,
@@ -323,6 +325,8 @@ const DataEditor: React.FC<DataEditorProps> = ({
       return { is_passport: isPassport, data, ...withExtras }
     }
 
+    if (method === 'snils') return { is_snils: raw.is_snils, data, ...withExtras };
+
     if (method === 'passport_reg') {
       const isPropiska =
         typeof byUrlRes?.is_propiska === 'boolean'
@@ -385,6 +389,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
     })
 
     const boolFlags: boolean[] = []
+    if (typeof checks.snils?.is_snils === 'boolean') boolFlags.push(checks.snils.is_snils && checks.snils.has_error !== true)
     if (typeof checks.passport_front?.is_passport === 'boolean') boolFlags.push(checks.passport_front.is_passport)
     if (typeof checks.passport_reg?.is_propiska === 'boolean') boolFlags.push(checks.passport_reg.is_propiska)
     if (typeof checks.egrn?.is_egrn === 'boolean') boolFlags.push(checks.egrn.is_egrn)
@@ -610,6 +615,20 @@ const DataEditor: React.FC<DataEditorProps> = ({
         }
       }
 
+      if (field.name === 'СНИЛС' && prevValue !== value) {
+        formState.data.forEach((section, si) => section.data.forEach((item, fi) => {
+          if (item.ai_method === 'snils') formState.updateAiStatus(si, fi, null);
+        }));
+        const latest = useAppsStore.getState().app;
+        if (latest?.service) {
+          const statuses = { ...(latest.ai_status || {}) };
+          delete statuses.snils;
+          setApp({...latest, ai_status: statuses, service: {...latest.service,
+            chapters: latest.service.chapters.map(ch => ({...ch, files: ch.files?.map(item =>
+              item.ai_method === 'snils' ? {...item, ai_status: {}} : item)}))}});
+        }
+      }
+
       onFieldChange?.({
         sectionIndex: sectionIdx,
         fieldIndex: fieldIdx,
@@ -708,7 +727,11 @@ const DataEditor: React.FC<DataEditorProps> = ({
     const mergedRemoteAiCheck =
       async (args: { method: string; objectKey: string; fileUrl: string }): Promise<any> => {
         if (!onCheckAI || !field.ai_method) return null;
+        const snapshot = () => JSON.stringify(latestForm.current.flatMap(section => section.data)
+          .filter(item => item.name === 'SNILS' || item.name === 'СНИЛС').map(item => [item.name, item.data]));
+        const before = snapshot();
         const res = await onCheckAI(args);
+        if (field.ai_method === 'snils' && before !== snapshot()) return null;
         const incoming = extractAiInboundFromCheckResponse(field.ai_method, res);
         if (incoming != null) {
           applyAiStatus(incoming, field.ai_method);

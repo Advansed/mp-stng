@@ -1,7 +1,7 @@
 name: Mobile attachment reference tests
 on:
   push:
-    branches: [fix/application-attachment-lifecycle]
+    branches: [fix/application-attachment-lifecycle, feat/vdgo-snils]
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,6 +18,8 @@ jobs:
           persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /src/utils/aiRequisites.ts
+            /src/components/DataEditor/fields/snils.ts
             /src/utils/fileReferences.ts
             /src/utils/attachmentUpload.ts
             /src/utils/attachmentDelete.ts

@@ -14,6 +14,8 @@ export type AiCheckError = { field?: string; error?: string }
 
 /** Результат checkAI по одному изображению (лицо паспорта и т.п.). */
 export type AiPassportImageResult = {
+  is_snils?: boolean
+  checksum_valid?: boolean
   is_passport?: boolean
   data?: Record<string, string>
   errors?: AiCheckError[]

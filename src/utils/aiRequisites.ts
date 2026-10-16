@@ -355,15 +355,17 @@ export function extractAiInboundFromCheckResponse(ai_method: string, res: any): 
   if (!checkData) return null
   const m = (ai_method || "").toLowerCase()
   if (m === "passport_front" && checkData.passport_front) return checkData.passport_front as AiPassportImageResult
+  if (m === "snils" && checkData.snils) return checkData.snils as AiPassportImageResult
   if (m === "passport_reg" && checkData.passport_reg) return checkData.passport_reg as AiPassportImageResult
   if (m === "egrn" && checkData.egrn) return checkData.egrn as AiPassportImageResult
   if ((m === "ventkanal" || m === "akt") && checkData.akt) return checkData.akt as AiPassportImageResult
   return null
 }
 
-function checkKeyForAiMethod(method: string): "passport_front" | "passport_reg" | "egrn" | "akt" {
+function checkKeyForAiMethod(method: string): "passport_front" | "passport_reg" | "egrn" | "akt" | "snils" {
   const m = (method || "").toLowerCase()
   if (m === "passport_front") return "passport_front"
+  if (m === "snils") return "snils"
   if (m === "passport_reg") return "passport_reg"
   if (m === "egrn") return "egrn"
   if (m === "ventkanal" || m === "akt") return "akt"
