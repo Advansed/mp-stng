@@ -1,3 +1,5 @@
+import { currentCheckService } from '../../utils/currentCheckService';
+import { initialCorrectionPage } from '../../utils/correctionStep';
 // Order.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { useToast } from '../Toast';
@@ -24,7 +26,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
   const [orderData, setOrderData]                     = useState<PageData>([]);
   const [isLoading, setIsLoading]                     = useState(true);
   const [normalizedService, setNormalizedService]     = useState<TService | null>(null);
-  const { checkAI, isAIChecking }                     = useCheckAI({ service });
+  const { checkAI, isAIChecking }                     = useCheckAI({ service: currentCheckService(normalizedService, orderData) });
   const didPersistRef                                 = useRef(false);
   const persistRef                                    = useRef<(() => Promise<void>) | null>(null);
 
@@ -341,6 +343,7 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
 
   return (
     <DataEditor
+      initialPage = { initialCorrectionPage(service) }
       key             = { normalizedService.id }
       data            = { orderData }
       onSave          = { handleSave }

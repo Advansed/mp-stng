@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-export const useNavigation = (totalPages: number) => {
-  const [currentPage, setCurrentPage] = useState(0);
+export const useNavigation = (totalPages: number, initialPage = 0) => {
+  const [currentPage, setCurrentPage] = useState(() => Math.max(0, Math.min(initialPage, totalPages - 1)));
 
   const nextPage = () => {
     if (currentPage < totalPages - 1) {

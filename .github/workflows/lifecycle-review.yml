@@ -18,6 +18,8 @@ jobs:
           persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /src/utils/currentCheckService.ts
+            /src/utils/correctionStep.ts
             /src/utils/aiRequisites.ts
             /src/components/DataEditor/fields/snils.ts
             /src/utils/fileReferences.ts

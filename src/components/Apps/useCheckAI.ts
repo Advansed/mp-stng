@@ -15,16 +15,17 @@ export interface UseCheckAIOptions {
 /**
  * Только вызывает `checkAI`. Обработка `errors/has_error` и рендер результата — в `DataEditor`/`aiRequisites`.
  */
-export function useCheckAI(_opts?: UseCheckAIOptions) {
+export function useCheckAI(opts?: UseCheckAIOptions) {
   const token = useToken()
   const app = useAppsStore((s) => s.app as EditingApp | null)
+  const currentService = opts?.serviceForCompare ?? app?.service;
   const [isAIChecking, setAIChecking] = useState(false)
 
   const checkAI = useCallback(
     async (method: string, objectKey: string, _fileUrl?: string): Promise<any> => {
       setAIChecking(true)
       try {
-        const res = await api("checkAI", { token, method, app: app?.service, url: objectKey })
+        const res = await api("checkAI", { token, method, app: currentService, url: objectKey })
         return res
       } catch {
         return null
@@ -32,7 +33,7 @@ export function useCheckAI(_opts?: UseCheckAIOptions) {
         setAIChecking(false)
       }
     },
-    [token, app?.id, app?.service]
+    [token, currentService]
   )
 
   return useMemo(() => ({ checkAI, isAIChecking }), [checkAI, isAIChecking])

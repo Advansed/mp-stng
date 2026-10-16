@@ -1,3 +1,5 @@
+import { currentCheckService } from '../../utils/currentCheckService';
+import { initialCorrectionPage } from '../../utils/correctionStep';
 // AppOrder.tsx — редактирование заявки (аналог Order.tsx из Services)
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../Toast';
@@ -19,7 +21,6 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
   const toast     = useToast();
   const app       = useAppsStore((s) => s.app);
   const setApp    = useAppsStore((s) => s.setApp);
-  const { checkAI, isAIChecking } = useCheckAI();
 
   
   const service   = app?.service;
@@ -29,6 +30,7 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
   const [orderData, setOrderData] = useState<PageData>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [normalizedService, setNormalizedService] = useState<TService | null>(null);
+  const { checkAI, isAIChecking } = useCheckAI({serviceForCompare:currentCheckService(normalizedService,orderData)});
 
   useEffect(() => {
     if (!service) {
@@ -285,6 +287,7 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
 
   return (
     <DataEditor
+      initialPage = { initialCorrectionPage(service) }
       key             = { app?.id || 'app-order' }
       data            = { orderData }
       onSave          = { handleSave }

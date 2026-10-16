@@ -49,11 +49,12 @@ const DataEditor: React.FC<DataEditorProps> = ({
   onCheckAI,
   isAIChecking,
   recheckAiOnLoad,
+  initialPage = 0,
   onFieldChange,
   onChange,
 }) => {
   const scrollRef                    = useRef<HTMLDivElement>(null);
-  const navigation                   = useNavigation(data.length);
+  const navigation                   = useNavigation(data.length, initialPage);
   const formState                    = useFormState(data);
   const latestForm = useRef(formState.data);
   latestForm.current = formState.data;
