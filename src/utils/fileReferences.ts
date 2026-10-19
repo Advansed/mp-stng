@@ -19,7 +19,8 @@ export function persistentFileReference(value: unknown): string | null {
       return url.toString()
     } catch { return null }
   }
-  if (/^[a-z][a-z0-9+.-]*:/i.test(ref) || /[\u0000-\u001f]/.test(ref)) return null
+  if (/^[a-z][a-z0-9+.-]*:/i.test(ref)) return null
+  for (let i = 0; i < ref.length; i++) if (ref.charCodeAt(i) <= 0x1f) return null
   return ref
 }
 export function persistentFileReferences(field: { data?: unknown; s3KeyByUrl?: Record<string, string> }): string[] {
