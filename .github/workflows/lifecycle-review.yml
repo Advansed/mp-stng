@@ -24,6 +24,7 @@ jobs:
             /src/utils/aiRequisites.ts
             /src/components/DataEditor/fields/snils.ts
             /src/utils/fileReferences.ts
+            /src/utils/uploadLimit.ts
             /src/utils/attachmentUpload.ts
             /src/utils/attachmentDelete.ts
             /src/Store/api.ts

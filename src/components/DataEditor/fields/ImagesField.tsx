@@ -3,6 +3,7 @@ import { IonButton, IonIcon, IonModal, IonSpinner } from "@ionic/react";
 import { cameraOutline, trashOutline, closeOutline, documentTextOutline } from "ionicons/icons";
 import { PickSource } from "../../Files";
 import styles from "./ImageField.module.css";
+import { ATTACHMENT_TOO_LARGE_MESSAGE } from "../../../utils/uploadLimit";
 import { useS3Upload } from "../hooks/useS3Upload";
 import { AiStatusResultPanel } from "./AiStatusResultPanel";
 import { UploadLaterBlock } from "./UploadLaterBlock";
@@ -73,11 +74,13 @@ export function ImagesField({
         ? ai_status
         : null;
 
-  const { uploadFile, delFileS3, dataUrlToBlob, isUploading, progress } = useS3Upload({
+  const { error: uploadError, uploadFile, delFileS3, dataUrlToBlob, isUploading, progress } = useS3Upload({
     documentId: doc, group: name,
     onError: (err) => console.error("ImagesField S3:", err),
   });
   
+  const sizeError = uploadError?.message === ATTACHMENT_TOO_LARGE_MESSAGE ? ATTACHMENT_TOO_LARGE_MESSAGE : null;
+
   const isBusy = isUploading || isAIChecking;
 
   useEffect(() => {
@@ -141,7 +144,7 @@ export function ImagesField({
   return (
     <div className={styles.field}>
       <label className={styles.label}>{label}</label>
-      <div className={`${styles.imageWrapper} ${error ? styles.wrapperError : ""}`}>
+      <div className={`${styles.imageWrapper} ${error || sizeError ? styles.wrapperError : ""}`}>
         <div style={{ position: "relative" }}>
           <div className={styles.imageGrid}>
             {value.map((image, index) => {
@@ -271,6 +274,7 @@ export function ImagesField({
       </div>
 
       {error && <span className={styles.errorMessage}>{error}</span>}
+      {sizeError && <span role="alert" className={styles.errorMessage}>{sizeError}</span>}
 
       <IonModal
         className={styles.modal}
