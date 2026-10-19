@@ -1,3 +1,4 @@
+import { submissionPayload } from '../../utils/submission';
 import { currentCheckService } from '../../utils/currentCheckService';
 import { initialCorrectionPage } from '../../utils/correctionStep';
 // AppOrder.tsx — редактирование заявки (аналог Order.tsx из Services)
@@ -182,10 +183,19 @@ export const AppOrder: React.FC<AppOrderProps> = ({ onBack, onSave, onPreview })
     return orderData;
   };
 
+  const handleSaveDraft = async (data: PageData) => {
+    try {
+      await onSave(submissionPayload(getOrderData(data), 'draft'));
+      onBack();
+    } catch {
+      toast.error('Не удалось сохранить черновик. Данные остались в форме.');
+    }
+  };
+
   const handleSave      = async (data: PageData) => {
     try {
       const orderData = getOrderData(data);
-      await onSave(orderData);
+      await onSave(submissionPayload(orderData, 'submit'));
       onBack();
     } catch (error) {
       console.error('Error saving order:', error);

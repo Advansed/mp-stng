@@ -64,7 +64,9 @@ export interface FieldChangeEvent {
 export interface DataEditorProps {
   initialPage?: number;
   data:         PageData;
-  onSave?:      (data: PageData) => void;
+  onSave?:      (data: PageData) => void | Promise<void>;
+  saveLabel?: string;
+  onSaveDraft?: (data: PageData) => void | Promise<void>;
   onChange?:    (data: Section) => void;
   onFieldChange?: (event: FieldChangeEvent) => void;
   onBack:       (data?: PageData) => void;

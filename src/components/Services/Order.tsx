@@ -1,3 +1,4 @@
+import { submissionPayload } from '../../utils/submission';
 import { currentCheckService } from '../../utils/currentCheckService';
 import { initialCorrectionPage } from '../../utils/correctionStep';
 // Order.tsx
@@ -215,15 +216,19 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     if ((service.type || normalizedService.type) !== 'agreement') return;
     didPersistRef.current = true;
     const kind = String((service as { Тип?: string }).Тип || '').trim();
-    const проведен: 0 | 2 = kind === 'Договор' ? 0 : 2;
-    await onSave(getOrderData(data, проведен), { silent: true });
+    try {
+      await onSave(submissionPayload(getOrderData(data), kind === 'Договор' ? 'edit' : 'draft'), { silent: true });
+    } catch (error) {
+      didPersistRef.current = false;
+      throw error;
+    }
   };
 
   persistRef.current = () => persistDraft(orderData);
 
   useEffect(() => {
     return () => {
-      void persistRef.current?.();
+      void persistRef.current?.().catch(() => { /* No retry after an ambiguous response. */ });
     };
   }, []);
 
@@ -231,17 +236,17 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
     try {
       await persistDraft(data ?? orderData);
     } catch (error) {
-      console.error('Error saving order:', error);
-    } finally {
-      onBack();
+      toast.error('Не удалось сохранить изменения. Данные остались в форме.');
+      return;
     }
+    onBack();
   };
 
   const handleSave      = async (data: PageData) => {
     try {
       if (isLoading || !normalizedService?.chapters?.length) return;
       didPersistRef.current = true;
-      await onSave(getOrderData(data, 0));
+      await onSave(submissionPayload(getOrderData(data, 0), 'submit'));
       onBack();
     } catch (error) {
       didPersistRef.current = false;
@@ -347,6 +352,8 @@ export const Order: React.FC<OrderProps> = ({ service, onBack, onSave, onPreview
       key             = { normalizedService.id }
       data            = { orderData }
       onSave          = { handleSave }
+      saveLabel       = "Отправить заявку"
+      onSaveDraft     = { String((service as { Тип?: string }).Тип || '').trim() === 'Договор' ? undefined : handleExit }
       onBack          = { handleExit }
       onPreview       = { (data: PageData) => onPreview(getOrderData(data)) }
       onCheckAI       = { ({ method, objectKey, fileUrl }) => checkAI(method, objectKey) }

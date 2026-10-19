@@ -1,3 +1,4 @@
+import { assertSaved } from '../../utils/submission'
 import { useCallback, useMemo } from 'react'
 import { useToken } from '../Login/authStore'
 import useAppsStore from '../../Store/appStore'
@@ -46,13 +47,13 @@ export const useApps = () => {
     setLoading(true)
     try {
       const res = await api("upd_details1", orderData)
-      if (res.error) toast.error(res.message || "Ошибка сохранения")
-      else toast.success(res.message || "Заявка сохранена")
+      assertSaved(res)
+      toast.success(orderData.intent === 'draft' ? "Черновик сохранён" : "Заявка отправлена")
 
       return res
     } catch (error: any) {
       toast.error("Ошибка сохранения заявки")
-      return { error: true, message: error.message }
+      throw error
     } finally {
       setLoading(false)
     }

@@ -44,6 +44,8 @@ import { PassportFront } from './fields/PassportFront';
 const DataEditor: React.FC<DataEditorProps> = ({
   data,
   onSave,
+  saveLabel = 'Сохранить',
+  onSaveDraft,
   onBack,
   onPreview,
   onCheckAI,
@@ -161,8 +163,7 @@ const DataEditor: React.FC<DataEditorProps> = ({
 
   const scrollToTop                  = () => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const currentSectionHasErrors      = (): boolean => {
-    const pageIndex = navigation.currentPage;
+  const currentSectionHasErrors      = (pageIndex = navigation.currentPage): boolean => {
     const currentSection = formState.data[pageIndex];
     if (!currentSection) return false;
 
@@ -216,16 +217,23 @@ const DataEditor: React.FC<DataEditorProps> = ({
     }
   };
 
-  const handleSave                   = () => {
-    const hasErrors = currentSectionHasErrors();
-
-    if (!hasErrors) {
+  const savingRef = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const saveAction = async (draft: boolean) => {
+    if (savingRef.current) return;
+    if (!draft) {
+      const invalid = visibleIndexes.filter(index => currentSectionHasErrors(index));
+      if (invalid.length) { navigation.goToPage(invalid[0]); scrollToTop(); return; }
       clearAll();
-      const orderData = [...formState.data] as typeof formState.data & { ai_status?: any }
-      orderData.ai_status = buildAiStatusPayload()
-      onSave?.(orderData as any)
     }
-  }
+    const orderData = [...formState.data] as typeof formState.data & { ai_status?: any };
+    orderData.ai_status = buildAiStatusPayload();
+    savingRef.current = true;
+    setSaving(true);
+    try { await (draft ? onSaveDraft?.(orderData) : onSave?.(orderData)); }
+    finally { savingRef.current = false; setSaving(false); }
+  };
+  const handleSave = () => { void saveAction(false); };
 
   const handlePreview                = async () => {
 
@@ -805,12 +813,12 @@ const DataEditor: React.FC<DataEditorProps> = ({
         <WizardHeader
           title={currentSection.title}
           pages={getPageTitle()}
-          onBack={handleBackNavigation}
-          onForward={handleForwardNavigation}
-          onClose={handleClose} // Изменили onSave на onClose
+          onBack={() => { if (!savingRef.current) handleBackNavigation(); }}
+          onForward={() => { if (!savingRef.current) handleForwardNavigation(); }}
+          onClose={() => { if (!savingRef.current) handleClose(); }} // Изменили onSave на onClose
           isLastStep={isLastPage}
-          canGoBack={true}
-          canGoForward={visiblePos >= 0 && visiblePos < visibleIndexes.length - 1}
+          canGoBack={!saving}
+          canGoForward={!saving && visiblePos >= 0 && visiblePos < visibleIndexes.length - 1}
         />
 
         <div className="step-container">
@@ -825,14 +833,19 @@ const DataEditor: React.FC<DataEditorProps> = ({
               ))
             }
 
+            {onSaveDraft && (
+              <button className="big-save-button" disabled={saving}
+                onClick={() => { void saveAction(true); }}>Сохранить черновик</button>
+            )}
             {/* Большая кнопка Сохранить на последней странице */}
             {isLastPage && (
               <div className="save-button-container">
                 <button
                   className="big-save-button"
                   onClick={handleSave}
+                  disabled={saving}
                 >
-                  Сохранить
+                  {saving ? 'Сохранение…' : saveLabel}
                 </button>
               </div>
             )}

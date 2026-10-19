@@ -1,3 +1,4 @@
+import { assertSaved } from '../../utils/submission'
 import { useServiceStore }  from '../../Store/serviceStore'
 import { useToast }         from '../Toast'
 import { useToken }         from '../Login/authStore'
@@ -29,10 +30,8 @@ export const useServices = () => {
     order.token = token
     const silent = options?.silent || order.Проведен === 2
     const res = await save( order, { silent } )
-    if (!silent) {
-      if(res.error) toast.error( res.message )
-      else toast.success( res.message )
-    }
+    assertSaved(res)
+    if (!silent) toast.success("Заявка отправлена")
     return res
   }
 
