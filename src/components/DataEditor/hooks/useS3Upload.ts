@@ -1,3 +1,4 @@
+import { assertAttachmentSize } from '../../../utils/uploadLimit'
 import { uploadAttachment } from '../../../utils/attachmentUpload'
 import { deleteAttachment } from '../../../utils/attachmentDelete'
 import { rememberConfirmedUpload, confirmedUploadKey } from '../../../utils/fileReferences'
@@ -101,6 +102,7 @@ export function useS3Upload(options: UseS3UploadOptions = {}) {
     setProgress(0)
 
     try {
+      assertAttachmentSize(file.size)
       if (process.env.REACT_APP_ATTACHMENTS_V2 === 'true') {
         const parts = (fileName || '').split('/')
         const documentId = options.documentId || parts[0]
