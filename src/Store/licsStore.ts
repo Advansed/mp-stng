@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { api } from './api';
+import { sendReading, ReadingResult } from '../utils/meterReadings';
 
 
 export interface LicCounter {
@@ -78,7 +79,7 @@ interface LicsActions {
   delLic: (token: string, lic: string) => Promise<any>;
   get_payment: (token: string, LC: string) => Promise<any>
   get_indices: (token: string, counterId: string) => Promise<any>
-  setIndice: (token: string, counters: LicCounter[]) => Promise<boolean>;
+  setIndice: (token: string, counters: LicCounter[]) => Promise<ReadingResult>;
   setLoading: (loading: boolean) => void;
   setSelectedLic: (lic: Lic | null) => void;
   setPendingAddLicLc: (lc: string | null) => void;
@@ -188,32 +189,24 @@ export const useLicsStore = create<LicsStore>()(
       },
 
       setIndice: async (token: string, counters: LicCounter[]) => {
-        set({ loading: true })
-        const res = await api('setIndications', { token: token, counters: counters });
-
-        if (!res.error) {
-          try {
-            const res = await api('getAccount', { token });
-
-            if (res.error) {
-              return res;
-            }
-
-            const licsWithSum = res.data?.map(lic => ({
+        set({ loading: true });
+        try {
+          return await sendReading(
+            () => api('setIndications', { token, counters }, 30000),
+            async () => {
+              const res = await api('getAccount', { token }, 15000);
+              if (!res || !(res.error === false || res.error === 0) || !Array.isArray(res.data)) {
+                throw new Error('ACCOUNT_REFRESH_FAILED');
+              }
+              const licsWithSum = res.data.map(lic => ({
               ...lic,
               sum: parseFloat(lic.debts.reduce((total, debt) => total + debt.sum, 0).toFixed(2))
-            })) || [];
-
-            set({ lics: licsWithSum || [], loading: false });
-            return res
-          } catch (error) {
-            return { error: true, message: "Ошибка передачи показаний" }
-          } finally {
-            set({ loading: false });
-          }
-        } else {
-          set({ loading: false })
-          return res
+              }));
+              set({ lics: licsWithSum });
+            },
+          );
+        } finally {
+          set({ loading: false });
         }
       },
 
@@ -279,4 +272,3 @@ export const selectTotalDebts = (state: LicsStore) =>
 
 export const selectCountersCount = (state: LicsStore) =>
   state.lics.reduce((total, lic) => total + lic.counters.length, 0);
-
