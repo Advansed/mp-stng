@@ -1,15 +1,19 @@
 // src/components/Lics/components/Counter/Counter.tsx
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 import { IonButton, IonInput } from '@ionic/react';
 import { CounterProps } from './types';
 import { useAuthStore } from '../../../Login/authStore';
 import {LicCounter } from '../../../../Store/licsStore';
 import { useToast } from '../../../Toast';
+import { parseReading, UNCONFIRMED_READING } from '../../../../utils/meterReadings';
 
 export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) => {
   const [mode, setMode] = useState(false);
   const [avail, setAvail] = useState(0);
   const [delta, setDelta] = useState(-1);
+  const [submitting, setSubmitting] = useState(false);
+  const [inputError, setInputError] = useState('');
+  const inFlight = useRef(false);
 
   const toast = useToast()
 
@@ -74,34 +78,46 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
   };
 
   const handleSubmitIndication = async () => {
+    if (inFlight.current || !mode) return;
+    inFlight.current = true;
+    setSubmitting(true);
     try {
       
       const res = await setIndice( [info] as LicCounter[] )
       
-      if (res) {
+      if (res?.error === false) {
         lload();
-        toast.success("Показания переданы")
-      } else toast.success("Ошибка передачи показаний")
+        setMode(false);
+        toast.success(res.message);
+      } else toast.error(res?.message || UNCONFIRMED_READING);
 
     } catch (error) {
       
-      toast.success("Ошибка передачи показаний")
-
+      toast.error(UNCONFIRMED_READING);
+    } finally {
+      inFlight.current = false;
+      setSubmitting(false);
     }
   };
 
   const handleInputChange = (value: string) => {
-    const parsedValue = parseInt(value);
-    info.indice = parsedValue;
+    const parsedValue = parseReading(value, info.predIndice || 0);
+    const numericValue = /^\d+$/.test(value) ? Number(value) : NaN;
+    setInputError(!value || parsedValue !== null ? '' :
+      !Number.isSafeInteger(numericValue) ? 'Введите целую часть показания без пробелов и дробных знаков.' :
+      numericValue === 0 ? 'Для передачи показания 0 обратитесь в контакт-центр.' :
+      numericValue < (info.predIndice || 0) ? 'Новое показание не должно быть меньше предыдущего.' :
+      'Разность показаний не должна превышать 10 000 м³.');
+    info.indice = parsedValue ?? NaN;
     info.period = item.current || '';
     
-    if (parsedValue >= (info.predIndice || 0) && (parsedValue - (info.predIndice || 0)) < 10001) {
+    if (parsedValue !== null) {
       setMode(true);
     } else {
       setMode(false);
     }
     
-    setDelta(parsedValue - (info.predIndice || 0));
+    setDelta(Number.isSafeInteger(numericValue) ? numericValue - (info.predIndice || 0) : -1);
   };
 
   const handleHistoryClick = () => {
@@ -168,13 +184,14 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
             <div className="w-40">{"Передать"}</div>
             <div className="w-50 s-input a-right">
               <IonInput
+                disabled={submitting}
                 className="s-input-1"
                 placeholder="Показание"
                 onIonInput={(e) => handleInputChange(e.detail.value as string)}
               />
             </div>
           </div>
-          
+          {inputError && <p className="cl-red" role="alert">{inputError}</p>}
           <p className="a-right fs-09">
             <b>
               {delta === 0 ? "" :
@@ -185,7 +202,7 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
           
           <p className="a-right fs-08">
             <b>
-              {delta === 0 ? "Передать нулевое показание" :
+              {delta === 0 ? "Расход за период: 0 м³" :
                delta > 10000 ? "Нельзя передать слишком большое показание" :
                delta < 0 ? "" : <></>}
             </b>
@@ -200,6 +217,7 @@ export const Counter: FC<CounterProps> = ({ info, item, setPage, setIndice }) =>
       <div className="mt-1">
         {mode && (
           <IonButton
+            disabled={submitting}
             color="tertiary"
             expand="block"
             mode="ios"

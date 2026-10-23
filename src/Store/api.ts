@@ -7,6 +7,7 @@ interface RequestJsonOptions {
   method?: string;
   params?: unknown;
   headers?: HeadersInit;
+  timeoutMs?: number;
 }
 
 export async function requestJson(
@@ -24,23 +25,31 @@ export async function requestJson(
     init.body = JSON.stringify(options.params);
   }
 
+  const controller = options.timeoutMs ? new AbortController() : undefined;
+  const timer = controller ? setTimeout(() => controller.abort(), options.timeoutMs) : undefined;
+  if (controller) init.signal = controller.signal;
+
   console.log(`[API] ${name} request`, { method });
 
   try {
     const res = await fetch(url, init);
+    if (options.timeoutMs && !res.ok) throw new Error('HTTP_REQUEST_FAILED');
     const data = await res.json();
     console.log(`[API] ${name} response`, { status: res.status });
     return data;
   } catch (error) {
     console.error(`[API] ${name} request failed`);
     throw error;
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
   }
 }
 
-export const api = async (endpoint: string, data: any) => {
+export const api = async (endpoint: string, data: any, timeoutMs?: number) => {
   return requestJson(endpoint, `${URL}/${endpoint}`, {
     method: 'POST',
     params: data,
+    timeoutMs,
   });
 };
 

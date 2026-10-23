@@ -1,0 +1,26 @@
+name: Mobile meter reading regression
+on:
+  push:
+    branches: [fix/meter-readings-results-20261021]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  readings:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/utils/meterReadings.ts
+            /src/Store/api.ts
+            /src/Store/licsStore.ts
+            /src/components/Lics/components/Indices/Counter.tsx
+            /test/readings/
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Synthetic regressions only (no mobile build or release)
+        run: node --test test/readings/readings.test.mjs
