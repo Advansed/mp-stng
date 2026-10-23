@@ -24,7 +24,6 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import { Login } from './components/Login/Login';
-import OneSignal from 'onesignal-cordova-plugin';
 import './app.css';
 import { ToastProvider } from './components/Toast';
 import { useAuthStore, useAuthUser } from './components/Login/authStore';
@@ -33,6 +32,7 @@ import { ROUTES } from './routes';
 import { RouterSync } from './pages/RouterSync';
 import { getScreen } from './pages/screens';
 import { Apps } from './components/Apps';
+import { registerFcmToken, subscribeFcmTokenRefresh } from './utils/pushNotifications';
 
 setupIonicReact();
 
@@ -99,28 +99,29 @@ const App: React.FC = () => {
   const auth = useAuthStore((state) => state.auth);
   const user = useAuthUser();
 
-  function OneSignalInit(): void {
-    OneSignal.initialize('daff2bee-e428-4bd3-9f47-ac3c914113d6');
-
-    const myClickListener = async function (event) {
-      const notificationData = JSON.stringify(event);
-    };
-    OneSignal.Notifications.addEventListener('click', myClickListener);
-
-    OneSignal.Notifications.requestPermission(true);
-
-    OneSignal.login(user?.id || '');
-    OneSignal.User.addAlias('external_id', user?.id || '');
-  }
-
   useEffect(() => {
-    if (user !== null && auth) {
-      try {
-        OneSignalInit();
-      } catch (error) {
-        console.error('OneSignal initialization error:', error);
+    if (user === null || !auth) return;
+    const authToken = useAuthStore.getState().token;
+    if (!authToken) return;
+
+    let active = true;
+    let removeRefreshListener: (() => void) | undefined;
+
+    registerFcmToken(authToken).catch((error) => {
+      console.error('FCM registration error:', error);
+    });
+    subscribeFcmTokenRefresh(() => useAuthStore.getState().token ?? '').then((remove) => {
+      if (!active) {
+        remove?.();
+        return;
       }
-    }
+      removeRefreshListener = remove;
+    });
+
+    return () => {
+      active = false;
+      removeRefreshListener?.();
+    };
   }, [auth, user]);
 
   return (
