@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "827564940238",
     "project_id": "app-stng",
-    "storage_bucket": "app-stng.appspot.com"
+    "storage_bucket": "app-stng.firebasestorage.app"
   },
   "client": [
     {
@@ -31,10 +31,10 @@
               "client_type": 3
             },
             {
-              "client_id": "827564940238-t2tajaf6mgeauo16iiq6ks4hd06tfhrq.apps.googleusercontent.com",
+              "client_id": "827564940238-1fhml5i6bjrmphassjpggcap2d6devh1.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "io.ionic.stng"
+                "bundle_id": "aostng.stng"
               }
             }
           ]
