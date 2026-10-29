@@ -1,0 +1,43 @@
+name: Mobile application status regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/components/Apps/**'
+      - 'src/components/Services/Services.tsx'
+      - 'src/Store/serviceStore.ts'
+      - 'src/components/Login/authStore.ts'
+      - 'src/Store/api.ts'
+      - 'tests/application-status.test.cjs'
+      - 'tests/login-timeout.test.cjs'
+      - '.github/workflows/application-status.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  application-status:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/components/Apps/AppStatuses.tsx
+            /src/components/Apps/appStatusUtils.ts
+            /src/components/Apps/index.tsx
+            /src/components/Services/Services.tsx
+            /src/Store/serviceStore.ts
+            /src/components/Login/authStore.ts
+            /src/Store/api.ts
+            /tests/application-status.test.cjs
+            /tests/login-timeout.test.cjs
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Synthetic status and authorization regression (no APK or IPA)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/status-test-deps" --ignore-scripts --omit=optional --no-audit --no-fund --no-save --package-lock=false typescript@5.9.3 zustand@5.0.8 react@18.2.0 react-dom@18.2.0 jsdom@16.7.0
+          NODE_PATH="$RUNNER_TEMP/status-test-deps/node_modules" node --test tests/application-status.test.cjs tests/login-timeout.test.cjs

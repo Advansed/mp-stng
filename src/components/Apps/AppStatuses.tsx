@@ -18,12 +18,14 @@ import {
   isDeniedStatus,
   isEditStatus,
   isSignedStatus,
+  isGoskeyReceipt,
   statusHint,
   statusLabel,
 } from './appStatusUtils'
 import styles from './AppStatuses.module.css'
 
 function formatPeriod(period: string): string {
+  if (!period) return 'Текущее состояние'
   const normalized = period.includes('T') ? period : period.replace(' ', 'T')
   const d = new Date(normalized)
   if (Number.isNaN(d.getTime())) return period
@@ -37,21 +39,6 @@ interface AppStatusesProps {
   onEditApp?: (id: string) => void
 }
 
-/** Подряд одинаковые статусы — в списке остаётся только последняя запись серии. */
-function collapseConsecutiveSameStatus(rows: AppStatusEntry[]): AppStatusEntry[] {
-  if (rows.length === 0) return []
-  const out: AppStatusEntry[] = []
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i]
-    const next = rows[i + 1]
-    const key = (row.status || '').toLowerCase()
-    const nextKey = next ? (next.status || '').toLowerCase() : ''
-    if (next && nextKey === key) continue
-    out.push(row)
-  }
-  return out
-}
-
 export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element {
   const location                     = useLocation()
   const services                     = useServiceStore((s) => s.services)
@@ -61,12 +48,24 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
   const { getSignedAgreementUrl }    = useApps()
   const { isOpen: pdfOpen, pdfData, openModal: openPdf, closeModal: closePdf } = usePDFDocModal()
   const [contractLoading, setContractLoading] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyError, setHistoryError] = useState(false)
 
-  useEffect(() => {
+  const refreshHistory = useCallback(async () => {
     if (!token) return
-    const found = useServiceStore.getState().services.some((row) => (row.id || row.doc_id) === appId)
-    if (!found) void loadServices(token, { silent: true })
-  }, [appId, loadServices, token])
+    setHistoryLoading(true)
+    setHistoryError(false)
+    try {
+      const result = await loadServices(token, { silent: true })
+      if (!result || result.error || !Array.isArray(result.data)) setHistoryError(true)
+    } catch {
+      setHistoryError(true)
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [loadServices, token])
+
+  useEffect(() => { void refreshHistory() }, [appId, refreshHistory])
 
   const record = useMemo(
     () => services.find((row) => (row.id || row.doc_id) === appId),
@@ -79,8 +78,9 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
 
   const statuses: AppStatusEntry[] = useMemo(() => {
     const fromState = (location.state as LocationState | undefined)?.statuses
-    if (fromState?.length) return fromState
     if (record?.statuses?.length) return record.statuses as AppStatusEntry[]
+    if (record?.status) return [{ period: '', status: record.status, comment: record.comment }]
+    if (!record && fromState?.length) return fromState
     return []
   }, [location.state, record])
 
@@ -90,9 +90,12 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
     )
   }, [statuses])
 
-  const displayRows = useMemo(() => collapseConsecutiveSameStatus(sorted), [sorted])
+  const displayRows = sorted
 
-  const lastStatus = sorted.length > 0 ? sorted[sorted.length - 1] : undefined
+  const latestHistory = sorted.length > 0 ? sorted[sorted.length - 1] : undefined
+  const lastStatus = record?.status && record.status !== latestHistory?.status
+    ? { period: '', status: record.status, comment: record.comment }
+    : latestHistory
 
   const showNextAction = useMemo(() => {
     if (!lastStatus) return false
@@ -106,8 +109,9 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
 
   const nextActionComments = useMemo(() => {
     if (!lastStatus || !hasStatusComments(lastStatus.status)) return []
-    return extractStatusComments(lastStatus as unknown as Record<string, unknown>)
-  }, [lastStatus])
+    const context = record && Object.prototype.hasOwnProperty.call(record, 'comment') ? record : lastStatus
+    return extractStatusComments(context as unknown as Record<string, unknown>)
+  }, [lastStatus, record])
 
   const nextActionCommentsTitle = lastStatus && isDeniedStatus(lastStatus.status)
     ? 'Причина отказа'
@@ -143,7 +147,17 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
         <h1 className={`main-title ion-text-wrap ${styles.title}`}>Статусы заявки</h1>
       </IonText>
       <IonCard className={styles.contentCard}>
+        {lastStatus && <p className={styles.subtitle}>
+          Текущий статус: {statusLabel(lastStatus.status, (record || lastStatus) as unknown as Record<string, unknown>)}
+        </p>}
+        {!showNextAction && record?.comment && extractStatusComments(record as unknown as Record<string, unknown>).map((comment, index) => (
+          <p key={index} className={styles.statusHint}>{comment}</p>
+        ))}
         <p className={styles.subtitle}>История изменений статуса</p>
+        <IonButton fill="clear" disabled={historyLoading} onClick={() => void refreshHistory()}>
+          {historyLoading ? 'Обновление истории…' : 'Обновить историю'}
+        </IonButton>
+        {historyError && <p role="alert">Не удалось обновить историю. Показаны ранее загруженные сведения. Попробуйте ещё раз.</p>}
 
         {sorted.length === 0 ? (
           <div className={styles.empty}>Нет записей о статусах для этой заявки.</div>
@@ -158,9 +172,15 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
                     <span className={styles.periodText}>{formatPeriod(row.period)}</span>
                   </div>
                   <IonBadge color={badgeColor(row.status)} className={styles.badge}>
-                    {statusLabel(row.status)}
+                    {statusLabel(row.status, row as unknown as Record<string, unknown>)}
                   </IonBadge>
 
+                  {isGoskeyReceipt(row.status, row as unknown as Record<string, unknown>) && (
+                    <p className={styles.statusHint}>Подписанный договор получен из Госключа</p>
+                  )}
+                  {extractStatusComments(row as unknown as Record<string, unknown>).map((comment, index) => (
+                    <p key={index} className={styles.statusHint}>{comment}</p>
+                  ))}
                   {statusHint(row.status) && (
                     <p className={styles.statusHint}>{statusHint(row.status)}</p>
                   )}

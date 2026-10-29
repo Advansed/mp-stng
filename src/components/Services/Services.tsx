@@ -239,7 +239,7 @@ export const Services: React.FC = () => {
                           </div>
                           {status ? (
                             <IonBadge color={badgeColor(status)} className={styles.statusBadge}>
-                              {statusLabel(status)}
+                              {statusLabel(status, row as unknown as Record<string, unknown>)}
                             </IonBadge>
                           ) : null}
                         </div>

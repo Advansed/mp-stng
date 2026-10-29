@@ -60,6 +60,7 @@ export type TServiceRecord = Partial<TService> & {
     Тип?:               string,
     Статус?:            string,
     status?:            string,
+    comment?:           string | string[],
     statuses?:          Array<{ period: string; status: string }>,
     СтатусДокумента?:   string | number,
     ДатаДокумента?:     string,

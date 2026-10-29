@@ -1,29 +1,52 @@
 /** Коды статусов заявки (значение поля `status` с бэка). */
-export type AppStatusCode = 'new' | 'checked' | 'edit' | 'created' | 'signed' | 'denied'
+export type AppStatusCode = 'new' | 'checked' | 'edit' | 'created' | 'signed' | 'denied' | 'success'
 
 export const STATUS_LABELS: Record<AppStatusCode, string> = {
-  new: 'Новая',
-  checked: 'Договор на создании',
-  edit: 'Проверка не пройдена',
+  new: 'Заявка отправлена',
+  checked: 'Заявка проверена',
+  edit: 'Есть замечания',
   created: 'Договор на подписании',
-  signed: 'Договор готов',
+  signed: 'Договор подписан',
   denied: 'Отказано',
+  success: 'Заявка выполнена',
 }
 
 /** Подписи для устаревших кодов с бэка. */
 const LEGACY_STATUS_LABELS: Record<string, string> = {
-  ai_checked: 'Договор на создании',
+  ai_checked: 'Заявка на обработке',
 }
 
 export function normalizeAppStatus(status: string): string {
   return (status || '').toLowerCase().trim()
 }
 
-export function statusLabel(status: string): string {
+// Presentation context from the approved upstream receipt convention, not signature verification.
+const GOSKEY_RECEIPTS = new Set([
+  'успешно поступил подписанный документ из системы госключ',
+  '"успешно поступил подписанный документ из системы госключ"',
+])
+export function isGoskeyReceipt(status: string, source?: Record<string, unknown>): boolean {
+  if (normalizeAppStatus(status) !== 'success' || !source) return false
+  let context = source
+  // An explicit current comment, including empty, takes precedence over history.
+  if (!Object.prototype.hasOwnProperty.call(source, 'comment') &&
+      !Object.prototype.hasOwnProperty.call(source, 'comments') && Array.isArray(source.statuses)) {
+    const matching = source.statuses.filter(row => row && normalizeAppStatus(row.status) === 'success')
+    matching.sort((a, b) => String(a.period || '').localeCompare(String(b.period || '')))
+    context = matching[matching.length - 1] || {}
+  }
+  return extractStatusComments(context).some(text => GOSKEY_RECEIPTS.has(
+    text.trim().replace(/\s+/g, ' ').toLowerCase().replace(/ё/g, 'е')
+  ))
+}
+
+export function statusLabel(status: string, source?: Record<string, unknown>): string {
+  if (isGoskeyReceipt(status, source)) return 'Договор подписан'
+
   const key = normalizeAppStatus(status)
   if (key in STATUS_LABELS) return STATUS_LABELS[key as AppStatusCode]
   if (key in LEGACY_STATUS_LABELS) return LEGACY_STATUS_LABELS[key]
-  return status.replace(/_/g, ' ')
+  return 'Статус уточняется'
 }
 
 export function badgeColor(
@@ -43,6 +66,7 @@ export function badgeColor(
     case 'created':
       return 'warning'
     case 'signed':
+    case 'success':
       return 'success'
     default:
       return 'primary'
@@ -85,7 +109,7 @@ export function statusHint(status: string): string | null {
   const s = normalizeAppStatus(status)
   switch (s) {
     case 'new':
-      return 'Заявка создана и редактируется'
+      return 'Следите за обновлениями в истории заявки'
     case 'checked':
     case 'ai_checked':
       return null
