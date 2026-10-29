@@ -2,18 +2,18 @@
 export type AppStatusCode = 'new' | 'checked' | 'edit' | 'created' | 'signed' | 'denied' | 'success'
 
 export const STATUS_LABELS: Record<AppStatusCode, string> = {
-  new: 'Заявка отправлена',
-  checked: 'Заявка проверена',
+  new: 'Заявка зарегистрирована',
+  checked: 'Проверка пройдена',
   edit: 'Есть замечания',
-  created: 'Договор на подписании',
-  signed: 'Договор подписан',
+  created: 'Подготовка договора',
+  signed: 'Отмечено подписание',
   denied: 'Отказано',
-  success: 'Заявка выполнена',
+  success: 'Статус обновлён',
 }
 
 /** Подписи для устаревших кодов с бэка. */
 const LEGACY_STATUS_LABELS: Record<string, string> = {
-  ai_checked: 'Заявка на обработке',
+  ai_checked: 'Статус обновлён',
 }
 
 export function normalizeAppStatus(status: string): string {
@@ -27,21 +27,15 @@ const GOSKEY_RECEIPTS = new Set([
 ])
 export function isGoskeyReceipt(status: string, source?: Record<string, unknown>): boolean {
   if (normalizeAppStatus(status) !== 'success' || !source) return false
-  let context = source
-  // An explicit current comment, including empty, takes precedence over history.
-  if (!Object.prototype.hasOwnProperty.call(source, 'comment') &&
-      !Object.prototype.hasOwnProperty.call(source, 'comments') && Array.isArray(source.statuses)) {
-    const matching = source.statuses.filter(row => row && normalizeAppStatus(row.status) === 'success')
-    matching.sort((a, b) => String(a.period || '').localeCompare(String(b.period || '')))
-    context = matching[matching.length - 1] || {}
-  }
-  return extractStatusComments(context).some(text => GOSKEY_RECEIPTS.has(
+  // Only this record's confirmation counts, never an older history entry.
+  return extractStatusComments(source).some(text => GOSKEY_RECEIPTS.has(
     text.trim().replace(/\s+/g, ' ').toLowerCase().replace(/ё/g, 'е')
   ))
 }
 
 export function statusLabel(status: string, source?: Record<string, unknown>): string {
-  if (isGoskeyReceipt(status, source)) return 'Договор подписан'
+  if (source?.Тип === 'Черновик') return 'Черновик'
+  if (isGoskeyReceipt(status, source)) return 'Подписание подтверждено'
 
   const key = normalizeAppStatus(status)
   if (key in STATUS_LABELS) return STATUS_LABELS[key as AppStatusCode]
@@ -77,7 +71,7 @@ export function isNewStatus(status: string): boolean {
   return normalizeAppStatus(status) === 'new'
 }
 
-/** Проверка пройдена, договор на создании. */
+/** Legacy code classification for existing callers; not proof of contract creation. */
 export function isCheckedStatus(status: string): boolean {
   const s = normalizeAppStatus(status)
   return s === 'checked' || s === 'ai_checked' || s.includes('проверено ии')

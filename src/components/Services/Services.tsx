@@ -47,9 +47,7 @@ function documentKind(row: TServiceRecord): 'draft' | 'contract' | 'template' {
 function contractStatus(row: TServiceRecord): string {
   const direct = String(row.status || row.Статус || '').trim()
   if (direct) return direct
-  const history = row.statuses
-  if (!history || history.length === 0) return ''
-  return String(history[history.length - 1].status || '').trim()
+  return ''
 }
 
 function contractAddress(row: TServiceRecord): string {

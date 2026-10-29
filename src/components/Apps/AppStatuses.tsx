@@ -25,7 +25,7 @@ import {
 import styles from './AppStatuses.module.css'
 
 function formatPeriod(period: string): string {
-  if (!period) return 'Текущее состояние'
+  if (!period) return 'Дата не указана'
   const normalized = period.includes('T') ? period : period.replace(' ', 'T')
   const d = new Date(normalized)
   if (Number.isNaN(d.getTime())) return period
@@ -79,23 +79,23 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
   const statuses: AppStatusEntry[] = useMemo(() => {
     const fromState = (location.state as LocationState | undefined)?.statuses
     if (record?.statuses?.length) return record.statuses as AppStatusEntry[]
-    if (record?.status) return [{ period: '', status: record.status, comment: record.comment }]
     if (!record && fromState?.length) return fromState
     return []
   }, [location.state, record])
 
   const sorted = useMemo(() => {
-    return [...statuses].sort(
-      (a, b) => new Date(a.period.replace(' ', 'T')).getTime() - new Date(b.period.replace(' ', 'T')).getTime()
-    )
+    return statuses.map((row, index) => ({ row, index, time: new Date((row.period || '').replace(' ', 'T')).getTime() }))
+      .sort((a, b) => {
+        if (Number.isFinite(a.time) && Number.isFinite(b.time)) return a.time - b.time || a.index - b.index
+        if (Number.isFinite(a.time) !== Number.isFinite(b.time)) return Number.isFinite(a.time) ? -1 : 1
+        return a.index - b.index
+      }).map(({ row }) => row)
   }, [statuses])
 
   const displayRows = sorted
 
-  const latestHistory = sorted.length > 0 ? sorted[sorted.length - 1] : undefined
-  const lastStatus = record?.status && record.status !== latestHistory?.status
-    ? { period: '', status: record.status, comment: record.comment }
-    : latestHistory
+  // History is not authoritative current state; never infer it from array order.
+  const lastStatus = record?.status ? { period: '', status: record.status, comment: record.comment } : undefined
 
   const showNextAction = useMemo(() => {
     if (!lastStatus) return false
@@ -153,7 +153,7 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
         {!showNextAction && record?.comment && extractStatusComments(record as unknown as Record<string, unknown>).map((comment, index) => (
           <p key={index} className={styles.statusHint}>{comment}</p>
         ))}
-        <p className={styles.subtitle}>История изменений статуса</p>
+        <p className={styles.subtitle}>Сохранённые события и сообщения</p>
         <IonButton fill="clear" disabled={historyLoading} onClick={() => void refreshHistory()}>
           {historyLoading ? 'Обновление истории…' : 'Обновить историю'}
         </IonButton>
@@ -176,7 +176,7 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
                   </IonBadge>
 
                   {isGoskeyReceipt(row.status, row as unknown as Record<string, unknown>) && (
-                    <p className={styles.statusHint}>Подписанный договор получен из Госключа</p>
+                    <p className={styles.statusHint}>Получено подтверждение подписания через Госключ</p>
                   )}
                   {extractStatusComments(row as unknown as Record<string, unknown>).map((comment, index) => (
                     <p key={index} className={styles.statusHint}>{comment}</p>
@@ -187,88 +187,86 @@ export function AppStatuses({ appId, onEditApp }: AppStatusesProps): JSX.Element
                 </div>
               </div>
             ))}
-            {showNextAction && (
-              <div className={`${styles.row} ${styles.nextActionRow}`} role="listitem">
-                <div className={`${styles.dot} ${styles.nextActionDot}`} aria-hidden />
-                <div className={`${styles.body} ${styles.nextActionBody}`}>
-                  <div className={styles.nextActionHeader}>Следующее действие</div>
-                  {nextActionComments.length > 0 && (
-                    <div className={styles.commentsBox}>
-                      <div className={styles.commentsTitle}>{nextActionCommentsTitle}</div>
-                      <ul className={styles.commentsList}>
-                        {nextActionComments.map((text, j) => (
-                          <li key={j}>{text}</li>
+          </div>
+        )}
+        {showNextAction && (
+          <div className={styles.nextActionRow} aria-label="Действия по заявке">
+            <div className={`${styles.body} ${styles.nextActionBody}`}>
+              <div className={styles.nextActionHeader}>Следующее действие</div>
+              {nextActionComments.length > 0 && (
+                <div className={styles.commentsBox}>
+                  <div className={styles.commentsTitle}>{nextActionCommentsTitle}</div>
+                  <ul className={styles.commentsList}>
+                    {nextActionComments.map((text, j) => (
+                      <li key={j}>{text}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {lastStatus && isEditStatus(lastStatus.status) && (
+                <>
+                  {editCheckErrorGroups.length > 0 && (
+                    <div className={styles.editReasonsBox}>
+                      <div className={styles.editReasonsTitle}>Причина возврата</div>
+                      <div className={styles.editReasonsList}>
+                        {editCheckErrorGroups.map((group) => (
+                          <details key={group.key} className={styles.editReasonItem}>
+                            <summary className={styles.editReasonSummary}>
+                              <span className={styles.editReasonLabel}>{group.label}</span>
+                              <span className={styles.editReasonCount}>
+                                {group.errors.length}
+                              </span>
+                            </summary>
+                            <ul className={styles.editReasonErrors}>
+                              {group.errors.map((err, j) => (
+                                <li key={`${group.key}-${j}`}>
+                                  {err.field ? (
+                                    <>
+                                      <span className={styles.editReasonField}>{err.field}: </span>
+                                      {err.error || 'Ошибка проверки'}
+                                    </>
+                                  ) : (
+                                    err.error || 'Ошибка проверки'
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
-                  {lastStatus && isEditStatus(lastStatus.status) && (
-                    <>
-                      {editCheckErrorGroups.length > 0 && (
-                        <div className={styles.editReasonsBox}>
-                          <div className={styles.editReasonsTitle}>Причина возврата</div>
-                          <div className={styles.editReasonsList}>
-                            {editCheckErrorGroups.map((group) => (
-                              <details key={group.key} className={styles.editReasonItem}>
-                                <summary className={styles.editReasonSummary}>
-                                  <span className={styles.editReasonLabel}>{group.label}</span>
-                                  <span className={styles.editReasonCount}>
-                                    {group.errors.length}
-                                  </span>
-                                </summary>
-                                <ul className={styles.editReasonErrors}>
-                                  {group.errors.map((err, j) => (
-                                    <li key={`${group.key}-${j}`}>
-                                      {err.field ? (
-                                        <>
-                                          <span className={styles.editReasonField}>{err.field}: </span>
-                                          {err.error || 'Ошибка проверки'}
-                                        </>
-                                      ) : (
-                                        err.error || 'Ошибка проверки'
-                                      )}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </details>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      <div className={styles.nextActionHint}>
-                        Исправьте данные и отправьте заявку повторно
-                      </div>
-                      <IonButton
-                        fill="solid"
-                        className={styles.editActionButton}
-                        onClick={() => {
-                          onEditApp?.(appId)
-                        }}
-                      >
-                        <IonIcon icon={createOutline} slot="start" />
-                        Редактировать
-                      </IonButton>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-            {showSignedContract && (
-              <div className={`${styles.row} ${styles.signedContractRow}`} role="listitem">
-                <div className={`${styles.dot} ${styles.signedContractDot}`} aria-hidden />
-                <div className={`${styles.body} ${styles.signedContractBody}`}>
-                  <div className={styles.signedContractHeader}>Договор подписан</div>
+                  <div className={styles.nextActionHint}>
+                    Исправьте данные и отправьте заявку повторно
+                  </div>
                   <IonButton
                     fill="solid"
-                    className={styles.contractLinkButton}
-                    onClick={() => void openSignedContract()}
+                    className={styles.editActionButton}
+                    onClick={() => {
+                      onEditApp?.(appId)
+                    }}
                   >
-                    <IonIcon icon={documentTextOutline} slot="start" />
-                    Открыть договор
+                    <IonIcon icon={createOutline} slot="start" />
+                    Редактировать
                   </IonButton>
-                </div>
-              </div>
-            )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        {showSignedContract && (
+          <div className={styles.signedContractRow} aria-label="Документ заявки">
+            <div className={`${styles.body} ${styles.signedContractBody}`}>
+              <div className={styles.signedContractHeader}>Договор</div>
+              <IonButton
+                fill="solid"
+                className={styles.contractLinkButton}
+                onClick={() => void openSignedContract()}
+              >
+                <IonIcon icon={documentTextOutline} slot="start" />
+                Открыть договор
+              </IonButton>
+            </div>
           </div>
         )}
       </IonCard>

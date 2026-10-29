@@ -25,12 +25,12 @@ function entry(status,comment,period='2026-10-29 10:00'){return{status,comment,p
 test('all existing status codes human-readable; unknown never raw',()=>{
 for(const code of ['new','checked','ai_checked','created','signed','success','edit','denied','unknown_internal_code'])assert.notEqual(utils.statusLabel(code),code);
 assert.equal(utils.statusLabel('unknown_internal_code'),'Статус уточняется');
-assert.equal(utils.statusLabel('ai_checked'),'Заявка на обработке');
+assert.equal(utils.statusLabel('ai_checked'),'Статус обновлён');
 assert.equal(utils.isSignedStatus('success'),false);assert.equal(utils.isSignedStatus('signed'),true);
 });
 test('success comment visible in complete history, never correction or unverified document action',()=>{
 const html=render({status:'success',statuses:[entry('success','Подписанный документ поступил из Госключа')]});
-assert.match(html,/Госключа/);assert.doesNotMatch(html,/>success<|Следующее действие|Открыть договор/);
+assert.match(html,/Госключ/);assert.doesNotMatch(html,/>success<|Следующее действие|Открыть договор/);
 });
 test('legacy signed preserves document action',()=>assert.match(render({status:'signed',statuses:[entry('signed','Документ подписан')]}),/Открыть договор/));
 test('same codes with distinct reasons retained, including historical success message under denied',()=>{
@@ -43,7 +43,7 @@ const html=render({status:'success',statuses:[entry('success','Актуальн�
 assert.match(html,/Актуальное сообщение/);assert.doesNotMatch(html,/Старый снимок|Редактировать/);
 });
 test('current status without history is meaningful and includes comment',()=>{
-const html=render({status:'success',comment:'Текущее подтверждение',statuses:[]});assert.match(html,/Заявка выполнена|Договор подписан/);assert.match(html,/Текущее подтверждение/);assert.doesNotMatch(html,/Нет записей/);
+const html=render({status:'success',comment:'Текущее подтверждение',statuses:[]});assert.match(html,/Статус обновлён|Отмечено подписание/);assert.match(html,/Текущее подтверждение/);assert.match(html,/Нет записей/);
 });
 test('current success overrides old signed action without rewriting historic signed',()=>{
 const html=render({status:'success',statuses:[entry('signed','Старая запись')]});assert.match(html,/Старая запись/);assert.doesNotMatch(html,/Открыть договор/);
@@ -78,19 +78,19 @@ const receipt='Успешно поступил подписанный докум
 assert.equal(utils.isGoskeyReceipt('success',{comment:receipt}),true);
 assert.equal(utils.isGoskeyReceipt('success',{comment:'"'+receipt+'"'}),true);
 assert.equal(utils.isGoskeyReceipt('success',{comment:'«'+receipt+'»'}),false);
-assert.equal(utils.statusLabel('success',{comment:receipt}),'Договор подписан');
+assert.equal(utils.statusLabel('success',{comment:receipt}),'Подписание подтверждено');
 assert.equal(utils.isGoskeyReceipt('denied',{comment:receipt}),false);
 assert.equal(utils.isGoskeyReceipt('success',{comment:'Ошибка Госключ'}),false);
 assert.equal(utils.isGoskeyReceipt('success',{comment:'NOT '+receipt}),false);
-assert.equal(utils.statusLabel('success'),'Заявка выполнена');
-const html=render({status:'success',statuses:[entry('success',receipt)]});assert.match(html,/Подписанный договор получен из Госключа/);assert.doesNotMatch(html,/Открыть договор/);
+assert.equal(utils.statusLabel('success'),'Статус обновлён');
+const html=render({status:'success',statuses:[entry('success',receipt)]});assert.match(html,/Получено подтверждение подписания через Госключ/);assert.doesNotMatch(html,/Открыть договор/);
 });
 
 test('explicit empty current comment prevents history-based receipt classification',()=>{
 const receipt='Успешно поступил подписанный документ из системы Госключ';
 assert.equal(utils.isGoskeyReceipt('success',{comment:'',statuses:[entry('success',receipt)]}),false);
 assert.equal(utils.isGoskeyReceipt('success',{statuses:[entry('denied',receipt)]}),false);
-assert.equal(utils.isGoskeyReceipt('success',{statuses:[entry('success',receipt)]}),true);
+assert.equal(utils.isGoskeyReceipt('success',{statuses:[entry('success',receipt)]}),false);
 assert.equal(utils.isGoskeyReceipt('success',{statuses:[entry('success',receipt),entry('success','Иное завершение','2026-10-29 11:00')]}),false);
 });
 
@@ -100,4 +100,28 @@ assert.match(html,/Новое замечание/);assert.match(html,/Старо
 });
 test('top-level success comment remains visible when nonempty history exists',()=>{
 const html=render({status:'success',comment:'Новое подтверждение',statuses:[entry('checked','Ранее проверено')]});assert.match(html,/Новое подтверждение/);
+});
+
+// Presentation-only regression: no invented chronology/current state.
+test('no history means no fabricated event; edit reason and action remain outside timeline',()=>{
+ const html=render({status:'edit',comment:'Укажите полное имя',statuses:[]});
+ assert.match(html,/Укажите полное имя/); assert.match(html,/Редактировать/);
+ assert.match(html,/Нет записей/); assert.doesNotMatch(html,/role="listitem"/);
+});
+test('current signed without history keeps existing document action without inventing an event',()=>{
+ const html=render({status:'signed',statuses:[]}); assert.match(html,/Открыть договор/);
+ assert.doesNotMatch(html,/role="listitem"/);
+});
+test('history alone cannot assert current state or current correction action',()=>{
+ const html=render({statuses:[entry('edit','Историческое замечание')]});
+ assert.match(html,/Историческое замечание/); assert.doesNotMatch(html,/Текущий статус:|Редактировать/);
+});
+test('undated source event remains visible without a made-up date',()=>{
+ const html=render({status:'denied',comment:'Причина отказа',statuses:[entry('denied','Причина отказа','')]});
+ assert.match(html,/Дата не указана/); assert.match(html,/Причина отказа/);
+});
+test('labels never claim external delivery or generic completion',()=>{
+ const expected={new:'Заявка зарегистрирована',checked:'Проверка пройдена',ai_checked:'Статус обновлён',created:'Подготовка договора',signed:'Отмечено подписание',success:'Статус обновлён',edit:'Есть замечания',denied:'Отказано'};
+ for(const [code,label] of Object.entries(expected))assert.equal(utils.statusLabel(code),label);
+ assert.equal(utils.statusLabel('new',{Тип:'Черновик'}),'Черновик');
 });
