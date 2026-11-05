@@ -47,9 +47,7 @@ function documentKind(row: TServiceRecord): 'draft' | 'contract' | 'template' {
 function contractStatus(row: TServiceRecord): string {
   const direct = String(row.status || row.Статус || '').trim()
   if (direct) return direct
-  const history = row.statuses
-  if (!history || history.length === 0) return ''
-  return String(history[history.length - 1].status || '').trim()
+  return ''
 }
 
 function contractAddress(row: TServiceRecord): string {
@@ -239,7 +237,7 @@ export const Services: React.FC = () => {
                           </div>
                           {status ? (
                             <IonBadge color={badgeColor(status)} className={styles.statusBadge}>
-                              {statusLabel(status)}
+                              {statusLabel(status, row as unknown as Record<string, unknown>)}
                             </IonBadge>
                           ) : null}
                         </div>

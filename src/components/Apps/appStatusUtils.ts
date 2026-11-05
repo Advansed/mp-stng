@@ -1,29 +1,46 @@
 /** Коды статусов заявки (значение поля `status` с бэка). */
-export type AppStatusCode = 'new' | 'checked' | 'edit' | 'created' | 'signed' | 'denied'
+export type AppStatusCode = 'new' | 'checked' | 'edit' | 'created' | 'signed' | 'denied' | 'success'
 
 export const STATUS_LABELS: Record<AppStatusCode, string> = {
-  new: 'Новая',
-  checked: 'Договор на создании',
-  edit: 'Проверка не пройдена',
-  created: 'Договор на подписании',
-  signed: 'Договор готов',
+  new: 'Заявка зарегистрирована',
+  checked: 'Проверка пройдена',
+  edit: 'Есть замечания',
+  created: 'Подготовка договора',
+  signed: 'Отмечено подписание',
   denied: 'Отказано',
+  success: 'Статус обновлён',
 }
 
 /** Подписи для устаревших кодов с бэка. */
 const LEGACY_STATUS_LABELS: Record<string, string> = {
-  ai_checked: 'Договор на создании',
+  ai_checked: 'Статус обновлён',
 }
 
 export function normalizeAppStatus(status: string): string {
   return (status || '').toLowerCase().trim()
 }
 
-export function statusLabel(status: string): string {
+// Presentation context from the approved upstream receipt convention, not signature verification.
+const GOSKEY_RECEIPTS = new Set([
+  'успешно поступил подписанный документ из системы госключ',
+  '"успешно поступил подписанный документ из системы госключ"',
+])
+export function isGoskeyReceipt(status: string, source?: Record<string, unknown>): boolean {
+  if (normalizeAppStatus(status) !== 'success' || !source) return false
+  // Only this record's confirmation counts, never an older history entry.
+  return extractStatusComments(source).some(text => GOSKEY_RECEIPTS.has(
+    text.trim().replace(/\s+/g, ' ').toLowerCase().replace(/ё/g, 'е')
+  ))
+}
+
+export function statusLabel(status: string, source?: Record<string, unknown>): string {
+  if (source?.Тип === 'Черновик') return 'Черновик'
+  if (isGoskeyReceipt(status, source)) return 'Подписание подтверждено'
+
   const key = normalizeAppStatus(status)
   if (key in STATUS_LABELS) return STATUS_LABELS[key as AppStatusCode]
   if (key in LEGACY_STATUS_LABELS) return LEGACY_STATUS_LABELS[key]
-  return status.replace(/_/g, ' ')
+  return 'Статус уточняется'
 }
 
 export function badgeColor(
@@ -43,6 +60,7 @@ export function badgeColor(
     case 'created':
       return 'warning'
     case 'signed':
+    case 'success':
       return 'success'
     default:
       return 'primary'
@@ -53,7 +71,7 @@ export function isNewStatus(status: string): boolean {
   return normalizeAppStatus(status) === 'new'
 }
 
-/** Проверка пройдена, договор на создании. */
+/** Legacy code classification for existing callers; not proof of contract creation. */
 export function isCheckedStatus(status: string): boolean {
   const s = normalizeAppStatus(status)
   return s === 'checked' || s === 'ai_checked' || s.includes('проверено ии')
@@ -85,7 +103,7 @@ export function statusHint(status: string): string | null {
   const s = normalizeAppStatus(status)
   switch (s) {
     case 'new':
-      return 'Заявка создана и редактируется'
+      return 'Следите за обновлениями в истории заявки'
     case 'checked':
     case 'ai_checked':
       return null

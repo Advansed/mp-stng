@@ -142,7 +142,7 @@ export const AppCard = memo(function AppCard({ info, onOpenStatuses }: AppCardPr
             <h2 className={styles.serviceText}>{info.service || "Заявка"}</h2>
           </div>
           <IonBadge color={badgeColor(info.status)} className={styles.statusBadge}>
-            {statusLabel(info.status)}
+            {statusLabel(info.status, info as unknown as Record<string, unknown>)}
           </IonBadge>
         </div>
 

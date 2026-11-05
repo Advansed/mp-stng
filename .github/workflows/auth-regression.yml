@@ -1,0 +1,33 @@
+name: Mobile authorization regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/components/Login/authStore.ts'
+      - 'src/Store/api.ts'
+      - 'tests/login-timeout.test.cjs'
+      - '.github/workflows/auth-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authorization:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/components/Login/authStore.ts
+            /src/Store/api.ts
+            /tests/login-timeout.test.cjs
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Synthetic authorization only (no APK or IPA)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/auth-test-deps" --ignore-scripts --no-audit --no-fund --no-save --package-lock=false typescript@5.9.3 zustand@5.0.8 react@18.2.0
+          NODE_PATH="$RUNNER_TEMP/auth-test-deps/node_modules" node --test tests/login-timeout.test.cjs

@@ -240,6 +240,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   // ========================================================================
 
   login: async (phone, password) => {
+    if (get().isLoading) {
+      return { error: true, message: 'Вход уже выполняется. Подождите.' };
+    }
     set({ isLoading: true, error: null });
 
     try {
@@ -248,7 +251,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         password,
         version,
         mode: 'android',
-      });
+      }, 20000);
 
       if (!res.error && res.data) {
         const user = res.data as AuthUser;
@@ -280,7 +283,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       return res as ApiResponse<AuthUser>;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Ошибка сети';
+      const errorMessage = error instanceof Error && error.name === 'AbortError'
+        ? 'Сервер не ответил вовремя. Проверьте подключение к интернету и повторите вход.'
+        : 'Не удалось выполнить вход. Проверьте подключение к интернету и попробуйте ещё раз.';
       set({
         isLoading: false,
         error: errorMessage,
