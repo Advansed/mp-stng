@@ -6,7 +6,7 @@ const ts = require('typescript');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 function setup(fetchImpl, revision) {
-  const storage = new Map(); let timer; let calls = 0; let lastInit;
+  const storage = new Map(); let timer; let calls = 0; let lastInit; const receipts=[];
   const localStorage = { getItem: k => storage.get(k) ?? null, setItem: (k,v) => storage.set(k,v), removeItem:k=>storage.delete(k) };
   function compile(file, imports) {
     const out = ts.transpileModule(revision ? require('node:child_process').execFileSync('git',['show',`${revision}:${file}`],{cwd:root,encoding:'utf8'}) : fs.readFileSync(path.join(root,file),'utf8'), {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
@@ -15,8 +15,8 @@ function setup(fetchImpl, revision) {
     return exports;
   }
   const api = compile('src/Store/api.ts',{});
-  const {useAuthStore:store} = compile('src/components/Login/authStore.ts', {'zustand':require('zustand'),'../../Store/api':api,'../DataEditor/fields/snils':{formatSnils:s=>s}});
-  return {store,storage, expire:()=>timer(), calls:()=>calls,init:()=>lastInit, hasTimer:()=>!!timer};
+  const {useAuthStore:store} = compile('src/components/Login/authStore.ts', {'../../referral/loginReceipt':{offerLoginReceipt(value){receipts.push(value)}},'zustand':require('zustand'),'../../Store/api':api,'../DataEditor/fields/snils':{formatSnils:s=>s}});
+  return {store,storage,receipts, expire:()=>timer(), calls:()=>calls,init:()=>lastInit, hasTimer:()=>!!timer};
 }
 const response = data => ({ok:true,status:200,json:async()=>data});
 const aborted = () => Object.assign(new Error('aborted'), {name:'AbortError'});
@@ -73,4 +73,14 @@ test('next explicit attempt works after a network failure',async()=>{
  let attempts=0;const ctx=setup(async()=>{if(++attempts===1) throw new TypeError('Failed to fetch');return response({error:false,data:{token:'synthetic-token'}});});
  assert.equal((await ctx.store.getState().login('x','x')).error,true);assert.equal(ctx.calls(),1);assert.equal(ctx.store.getState().isLoading,false);
  assert.equal((await ctx.store.getState().login('x','x')).error,false);assert.equal(ctx.calls(),2);assert.equal(ctx.store.getState().auth,true);assert.equal(ctx.store.getState().isLoading,false);
+});
+
+test('successful login forwards only optional dedicated server receipt, never bearer',async()=>{
+ const ctx=setup(async()=>response({error:false,referral_login_receipt:'dedicated-proof',data:{token:'active-bearer',code:'subscriber'}}));
+ await ctx.store.getState().login('synthetic-phone','synthetic-password');
+ assert.deepEqual(ctx.receipts,['dedicated-proof']);
+});
+test('rejected login never offers even a supplied receipt',async()=>{
+ const ctx=setup(async()=>response({error:true,referral_login_receipt:'untrusted'}));
+ await ctx.store.getState().login('x','x');assert.deepEqual(ctx.receipts,[]);
 });

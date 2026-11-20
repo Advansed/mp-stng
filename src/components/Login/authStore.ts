@@ -1,3 +1,4 @@
+import { offerLoginReceipt } from '../../referral/loginReceipt';
 import { create } from 'zustand';
 import { api, version } from '../../Store/api';
 import { formatSnils } from '../DataEditor/fields/snils';
@@ -274,6 +275,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
         // Обновляем профиль из данных пользователя
         get()._updateProfileFromUser(user);
+        offerLoginReceipt(res.referral_login_receipt);
       } else {
         set({
           isLoading: false,

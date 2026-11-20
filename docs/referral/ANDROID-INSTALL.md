@@ -29,7 +29,7 @@ Two explicit flavors avoid including both SDKs in every store build:
 
 Both retain the existing application ID `io.ionic.stng`; no suffix or signing key change. Existing API22 support is preserved for Play. RuStore Android5.1/API22 users cannot update to the RuStore variant; this is a release decision requiring review. Do not bypass the manifest requirement with `overrideLibrary`.
 
-Existing project baseline has AGP8.2.1, Gradle9.0-milestone-1 and compile/targetSDK36. This combination was not changed opportunistically and full Android packaging is not certified. Release engineering must reconcile/test the build toolchain and increase the stale versionCode2580/versionName2.5.8 against the actual store's latest release before publishing.
+The incompatible project baseline (AGP8.2.1 with Gradle9.0-milestone-1 and compile/targetSDK36) has been corrected to **AGP8.10.1 + Gradle8.11.1 + JDK17**, matching [official API36 compatibility](https://developer.android.com/build/releases/agp-8-10-0-release-notes). The Gradle wrapper pins the official distribution SHA-256. Compile/target36 and minimum APIs remain unchanged. Full build results are recorded below; release engineering must increase the stale versionCode2580/versionName2.5.8 against the actual store's latest release before publishing.
 
 ## Link and bridge contract
 
@@ -76,3 +76,31 @@ No signing passwords belong in commands or Git. Store-distributed builds must us
 Use controlled synthetic invitations and dedicated test accounts/numbers only. Required: Google Play Console app access to an internal testing track, opted-in tester/store account and physical Android device; RuStore Console app access and supported test distribution preserving RuStore as installer, with physical RuStore device. Upload/publication requires explicit approval; MFA must be completed by owner. Confirm exact testing workflow with the current console rather than assuming sideload referrer works.
 
 For each store: unique link → store installation → first open → pending token readback → normal login → separately verified server result. Also test organic install, unsupported/outdated store, no network, late callback, storage failure, restart before JS ack, duplicate launch, existing user/new user, reinstall, repeated login, two invitations, and app update between stores. A result is credited only once by the Linux server after trusted login validation. This last integration is outside this native bridge and remains a blocker for full automatic credit.
+
+## Toolchain preparation follow-up
+
+Prepared isolated JDK17, Android platform36 and build-tools35.0.0; official Android repository checksums verified before unpacking. Gradle8.11.1 official endpoints redirected to GitHub, returning HTTP403 in this environment. A mirror supplied the distribution; its complete SHA-256 exactly matched the independently retrieved official value `f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6` before execution. `gradle --version` successfully reports8.11.1/JDK17. The isolated JDK trusts the existing OS public CAs; certificate validation remains enabled. No global SDK/JDK or production service was changed. This is toolchain readiness, not an APK result.
+
+## Actual final Android debug build — PASS
+
+After the toolchain correction, a real Gradle build exposed a pre-existing missing `mipmap/ic_launcher_foreground` resource. Fixed using the **existing STNG iOS brand PNG**, not the Ionic/Android template artwork. Added legacy launcher resources for API22/23 and an adaptive foreground with the same logo. No signing identity or app ID changed.
+
+Final Capacitor sync succeeded with all8 existing plugins. Final Gradle run completed successfully in22seconds:243 tasks,12 executed and231 up-to-date. Tasks included both flavor unit suites and both debug APKs. Each variant ran6 tests (5 referral parser tests plus1 existing example), zero failures/errors/skips. The native Node safety suite now has5 tests, including the legacy launcher fallback.
+
+| APK | Actual package | Minimum / target API | Bytes | SHA-256 |
+|---|---|---|---|---|
+| `android/app/build/outputs/apk/play/debug/app-play-debug.apk` | `io.ionic.stng` | 22 /36 | 19908124 | `20d5cba3e546a0b35240d55e10419bf633868f07d40b710eb5cff2fa39612fa5` |
+| `android/app/build/outputs/apk/rustore/debug/app-rustore-debug.apk` | `io.ionic.stng` | 23 /36 | 18956975 | `1a632de4c5d55904998443a898ece66bac635d9dc19879a78077230908d1c2a8` |
+
+`apksigner verify` passed for both debug packages. All213 final React build files matched the embedded APK assets byte-for-byte. Evidence: `ANDROID-BUILD-EVIDENCE.json`. These are debug-signed artifacts with the pre-existing version2580/2.5.8; they are **not** authorized store releases and must not replace the installed production app for subscriber testing.
+
+Actual merged RuStore manifest has one additional permission versus Play: `RECEIVE_BOOT_COMPLETED`. It includes the SDK metrics `SendMetricsEventJobService` in addition to the previously documented FSA/VKR services. Device traffic/privacy review remains required. No emulator, physical device, store installation, real login/SMS or attribution receipt was executed by these builds.
+
+## Actual unsigned release packaging — PASS
+
+`:app:bundlePlayRelease :app:assembleRustoreRelease` completed successfully in2minutes6seconds. Produced Google Play AAB and RuStore unsigned APK using the final sources/assets. Both contain all213 final React files byte-for-byte. `jarsigner` reports the AAB unsigned; `apksigner` confirms the APK lacks a signature. No production signing keys were used.
+
+- Google Play: `android/app/build/outputs/bundle/playRelease/app-play-release.aab`.
+- RuStore: `android/app/build/outputs/apk/rustore/release/app-rustore-release-unsigned.apk`.
+
+Exact sizes/hashes are in `ANDROID-BUILD-EVIDENCE.json`. These are build artifacts only: approved release signing, version increment, console upload authorization and real store/device tests remain outstanding. Do not upload currentversion2580/2.5.8 as a new production release.

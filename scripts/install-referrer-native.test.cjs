@@ -32,3 +32,12 @@ test('Google disconnects; RuStore does not send optional phone/auth advertising 
  assert.match(rustore,/getInstallReferrerV2\(\)/);
  assert.doesNotMatch(rustore,/sendAuthEvent|sendFsaEvent|PhoneNumber|getDebugInfo/);
 });
+test('launcher has brand resource and fallback below Android26', () => {
+ for (const name of ['ic_launcher','ic_launcher_round']) {
+  assert.match(read(`android/app/src/main/res/mipmap-nodpi/${name}.xml`), /@mipmap\/stng_launcher_mark/);
+  assert.match(read(`android/app/src/main/res/mipmap-anydpi-v26/${name}.xml`), /@drawable\/stng_launcher_foreground/);
+ }
+ const brand=fs.readFileSync(path.join(root,'android/app/src/main/res/mipmap-nodpi/stng_launcher_mark.png'));
+ assert.equal(brand.subarray(1,4).toString(),'PNG');
+ assert.match(read('android/app/src/main/res/drawable/stng_launcher_foreground.xml'), /@mipmap\/stng_launcher_mark/);
+});

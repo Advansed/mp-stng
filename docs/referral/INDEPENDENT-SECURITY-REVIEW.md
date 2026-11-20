@@ -35,3 +35,12 @@ Independent in-memory synthetic counterexample against the corrected code: invit
 Seven isolated SMS-provider tests passed against injected fetch implementations. No real provider was called.
 
 The shared development `node_modules` contains better-sqlite3 ABI137. Running it with Node22 (ABI127) fails module loading. Running the phone suite under default Node24 reproduced the previously documented native teardown assertion `RemoveEnvironmentCleanupHook`; this is a local test-runtime failure, not an API incident. A single in-memory counterexample completed under Node24, but the full suite is **not certified on that runtime**. Use the separately prepared Node22/native-ABI127 validation environment; do not replace production or shared dependencies to hide the mismatch. Parent release evidence must identify the runtime used for its passing suite.
+
+
+## Follow-up: conditional signed login receipt
+
+Independent review of `src/referral/loginReceipt.ts`, its authStore hook, initializer and Linux pinned-key verifier found no fallback that forwards the existing Windows bearer/password/client phone. Absent optional receipt means no request; iOS does not need locally saved invitation; native forwarding explicitly omits cookies, Authorization and referrer. Observer execution is asynchronous and catches errors; storage/network errors are swallowed without affecting normal login. Five independent receipt-forwarder tests passed with injected fetch only.
+
+The Linux verifier checks ES256 signature with a pinned P-256 public key, restrictive header, issuer/audience, expiry/fresh auth_time, and receipt-ID conflicts. It does not fetch keys or call Windows. Android token substitution is guarded by a signed invitation hash unless an authoritative phone claim already determines attribution. The route is disabled by default and Phase A rejects enabling its flags.
+
+Readiness limitations: no live issuer exists; Android voluntary participation/hash binding is not provided by the unchanged login request. Generic login receipt alone therefore does not finish Android attribution. The client receipt limit was aligned with the server at4096 bytes during this review. The transport's timeout begins after native/storage preparation, so a hung storage/plugin operation may lose the referral handoff, but does not block login; bounded preparation remains a reliability improvement. All successful results here are source/mocked checks, not real app authorizations.

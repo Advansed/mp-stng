@@ -1,6 +1,6 @@
 # Native referral links: release gates
 
-This source change is not a deployed referral service or published APK/IPA. It does not connect to Windows, SQL, SMS, registration or attribution APIs. Opening a link is not proof of registration, installation, first-ever launch or account ownership. This release only captures a pending invitation locally with the existing localforage storage; it does not bind a subscriber identity or report server confirmations. Browser/OS storage eviction, clearing app data or uninstall can remove it. Durable retention across uninstall is not promised.
+This source change is not a deployed referral service or published APK/IPA. It does not add Windows, SQL, SMS or registration calls. A native-only optional handoff posts a dedicated signed backend login receipt to the separate Linux API; the current backend does not issue this receipt, so no new request occurs today. Opening a link is not proof of registration, installation, first-ever launch or account ownership. Pending invitations are captured locally with the existing localforage storage. Only the separately gated Linux verifier may credit a server-confirmed login; local auth state cannot do so. Browser/OS storage eviction, clearing app data or uninstall can remove it. Durable retention across uninstall is not promised.
 
 ## Verified source identifiers
 
@@ -41,7 +41,7 @@ Do not route those requests to the SPA fallback, cache personal data, or add any
 
 - Updated app installed + OS association verified: invitation can open the installed app, including cold and warm launches. OS/user browser choices can still keep the link in the browser.
 - App absent: invitation opens the public PWA page. That page can offer the correct store based on device, with explicit store choice/fallback.
-- Target flow no longer requires reopening the invitation. Google Play/RuStore native Install Referrer source support is added; actual store installations remain unverified. See ANDROID-INSTALL.md. iOS uses a Linux verified-phone claim plus future trusted login receipt; that verifier is not connected.
+- Target flow no longer requires reopening the invitation. Google Play/RuStore native Install Referrer source support is added; actual store installations remain unverified. See ANDROID-INSTALL.md. iOS uses a Linux verified-phone claim plus future trusted login receipt; the verifier is prepared but disabled and the existing backend does not issue the required proof.
 - Intent/entitlement alone does not perform deferred attribution. Android store bridges now supply local context separately; iOS matching remains blocked on trusted server evidence. No attribution or `APP_FIRST_OPEN` server confirmation may be inferred from a store click.
 - This requires a new signed Android/iOS release; existing installed binaries do not acquire native link handling from a Git push.
 
