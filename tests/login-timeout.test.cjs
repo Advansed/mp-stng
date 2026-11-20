@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-function setup(fetchImpl, revision) {
+function setup(fetchImpl, revision, referralContext = {}) {
   const storage = new Map(); let timer; let calls = 0; let lastInit; const receipts=[];
   const localStorage = { getItem: k => storage.get(k) ?? null, setItem: (k,v) => storage.set(k,v), removeItem:k=>storage.delete(k) };
   function compile(file, imports) {
@@ -15,7 +15,7 @@ function setup(fetchImpl, revision) {
     return exports;
   }
   const api = compile('src/Store/api.ts',{});
-  const {useAuthStore:store} = compile('src/components/Login/authStore.ts', {'../../referral/loginReceipt':{offerLoginReceipt(value){receipts.push(value)}},'zustand':require('zustand'),'../../Store/api':api,'../DataEditor/fields/snils':{formatSnils:s=>s}});
+  const {useAuthStore:store} = compile('src/components/Login/authStore.ts', {'../../referral/loginReceipt':{getLoginInvitationContext:async()=>referralContext,offerLoginReceipt(value){receipts.push(value)}},'zustand':require('zustand'),'../../Store/api':api,'../DataEditor/fields/snils':{formatSnils:s=>s}});
   return {store,storage,receipts, expire:()=>timer(), calls:()=>calls,init:()=>lastInit, hasTimer:()=>!!timer};
 }
 const response = data => ({ok:true,status:200,json:async()=>data});
@@ -40,12 +40,12 @@ for(const stage of ['fetch','body']) test(`${stage} timeout clears loading, no a
   const wait = ()=>new Promise((resolve,reject)=>{ if(init.signal.aborted) return reject(aborted()); init.signal.addEventListener('abort',()=>reject(aborted()),{once:true}); });
   return stage==='fetch'?wait():{ok:true,status:200,json:wait};
  });
- const pending=ctx.store.getState().login('x','x');await Promise.resolve();await Promise.resolve();ctx.expire();
+ const pending=ctx.store.getState().login('x','x');await new Promise(setImmediate);ctx.expire();
  const result=await pending;assert.match(result.message,/вовремя/);assert.equal(ctx.store.getState().isLoading,false);assert.equal(ctx.calls(),1);
 });
 test('double press issues only one request',async()=>{
  let done;const ctx=setup(()=>new Promise(resolve=>done=resolve));const pending=ctx.store.getState().login('x','x');
- const duplicate=await ctx.store.getState().login('x','x');assert.equal(duplicate.error,true);assert.equal(ctx.calls(),1);assert.equal(ctx.store.getState().isLoading,true);
+ await new Promise(setImmediate);const duplicate=await ctx.store.getState().login('x','x');assert.equal(duplicate.error,true);assert.equal(ctx.calls(),1);assert.equal(ctx.store.getState().isLoading,true);
  done(response({error:true,message:'denied'}));await pending;assert.equal(ctx.store.getState().isLoading,false);
 });
 for(const kind of ['http','json']) test(`${kind} failure clears loading without auth`,async()=>{
@@ -84,3 +84,5 @@ test('rejected login never offers even a supplied receipt',async()=>{
  const ctx=setup(async()=>response({error:true,referral_login_receipt:'untrusted'}));
  await ctx.store.getState().login('x','x');assert.deepEqual(ctx.receipts,[]);
 });
+
+test('optional invitation reaches the one ordinary authorization call without altering credentials',async()=>{const token='a'.repeat(43),ctx=setup(async()=>response({error:false,data:{token:'synthetic-token',code:'synthetic-code'}}),undefined,{referral_invite_token:token});await ctx.store.getState().login('synthetic-phone','synthetic-password');assert.equal(ctx.calls(),1);assert.deepEqual(JSON.parse(ctx.init().body),{referral_invite_token:token,phone:'synthetic-phone',password:'synthetic-password',version:'2.5.9',mode:'android'});});

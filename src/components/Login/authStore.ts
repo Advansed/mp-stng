@@ -1,4 +1,4 @@
-import { offerLoginReceipt } from '../../referral/loginReceipt';
+import { offerLoginReceipt, getLoginInvitationContext } from '../../referral/loginReceipt';
 import { create } from 'zustand';
 import { api, version } from '../../Store/api';
 import { formatSnils } from '../DataEditor/fields/snils';
@@ -247,7 +247,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
+      const referralContext = await getLoginInvitationContext();
       const res = await api('authorization', {
+        ...referralContext,
         phone,
         password,
         version,

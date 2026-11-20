@@ -50,3 +50,22 @@ export function createReceiptForwarder(options: ReceiptForwarderOptions) {
     finally { if (timer !== undefined) clearTimeout(timer); }
   };
 }
+
+// Optional context is bounded and never blocks ordinary authentication on storage/SDK failure.
+let invitationContext: (() => Promise<string | undefined>) | undefined;
+export function registerLoginInvitationContext(provider: () => Promise<string | undefined>): () => void {
+  invitationContext = provider;
+  return () => { if (invitationContext === provider) invitationContext = undefined; };
+}
+export async function getLoginInvitationContext(): Promise<{ referral_invite_token?: string }> {
+  if (!invitationContext) return {};
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const value = await Promise.race([
+      invitationContext(),
+      new Promise<undefined>(resolve => { timer = setTimeout(() => resolve(undefined), 1500); }),
+    ]);
+    return typeof value === 'string' && /^[A-Za-z0-9_-]{43}$/.test(value) ? { referral_invite_token: value } : {};
+  } catch { return {}; }
+  finally { if (timer !== undefined) clearTimeout(timer); }
+}

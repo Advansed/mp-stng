@@ -1,7 +1,7 @@
 name: Mobile referral links regression
 on:
   push:
-    branches: [main, feat/referral-native-invitations]
+    branches: [main, feat/referral-native-invitations, feat/referral-login-context]
     paths:
       - 'src/referral/**'
       - 'package-lock.json'

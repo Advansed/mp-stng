@@ -1,3 +1,5 @@
+> Дополнение текущего кандидата: [LOGIN-CONTEXT-FOLLOWUP.md](LOGIN-CONTEXT-FOLLOWUP.md). Прежний Android-пробел закрыт в исходниках совместимым контекстом входа; production-выпуск остаётся отдельным действием. Проверки f44dd03 ниже — исторические.
+
 # Dedicated signed mobile login receipt — candidate contract
 
 Source-only implementation: `src/login-receipt.js`. No issuer currently emits this receipt, no production public key is configured, and no existing API is called. Windows/IIS/SQL/mobile backend remain unchanged. This is a proposed additive contract for separate review, not an implemented production authentication integration.
