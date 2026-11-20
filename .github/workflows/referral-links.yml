@@ -11,7 +11,9 @@ on:
       - 'ios/App/App/AppDelegate.swift'
       - 'ios/App/App.xcodeproj/project.pbxproj'
       - 'scripts/*referral*'
-      - 'tests/referral-mobile.test.cjs'
+      - 'tests/referral*.test.cjs'
+      - 'android/app/src/**'
+      - 'android/app/build.gradle'
       - '.github/workflows/referral-links.yml'
   workflow_dispatch:
 permissions:
@@ -31,4 +33,4 @@ jobs:
       - name: Isolated synthetic regression (no API or store deployment)
         run: |
           npm install --prefix "$RUNNER_TEMP/referral-test-deps" --ignore-scripts --omit=optional --no-audit --no-fund --no-save --package-lock=false typescript@5.9.3 zustand@5.0.8 react@18.2.0 react-dom@18.2.0 jsdom@16.7.0
-          NODE_PATH="$RUNNER_TEMP/referral-test-deps/node_modules" node --test tests/referral-mobile.test.cjs scripts/referral-associations.test.cjs tests/application-status.test.cjs tests/login-timeout.test.cjs
+          NODE_PATH="$RUNNER_TEMP/referral-test-deps/node_modules" node --test tests/referral-mobile.test.cjs tests/referral-install.test.cjs scripts/referral-associations.test.cjs scripts/install-referrer-native.test.cjs tests/application-status.test.cjs tests/login-timeout.test.cjs

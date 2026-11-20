@@ -3,6 +3,8 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/referral_backup_rules"
+        android:dataExtractionRules="@xml/referral_data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"

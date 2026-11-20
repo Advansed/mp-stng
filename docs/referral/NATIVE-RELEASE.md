@@ -41,8 +41,8 @@ Do not route those requests to the SPA fallback, cache personal data, or add any
 
 - Updated app installed + OS association verified: invitation can open the installed app, including cold and warm launches. OS/user browser choices can still keep the link in the browser.
 - App absent: invitation opens the public PWA page. That page can offer the correct store based on device, with explicit store choice/fallback.
-- After installing, subscriber returns to the **same original invitation** and taps it again. Store installation does not automatically preserve the link in this release.
-- Google Play Install Referrer, RuStore deferred attribution and iOS post-install matching are not implemented by the native intent/entitlement change. No attribution or `APP_FIRST_OPEN` server confirmation may be inferred from a store click.
+- Target flow no longer requires reopening the invitation. Google Play/RuStore native Install Referrer source support is added; actual store installations remain unverified. See ANDROID-INSTALL.md. iOS uses a Linux verified-phone claim plus future trusted login receipt; that verifier is not connected.
+- Intent/entitlement alone does not perform deferred attribution. Android store bridges now supply local context separately; iOS matching remains blocked on trusted server evidence. No attribution or `APP_FIRST_OPEN` server confirmation may be inferred from a store click.
 - This requires a new signed Android/iOS release; existing installed binaries do not acquire native link handling from a Git push.
 
 ## Device acceptance before publication
@@ -54,7 +54,7 @@ Use a synthetic invitation and controlled account; no real registrations require
 3. Android 12+: `adb shell pm verify-app-links --re-verify io.ionic.stng`, then `adb shell pm get-app-links io.ionic.stng`. Confirm `referal.aostng.ru: verified`.
 4. Tap invitation from outside app (e.g. notes/message) on Android and iPhone: stopped app, foreground app, already signed in and signed out. Confirm pending invitation survives restart and ESIA login still works.
 5. Invalid token/path, foreign host, expired invitation and unavailable referral service must not break normal app use.
-6. Install from the intended store and reopen original invitation; confirm expected link context. Record separately that automatic deferred installation is not covered.
+6. Install from each intended store without reopening the invitation; confirm automatic reference delivery with the correct flavor. Record actual device evidence; a direct link or sideload is not this test.
 7. Check push notifications and existing URL handlers on the same build.
 
 No production Windows/SQL changes, domain publishing, store uploads or real SMS are needed for source-only checks. Release and hosting still require explicit approval.

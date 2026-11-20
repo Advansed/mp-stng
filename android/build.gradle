@@ -19,6 +19,10 @@ apply from: "variables.gradle"
 
 allprojects {
     repositories {
+        maven {
+            url "https://nexus-external.rustore.ru/repository/maven-rustore-exposed"
+            content { includeGroupByRegex "ru\\.rustore\\.sdk.*" }
+        }
         google()
         mavenCentral()
     }
