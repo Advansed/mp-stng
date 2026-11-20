@@ -45,3 +45,10 @@ NODE_PATH=/opt/aostng-infra/mobile-registration-source/node_modules node --test 
 Reviewed implementation is capture-only. It does not navigate away from an in-progress form or reset the existing account. A warm event arriving before cold-start lookup completes wins first-touch storage by receipt order. The local 30-day retention policy is not a promise of server invitation validity; a future backend claim must validate expiry again.
 
 Total executed at this review: **46 local tests** (30 existing, 11 referral, 5 association/config). These are mocked/local source tests; no live registration, SMS, physical-device link association, or store-install attribution was tested.
+
+## Main publication and build limitation
+
+Executable commit: `16ab6717fb0779fc3e6b402bdaa426eb8799c2d6`.
+GitHub Actions on main: [44690669735](https://github.com/Advansed/mp-stng/actions/runs/44690669735), SUCCESS, all 46 tests. Feature branch run 44690558035 also succeeded. Scoped strict TypeScript checking of all three new referral modules passed with local TypeScript 4.9.5.
+
+Full CRA build was attempted with the previously installed development dependency tree and failed because `@capacitor-firebase/messaging` was missing there. Fresh `npm ci` rejected the existing lockfile during setup; a separate dependency-resolution attempt was stopped without changes to manifests/lockfiles or production. Therefore a complete current web/native build is **not certified** by this report. No Android SDK/Java or Xcode toolchain was available in this environment. Complete dependency installation and signed native builds are mandatory in the mobile release environment before publishing to stores. No APK/IPA or PWA was deployed.
