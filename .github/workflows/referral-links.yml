@@ -1,7 +1,7 @@
 name: Mobile referral links regression
 on:
   push:
-    branches: [main, feat/referral-native-invitations, feat/referral-login-context]
+    branches: [main, feat/referral-native-invitations, feat/referral-login-context, fix/referral-registration-handoff-20261123]
     paths:
       - 'src/referral/**'
       - 'package-lock.json'
@@ -37,7 +37,7 @@ jobs:
       - name: Isolated synthetic regression (no API or store deployment)
         run: |
           npm install --prefix "$RUNNER_TEMP/referral-test-deps" --ignore-scripts --omit=optional --no-audit --no-fund --no-save --package-lock=false typescript@5.9.3 zustand@5.0.8 react@18.2.0 react-dom@18.2.0 jsdom@16.7.0
-          NODE_PATH="$RUNNER_TEMP/referral-test-deps/node_modules" node --test tests/referral-mobile.test.cjs tests/referral-install.test.cjs tests/referral-receipt.test.cjs scripts/referral-associations.test.cjs scripts/install-referrer-native.test.cjs tests/application-status.test.cjs tests/login-timeout.test.cjs
+          NODE_PATH="$RUNNER_TEMP/referral-test-deps/node_modules" node --test tests/referral-mobile.test.cjs tests/referral-install.test.cjs tests/referral-receipt.test.cjs tests/referral-registration.test.cjs scripts/referral-associations.test.cjs scripts/install-referrer-native.test.cjs tests/application-status.test.cjs tests/login-timeout.test.cjs
   web-build:
     runs-on: ubuntu-24.04
     timeout-minutes: 15

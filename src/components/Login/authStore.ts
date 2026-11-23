@@ -1,7 +1,11 @@
+import { Capacitor } from '@capacitor/core';
+import { createReferralRegistration } from '../../referral/registration';
 import { offerLoginReceipt, getLoginInvitationContext } from '../../referral/loginReceipt';
 import { create } from 'zustand';
 import { api, version } from '../../Store/api';
 import { formatSnils } from '../DataEditor/fields/snils';
+
+const referralRegistration = createReferralRegistration({ call: (endpoint, body) => api(endpoint, body, endpoint.endsWith("capabilities") ? 3000 : 25000), platform: () => Capacitor.getPlatform(), context: getLoginInvitationContext, offer: offerLoginReceipt });
 
 function readSnils(user: AuthUser & { СНИЛС?: string }): string {
   return formatSnils(user.snils || user.СНИЛС || '');
@@ -142,7 +146,7 @@ interface AuthStore {
   login: (phone: string, password: string) => Promise<ApiResponse<AuthUser>>;
   create: (phone: string, name: string, terms: boolean) => Promise<ApiResponse<AuthUser>>;
   restore: (phone: string) => Promise<boolean>;
-  compare: (sms: string) => boolean;
+  compare: (sms: string) => Promise<boolean>;
   password: (password: string) => Promise<boolean>;
   logout: () => void;
   setAuth: (auth: boolean) => void;
@@ -241,6 +245,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   // ========================================================================
 
   login: async (phone, password) => {
+    referralRegistration.clear();
     if (get().isLoading) {
       return { error: true, message: 'Вход уже выполняется. Подождите.' };
     }
@@ -312,6 +317,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
+      if (await referralRegistration.start(phone, terms)) {
+        set({ auth: false, isLoading: false, phone });
+        return { error: false, data: { phone } } as ApiResponse<AuthUser>;
+      }
       const res = await api('registration', {
         phone,
         name,
@@ -355,6 +364,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   restore: async (phone) => {
+    if (referralRegistration.active()) {
+      const result = await get().create(phone, '', true);
+      return result.error === false;
+    }
+    referralRegistration.clear();
     set({ isLoading: true, error: null });
 
     try {
@@ -392,12 +406,28 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  compare: (sms) => {
+  compare: async (sms) => {
+    if (referralRegistration.active()) {
+      try { return await referralRegistration.verify(sms); } catch { return false; }
+    }
     const { user } = get();
     return sms === user?.pincode;
   },
 
   password: async (password) => {
+    if (referralRegistration.active()) {
+      set({ isLoading: true, error: null });
+      try {
+        const result = await referralRegistration.complete(password);
+        get()._setToken(result.data.token);
+        get()._updateProfileFromUser(result.data);
+        set({ user: result.data, token: result.data.token, auth: true, isLoading: false });
+        return true;
+      } catch (error) {
+        set({ isLoading: false, error: error instanceof Error ? error.message : 'Не удалось завершить регистрацию' });
+        return false;
+      }
+    }
     const { token } = get();
     if (!token) {
       set({ error: 'Токен не найден' });
@@ -410,6 +440,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const res = await api('profile', { token, password });
 
       if (!res.error) {
+        offerLoginReceipt(res.referral_login_receipt);
         set({ auth: true, isLoading: false });
         return true;
       }
@@ -430,6 +461,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   logout: () => {
+    referralRegistration.clear();
     get()._clearAuth();
   },
 
