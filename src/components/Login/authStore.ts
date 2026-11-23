@@ -318,7 +318,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       if (await referralRegistration.start(phone, terms)) {
-        set({ auth: false, isLoading: false, phone });
+        set({ auth: false, isLoading: false, phone, user: { code: phone, phone } as AuthUser });
         return { error: false, data: { phone } } as ApiResponse<AuthUser>;
       }
       const res = await api('registration', {

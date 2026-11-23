@@ -97,6 +97,7 @@ test('native first registration enters cabinet and hands off server proof withou
  assert.fail('unexpected legacy/auth mutation');
  },undefined,{},'ios');
  assert.equal((await ctx.store.getState().create('80000000001','',true)).error,false);
+ assert.equal(ctx.store.getState().user.code,'80000000001');
  assert.equal(await ctx.store.getState().compare('0000'),false);assert.equal(ctx.store.getState().auth,false);
  assert.equal(await ctx.store.getState().compare('1234'),true);
  assert.equal(await ctx.store.getState().password('Synthetic!42'),true);
