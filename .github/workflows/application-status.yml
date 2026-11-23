@@ -1,13 +1,14 @@
 name: Mobile application status regression
 on:
   push:
-    branches: [main]
+    branches: [main, fix/referral-registration-handoff-20261123]
     paths:
       - 'src/components/Apps/**'
       - 'src/components/Services/Services.tsx'
       - 'src/Store/serviceStore.ts'
       - 'src/components/Login/authStore.ts'
       - 'src/Store/api.ts'
+      - 'src/referral/registration.ts'
       - 'tests/application-status.test.cjs'
       - 'tests/login-timeout.test.cjs'
       - '.github/workflows/application-status.yml'
@@ -32,6 +33,7 @@ jobs:
             /src/Store/serviceStore.ts
             /src/components/Login/authStore.ts
             /src/Store/api.ts
+            /src/referral/registration.ts
             /tests/application-status.test.cjs
             /tests/login-timeout.test.cjs
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020

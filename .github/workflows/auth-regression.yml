@@ -1,10 +1,11 @@
 name: Mobile authorization regression
 on:
   push:
-    branches: [main]
+    branches: [main, fix/referral-registration-handoff-20261123]
     paths:
       - 'src/components/Login/authStore.ts'
       - 'src/Store/api.ts'
+      - 'src/referral/registration.ts'
       - 'tests/login-timeout.test.cjs'
       - '.github/workflows/auth-regression.yml'
   workflow_dispatch:
@@ -23,6 +24,7 @@ jobs:
           sparse-checkout: |
             /src/components/Login/authStore.ts
             /src/Store/api.ts
+            /src/referral/registration.ts
             /tests/login-timeout.test.cjs
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
