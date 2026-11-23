@@ -4,7 +4,7 @@ The native app now negotiates the additive Windows registration capability. Unsu
 
 For the supported path, the four existing SMS inputs send the entered code to Windows. Windows checks the server challenge (5 minutes, 5 attempts), then commits the first account creation/password via existing SQL procedures. Only its successful response opens the cabinet and offers the separate signed receipt immediately. No extra authorization call or QR scan is required. The ordinary session/password/mobile SMS are never sent to Linux. A broken receipt consumer cannot prevent cabinet access.
 
-Android Play/RuStore referrer bridge, flavors, minSdk and package `io.ionic.stng` are unchanged. iOS remains `aostng.stng`, including Firebase plist. ESIA and ordinary login/recovery endpoints are unchanged; real ESIA/provider acceptance still needs a controlled device test. Do not call synthetic tests store installations.
+Android Play/RuStore referrer bridge, flavors, minSdk and package `io.ionic.stng` are unchanged. The iOS Xcode bundle remains `aostng.stng`. RELEASE BLOCKER: the inherited `ios/App/App/GoogleService-Info.plist` instead declares `io.ionic.stng`. Obtain the genuine Firebase configuration for the registered iOS app `aostng.stng`; do not fix this by editing only the BUNDLE_ID string. No matching file was found among eight local configuration candidates. ESIA and ordinary login/recovery endpoints are unchanged; real ESIA/provider acceptance still needs a controlled device test. Do not call synthetic tests store installations.
 
 ## Kolya
 
@@ -22,7 +22,7 @@ cd android
 
 Use the existing production signing keys and approved next versionCode. No signing secrets in CLI arguments/Git. Local AAB/APK checks do not imply store signing or publication.
 
-On macOS: `npx cap sync ios`, `cd ios/App && pod install`, open `App.xcworkspace`, keep bundle ID `aostng.stng`, select the authorized team/provisioning and archive. Xcode/CocoaPods/signing cannot be verified on this Linux host.
+After replacing the Firebase plist with the authorized configuration for `aostng.stng`, on macOS: `npx cap sync ios`, `cd ios/App && pod install`, open `App.xcworkspace`, keep bundle ID `aostng.stng`, select the authorized team/provisioning and archive. Xcode/CocoaPods/signing cannot be verified on this Linux host.
 
 Release server changes separately before promising +1. Without the approved Windows + Linux candidate, this mobile build deliberately falls back to normal registration and gives no referral credit. After rollout, test one controlled new account from each store, an existing account (+0), repeated login/reinstall (+0), and immediate cabinet entry. No store publication was performed here.
 
