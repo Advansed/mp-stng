@@ -5,6 +5,7 @@
 /android
 /.pnp
 .pnp.js
+firebase-service-account.json
 
 # testing
 /coverage
