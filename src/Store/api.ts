@@ -1,7 +1,7 @@
 // URL базовый адрес API
 export const URL = "https://fhd.aostng.ru/inter_vesta/hs/API_STNG/V2";
 
-export const version = '2.5.9'
+export const version = '2.6.0'
 
 interface RequestJsonOptions {
   method?: string;
