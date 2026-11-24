@@ -88,11 +88,11 @@ const ESIALoginButton: React.FC = () => {
     };
 
     // Подписываемся на событие открытия deep link
-    App.addListener('appUrlOpen', handleAppUrlOpen);
+    const listener = App.addListener('appUrlOpen', handleAppUrlOpen);
 
     return () => {
       // Отписываемся при размонтировании
-      App.removeAllListeners();
+      void listener.then(handle => handle.remove()).catch(() => undefined);
     };
   }, []);
 

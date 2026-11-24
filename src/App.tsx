@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { ReferralInitializer } from './referral/ReferralInitializer';
 import { IonApp, IonRouterOutlet, IonSplitPane, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
@@ -127,6 +128,7 @@ const App: React.FC = () => {
   return (
     <>
       <AppInitializer />
+      <ReferralInitializer />
       <IonApp>
         <ToastProvider>
           <IonReactRouter>

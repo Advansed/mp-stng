@@ -44,14 +44,14 @@ export const useLogin = (): UseAuthReturn => {
     };
 
     const ucompare = async (sms: string): Promise<boolean> => {
-        const result = compare(sms);
+        const result = await compare(sms);
         if (!result) toast.error('Неверный СМС');
         return result;
     };
 
     const upassword = async (pass: string): Promise<boolean> => {
         const result = await password(pass);
-        if (!result) toast.error('Ошибка смены пароля');
+        if (!result) toast.error(useAuthStore.getState().error || 'Ошибка смены пароля');
         return result;
     };
 

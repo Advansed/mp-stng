@@ -1,0 +1,23 @@
+{
+  "sourceBase": "f44dd03",
+  "kind": "context follow-up local unsigned release; not store install",
+  "nodeTests": 66,
+  "typescript": "PASS",
+  "reactBuild": "PASS",
+  "artifacts": [
+    {
+      "path": "android/app/build/outputs/bundle/playRelease/app-play-release.aab",
+      "sha256": "8f1eb0d221c490c76d932a947d4331f80e6fc3ba6e4f827dad92b413d164e63e",
+      "bytes": 16168588,
+      "webAssetCount": 213,
+      "webAssetsMatch": true
+    },
+    {
+      "path": "android/app/build/outputs/apk/rustore/release/app-rustore-release-unsigned.apk",
+      "sha256": "b5dbce7e3b0136deddeaa99ad6e8ef826fc2fca24ea16b45e63b414d9e854345",
+      "bytes": 17384760,
+      "webAssetCount": 213,
+      "webAssetsMatch": true
+    }
+  ]
+}

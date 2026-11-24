@@ -1,0 +1,57 @@
+{
+  "type": "local-debug-build-not-store-E2E",
+  "toolchain": {
+    "agp": "8.10.1",
+    "gradle": "8.11.1",
+    "jdk": 17,
+    "compileSdk": 36
+  },
+  "variants": {
+    "play": {
+      "path": "android/app/build/outputs/apk/play/debug/app-play-debug.apk",
+      "sha256": "20d5cba3e546a0b35240d55e10419bf633868f07d40b710eb5cff2fa39612fa5",
+      "bytes": 19908124,
+      "badging": [
+        "package: name='io.ionic.stng' versionCode='2580' versionName='2.5.8' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "sdkVersion:'22'",
+        "targetSdkVersion:'36'",
+        "launchable-activity: name='io.ionic.stng.MainActivity'  label='\u0421\u0422\u041d\u0413' icon=''"
+      ],
+      "webAssetsMatch": true,
+      "webFilesCompared": 213,
+      "debugSignatureVerified": true
+    },
+    "rustore": {
+      "path": "android/app/build/outputs/apk/rustore/debug/app-rustore-debug.apk",
+      "sha256": "1a632de4c5d55904998443a898ece66bac635d9dc19879a78077230908d1c2a8",
+      "bytes": 18956975,
+      "badging": [
+        "package: name='io.ionic.stng' versionCode='2580' versionName='2.5.8' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "sdkVersion:'23'",
+        "targetSdkVersion:'36'",
+        "launchable-activity: name='io.ionic.stng.MainActivity'  label='\u0421\u0422\u041d\u0413' icon=''"
+      ],
+      "webAssetsMatch": true,
+      "webFilesCompared": 213,
+      "debugSignatureVerified": true
+    }
+  },
+  "unsignedRelease": {
+    "play": {
+      "path": "android/app/build/outputs/bundle/playRelease/app-play-release.aab",
+      "sha256": "faa698067eb136b6f4c48f520647e315d753ec4ec1800e6055404eec02153943",
+      "bytes": 16168423,
+      "unsigned": true,
+      "webAssetsMatch": true,
+      "webFilesCompared": 213
+    },
+    "rustore": {
+      "path": "android/app/build/outputs/apk/rustore/release/app-rustore-release-unsigned.apk",
+      "sha256": "9e6346169e8b793815b3ab8a942cabe518538703284b73a642cb084b69f812b7",
+      "bytes": 17384596,
+      "unsigned": true,
+      "webAssetsMatch": true,
+      "webFilesCompared": 213
+    }
+  }
+}

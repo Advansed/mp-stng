@@ -1,0 +1,57 @@
+name: Mobile referral links regression
+on:
+  push:
+    branches: [main, feat/referral-native-invitations, feat/referral-login-context, fix/referral-registration-handoff-20261123]
+    paths:
+      - 'src/referral/**'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'src/components/Login/authStore.ts'
+      - 'ios/App/App/Info.plist'
+      - 'src/App.tsx'
+      - 'src/components/Login/ESIALoginButton.tsx'
+      - 'android/app/src/main/AndroidManifest.xml'
+      - 'ios/App/App/App.entitlements'
+      - 'ios/App/App/AppDelegate.swift'
+      - 'ios/App/App.xcodeproj/project.pbxproj'
+      - 'scripts/*referral*'
+      - 'tests/referral*.test.cjs'
+      - 'android/app/src/**'
+      - 'android/app/build.gradle'
+      - '.github/workflows/referral-links.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  referral:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Isolated synthetic regression (no API or store deployment)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/referral-test-deps" --ignore-scripts --omit=optional --no-audit --no-fund --no-save --package-lock=false typescript@5.9.3 zustand@5.0.8 react@18.2.0 react-dom@18.2.0 jsdom@16.7.0
+          NODE_PATH="$RUNNER_TEMP/referral-test-deps/node_modules" node --test tests/referral-mobile.test.cjs tests/referral-install.test.cjs tests/referral-receipt.test.cjs tests/referral-registration.test.cjs scripts/referral-associations.test.cjs scripts/install-referrer-native.test.cjs tests/application-status.test.cjs tests/login-timeout.test.cjs
+  web-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - run: npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+      - run: npx --no-install tsc --noEmit
+      - name: Production React build (existing lint warnings remain visible)
+        run: npm run build
+        env:
+          CI: 'false'
+          GENERATE_SOURCEMAP: 'false'
